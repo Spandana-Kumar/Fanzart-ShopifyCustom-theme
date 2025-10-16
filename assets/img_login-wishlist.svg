@@ -1,0 +1,79 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 227" width="352" height="227">
+	<title>login-wishlist</title>
+	<defs>
+		<clipPath clipPathUnits="userSpaceOnUse" id="cp1">
+			<path d="m0-36h352v290h-352z"/>
+		</clipPath>
+		<clipPath clipPathUnits="userSpaceOnUse" id="cp2">
+			<path d="m81 2h189v203h-189z"/>
+		</clipPath>
+		<clipPath clipPathUnits="userSpaceOnUse" id="cp3">
+			<path d="m91 23h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+		</clipPath>
+		<clipPath clipPathUnits="userSpaceOnUse" id="cp4">
+			<path d="m91 49h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+		</clipPath>
+		<clipPath clipPathUnits="userSpaceOnUse" id="cp5">
+			<path d="m91 75h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+		</clipPath>
+		<clipPath clipPathUnits="userSpaceOnUse" id="cp6">
+			<path d="m91 101h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+		</clipPath>
+		<clipPath clipPathUnits="userSpaceOnUse" id="cp7">
+			<path d="m91 126h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+		</clipPath>
+		<clipPath clipPathUnits="userSpaceOnUse" id="cp8">
+			<path d="m91 152h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+		</clipPath>
+		<clipPath clipPathUnits="userSpaceOnUse" id="cp9">
+			<path d="m91 178h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+		</clipPath>
+	</defs>
+	<style>
+		.s0 { fill: #ffffff } 
+		.s1 { fill: none;stroke: #d4d4d4 } 
+		.s2 { fill: #a1a1aa } 
+		.s3 { fill: none;stroke: #a1a1aa;stroke-width: 4 } 
+		.s4 { fill: #d9d9d9 } 
+		.s5 { fill: #f5f5f5 } 
+	</style>
+	<g id="Clip-Path" clip-path="url(#cp1)">
+		<g>
+			<path fill-rule="evenodd" class="s0" d="m0-36h352v290h-352z"/>
+			<path class="s1" d="m85 2.5h181c1.9 0 3.5 1.6 3.5 3.5v203c0 1.9-1.6 3.5-3.5 3.5h-181c-1.9 0-3.5-1.6-3.5-3.5v-203c0-1.9 1.6-3.5 3.5-3.5z"/>
+			<path class="s0" d="m81 2h189v203h-189z"/>
+			<g id="Clip-Path" clip-path="url(#cp2)">
+				<path class="s2" d="m81 2v14h189v-14-14h-189z"/>
+			</g>
+			<g id="Clip-Path" clip-path="url(#cp3)">
+				<path fill-rule="evenodd" class="s3" d="m91 23h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+			</g>
+			<g id="Clip-Path" clip-path="url(#cp4)">
+				<path fill-rule="evenodd" class="s3" d="m91 49h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+			</g>
+			<g id="Clip-Path" clip-path="url(#cp5)">
+				<path fill-rule="evenodd" class="s3" d="m91 75h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+			</g>
+			<g id="Clip-Path" clip-path="url(#cp6)">
+				<path fill-rule="evenodd" class="s3" d="m91 101h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+			</g>
+			<g id="Clip-Path" clip-path="url(#cp7)">
+				<path fill-rule="evenodd" class="s3" d="m91 126h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+			</g>
+			<g id="Clip-Path" clip-path="url(#cp8)">
+				<path fill-rule="evenodd" class="s3" d="m91 152h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+			</g>
+			<g id="Clip-Path" clip-path="url(#cp9)">
+				<path fill-rule="evenodd" class="s3" d="m91 178h12c1.1 0 2 0.9 2 2v12c0 1.1-0.9 2-2 2h-12c-1.1 0-2-0.9-2-2v-12c0-1.1 0.9-2 2-2z"/>
+			</g>
+			<path fill-rule="evenodd" class="s4" d="m111 23h150v16h-150z"/>
+			<path fill-rule="evenodd" class="s4" d="m111 49h150v16h-150z"/>
+			<path fill-rule="evenodd" class="s4" d="m111 75h150v16h-150z"/>
+			<path fill-rule="evenodd" class="s4" d="m111 101h150v16h-150z"/>
+			<path fill-rule="evenodd" class="s4" d="m111 126h150v16h-150z"/>
+			<path fill-rule="evenodd" class="s4" d="m111 152h150v16h-150z"/>
+			<path fill-rule="evenodd" class="s4" d="m111 178h150v16h-150z"/>
+			<path class="s5" d="m357 213c0 7.2-131.2 13-183.7 13-52.6 0-179.3-5.8-179.3-13 0-7.2 126.7-13 179.3-13 52.5 0 183.7 5.8 183.7 13z"/>
+		</g>
+	</g>
+</svg>

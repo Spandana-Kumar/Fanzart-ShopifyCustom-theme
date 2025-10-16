@@ -1,56 +1,135 @@
-<footer>
-  <div class="footer__copyright">
-    &copy;
-    {{ 'now' | date: '%Y' }}
-    {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
-  </div>
+{% assign footer_data = shop.metaobjects.footer_info.footer %}
+<footer class="footer__wrapper">
+  <div class="container">
+    <a href="{{ routes.root_url }}" class="brand">
+      {% if section.settings.footer_logo != blank %}
+        <img src="{{ section.settings.footer_logo | image_url }}" alt="{{ shop.name }}">
+      {% else %}
+        <img src="{{ 'img_logo_white.svg' | asset_url }}" alt="{{ shop.name }}">
+      {% endif %}
+    </a>
 
-  <div class="footer__links">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
 
-  <div class="footer__payment">
-    {% if section.settings.show_payment_icons %}
-      {% for type in shop.enabled_payment_types %}
-        {{ type | payment_type_svg_tag }}
-      {% endfor %}
-    {% endif %}
-  </div>
+    <div class="footer_contents">
+      <div class="row">
+        <!-- Contact Info Column -->
+        <div class="col-12 col-md-4 col-lg-3 order-md-1 order-2">
+          <div class="contact_flex">
+            
+            <h6>{{ footer_data.address.value | newline_to_br }}</h6>
+            <ul class="contact_list">
+              <li>
+                <img src="{{ 'img_mail.svg' | asset_url }}" alt="Mail" />
+                <a href="mailto:{{ footer_data.email.value }}">{{ footer_data.email.value }}</a>
+              </li>
+              <li>
+                <img src="{{ 'img_phone.svg' | asset_url }}" alt="Phone" />
+                <a href="tel:{{ footer_data.mobile_phone.value }}">{{ footer_data.mobile_phone.value }}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Footer Links -->
+        <div class="col-12 col-md-8 col-lg-8 offset-lg-1 order-1 order-md-2">
+          <div class="links_flex">
+            {% assign footer_links = linklists.footer.links %}
+
+            <!-- General Links (no child links) -->
+            <ul class="links_list">
+              {% for link in footer_links %}
+                {% unless link.links.size > 0 %}
+                  <li><a href="{{ link.url }}"><span>{{ link.title }}</span></a></li>
+                {% endunless %}
+              {% endfor %}
+            </ul>
+
+            <!-- Ceiling Fans Submenu -->
+            {% assign ceiling_fans = footer_links | where: "title", "Ceiling Fans" | first %}
+            {% if ceiling_fans.links.size > 0 %}
+              <ul class="links_list">
+                <li><h6>{{ ceiling_fans.title }}</h6></li>
+                {% for sublink in ceiling_fans.links %}
+                  <li><a href="{{ sublink.url }}"><span>{{ sublink.title }}</span></a></li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+
+            <!-- Other Fans Submenu -->
+            {% assign other_fans = footer_links | where: "title", "Other Fans" | first %}
+            {% if other_fans.links.size > 0 %}
+              <ul class="links_list">
+                <li><h6>{{ other_fans.title }}</h6></li>
+                {% for sublink in other_fans.links %}
+                  <li><a href="{{ sublink.url }}"><span>{{ sublink.title }}</span></a></li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+     <div class="bottom_contents">
+            <div class="logos_wrap">
+                <img src="{{ 'img_footer_icon1.svg' | asset_url }}" class="dmca" alt="Logo" />
+                 <ul class="icons_list">
+                    <li>
+                      <img src="{{ 'img_footer_icon2.svg' | asset_url }}" alt="Logo" />
+                    </li>
+                    <li>
+                       <img src="{{ 'img_footer_icon3.svg' | asset_url }}" alt="Logo" />
+                    </li>
+                    <li>
+                       <img src="{{ 'img_footer_icon4.svg' | asset_url }}" alt="Logo" />
+                    </li>
+                    <li>
+                     <img src="{{ 'img_footer_icon5.svg' | asset_url }}" alt="Logo" />
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bottom_links_flex">
+                <div class="bottom_inner_flex">
+                    <h6>Fanzart 2024. All Right Reserved</h6>
+                    {% assign bottom_links = linklists['customer-account-main-menu'].links %}
+                    <ul class="bottom_links_list">
+                        {% for link in bottom_links %}
+                        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+{% assign social_media_links = footer_data.social_links.value %}
+<ul class="bottom_links_list">
+  {% for social in social_media_links %}
+    <li>
+      <a href="{{ social.link }}" target="_blank" rel="noopener">
+        <img 
+          src="{{ social.icon | img_url: 'master' }}" 
+          alt="{{ social.text | escape }}" 
+        />
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+
+
+
+            </div>
+        </div>
+    </div>
 </footer>
 
-{% stylesheet %}
-  footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
-  }
-  footer a {
-    text-decoration: none;
-    color: var(--color-foreground);
-  }
-  footer .footer__links,
-  footer .footer__payment {
-    display: flex;
-    gap: 1rem;
-  }
-{% endstylesheet %}
+
 
 {% schema %}
 {
-  "name": "t:general.footer",
+  "name": "Footer",
   "settings": [
     {
-      "type": "link_list",
-      "id": "menu",
-      "label": "t:labels.menu"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_payment_icons",
-      "label": "t:labels.show_payment_icons",
-      "default": true
+      "type": "image_picker",
+      "id": "footer_logo",
+      "label": "Footer Logo"
     }
   ]
 }

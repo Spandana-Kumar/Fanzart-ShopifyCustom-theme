@@ -1,0 +1,171 @@
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
+        integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/25.3.1/build/js/intlTelInput.min.js"
+        integrity="sha512-SlsU65KdLej2skQ24jI+POL40KCeJ7aR9dy6lhT6ZUggKQeoqq6Lj+7n6i8zqO2gcelYQBPgOdrtIwDXF6cLIw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+ 
+<script>
+  $("#phone, #pincode").on("input", function () {
+    const cleaned = $(this).val().replace(/\D/g, "");
+    $(this).val(cleaned);
+  });
+
+  var input = document.querySelector("#phone");
+  if (input) {
+    window.intlTelInput(input, {
+      allowDropdown: true,
+      countrySearch: false,
+      separateDialCode: true,
+      initialCountry: "in",
+    });
+  }
+
+  $(function () {
+    function showError($el, msg) {
+      $el.addClass("error");
+      $el.closest(".form_group").find(".errorMsg").text(msg).show();
+    }
+
+    function clearError($el) {
+      $el.removeClass("error");
+      $el.closest(".form_group").find(".errorMsg").hide();
+    }
+
+    function validateField($el) {
+      const name = $el.attr("name");
+      const rawVal = $el.val();
+      const val = typeof rawVal === "string" ? rawVal.trim() : rawVal;
+
+      if (optionalFields.includes(name)) {
+        clearError($el);
+        return true;
+      }
+
+      if (!val || val === "0") {
+        showError($el, "This field is required");
+        return false;
+      }
+
+      if (name === "contact[email]" && !/^\S+@\S+\.\S+$/.test(val)) {
+        showError($el, "Enter a valid email");
+        return false;
+      }
+
+      if (name === "contact[phone]" && !/^\d{10}$/.test(val)) {
+        showError($el, "Enter a valid 10-digit phone number");
+        return false;
+      }
+
+      clearError($el);
+      return true;
+    }
+
+    // Optional fields
+    const optionalFields = ["contact[preferredMode]", "contact[reason]"];
+
+    // Real-time validation
+    $(".formControl").on("input blur change", function () {
+      validateField($(this));
+    });
+
+    // Checkbox validation
+    $("#chkbox").on("change", function () {
+      if ($(this).is(":checked")) {
+        clearError($(this));
+      } else {
+        showError($(this), "Please accept the agreement");
+      }
+    });
+
+    // Submit handler
+    $("#contactForm").on("submit", function (e) {
+      let isValid = true;
+
+      $(".formControl").each(function () {
+        if (!validateField($(this))) isValid = false;
+      });
+
+      const $radios = $("input[name='contact[role]']");
+      if (!$radios.is(":checked")) {
+        showError($radios.first(), "Please select an option");
+        isValid = false;
+      } else {
+        clearError($radios.first());
+      }
+
+      const $chk = $("#chkbox");
+      if (!$chk.is(":checked")) {
+        showError($chk, "Please accept the agreement");
+        isValid = false;
+      } else {
+        clearError($chk);
+      }
+
+      if (!isValid) {
+        e.preventDefault(); // prevent submission if invalid
+      }
+      // ✅ If valid, form will submit naturally and Shopify handles reCAPTCHA
+    });
+
+    $(".close-btn").on("click", function () {
+      $("#successMsg").fadeOut();
+    });
+  });
+</script>
+
+
+
+    <script>
+        $(document).ready(function () {
+            $(".tab_content").hide();
+            $(".tab_content:first").show();
+
+            /* if in tab mode */
+            $("ul.tabs li").click(function () {
+
+                $(".tab_content").hide();
+                var activeTab = $(this).attr("rel");
+                $("#" + activeTab).fadeIn();
+
+                $("ul.tabs li").removeClass("active");
+                $(this).addClass("active");
+
+                $(".tab_drawer_heading").removeClass("d_active");
+                $(".tab_drawer_heading[rel^='" + activeTab + "']").addClass("d_active");
+
+            });
+            /* if in drawer mode */
+            $(".tab_drawer_heading").click(function () {
+
+                $(".tab_content").hide();
+                var d_activeTab = $(this).attr("rel");
+                $("#" + d_activeTab).fadeIn();
+
+                $(".tab_drawer_heading").removeClass("d_active");
+                $(this).addClass("d_active");
+
+                $("ul.tabs li").removeClass("active");
+                $("ul.tabs li[rel^='" + d_activeTab + "']").addClass("active");
+            });
+
+
+            /* Extra class "tab_last" 
+              to add border to right side
+              of last tab */
+            $('ul.tabs li').last().addClass("tab_last");
+
+        });
+    </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+  if (window.location.hash === "#successMsg") {
+    const thankYou = document.getElementById("successMsg");
+    if (thankYou) {
+      thankYou.scrollIntoView({ behavior: "smooth" });
+    }
+  }
+});
+  </script>

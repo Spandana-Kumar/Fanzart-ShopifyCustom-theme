@@ -1,0 +1,28 @@
+{
+  "name": "By Specialty",
+  "sections": {
+    "banner": {
+      "type": "collection-banner"
+    },
+    "showcase": {
+      "type": "collection-showcase"
+    },
+    "impression": {
+      "type": "collection-impression"
+    },
+    "circle": {
+      "type": "collection-product-circle"
+    },
+     "showroom":{
+      "type": "product-showroom"
+    }
+  },
+  "order": [
+    "banner",
+    "showcase",
+    "impression",
+    "circle",
+    "showroom"
+    
+  ]
+}

@@ -1,0 +1,105 @@
+<section class="fan__company__wrapper">
+  <!-- Large Screen Above 768 -->
+  <div class="img_wrap d-none d-md-block">
+    {% for block in section.blocks %}
+      <div class="img">
+        {% if block.settings.desktop_image %}
+          <img src="{{ block.settings.desktop_image | img_url: 'master' }}" class="hide" alt="{{ block.settings.text | escape }}" />
+        {% endif %}
+        <div class="bgOverlay"></div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="floating_contents">
+    <div class="inner_wrap">
+      {% if section.settings.glass_image %}
+        <img src="{{ section.settings.glass_image | img_url: 'medium' }}" alt="Glass Image" />
+      {% endif %}
+      <div class="contents">
+        <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
+          {{ section.settings.heading }}
+        </h2>
+        <p class="font_18 txtDarkLight" data-aos="fade-up" data-aos-duration="1500">
+          {{ section.settings.subtext }}
+        </p>
+
+        <!-- Desktop Listing -->
+        <ul class="listing d-none d-md-block">
+          {% for block in section.blocks %}
+            {% assign index_multiplier = forloop.index0 | times: 200 %}
+            {% assign aos_delay = 1700 | plus: index_multiplier %}
+            <li data-aos="fade-up" data-aos-duration="{{ aos_delay }}">
+              {{ block.settings.text }}
+            </li>
+          {% endfor %}
+        </ul>
+
+
+        <!-- Mobile Listing -->
+        <div class="mobile_wrap d-md-none d-block">
+          <ul class="img_list_mobile">
+            {% for block in section.blocks %}
+              <li>
+                {% if block.settings.mobile_image %}
+                  <img src="{{ block.settings.mobile_image | img_url: 'medium' }}" alt="{{ block.settings.text | escape }}" />
+                {% endif %}
+                <p>{{ block.settings.text }}</p>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "About - Best Fan Company",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "glass_image",
+      "label": "Glass Image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Main Heading",
+      "default": "We're known as the Best Fan Company in India"
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Subtext",
+      "default": "We don’t just check boxes. We set new ones by building fans that belong in spaces where detail matters."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "fan_block",
+      "name": "Fan Feature Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "desktop_image",
+          "label": "Desktop Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile Image"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Feature Text",
+          "default": "India’s First Luxury Fan Brand"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 20
+}
+{% endschema %}

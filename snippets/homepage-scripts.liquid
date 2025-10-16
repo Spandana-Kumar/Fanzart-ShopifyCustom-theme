@@ -1,0 +1,355 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/MotionPathPlugin.min.js"
+    integrity="sha512-vuNgw6lF+p97XmL9lFpbQZWBXxIFnwUVt7J/uknE4NJru5GJjjhIAauXdDtNdezqOJFnit+M3AeaM+gZ93hlmg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/Draggable.min.js"
+    integrity="sha512-dgqdovLK5r/NMiV5YfWA0xC94DKGrm+6q1OZpuWHm+uBGLTck6wu58WAX9lmy8wec6cVnsgxbPJ60DtmNFnfgg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script> 
+    
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      $(window).load(function () {
+        if (window.innerWidth >= 767) {
+          gsap.registerPlugin(MotionPathPlugin);
+
+          const boxFour = gsap.utils.toArray(".box_four .box");
+          const boxThree = gsap.utils.toArray(".box_three .box");
+          const spacingFactor = 0.03;
+          gsap.set(boxFour, {
+            motionPath: (i) => ({
+              path: "#myPath",
+              align: "#myPath",
+              alignOrigin: [0.5, 0.5],
+              start: (i - (boxFour.length - 1) / 2) * spacingFactor - 0.25,
+              end: (i - (boxFour.length - 1) / 2) * spacingFactor - 0.25,
+              autoRotate: true,
+            })
+          });
+
+          gsap.set(boxThree, {
+            motionPath: (i) => ({
+              path: "#myPath",
+              align: "#myPath",
+              alignOrigin: [0.5, 0.5],
+              start: (i - (boxThree.length - 1) / 2) * spacingFactor + 0.02,
+              end: (i - (boxThree.length - 1) / 2) * spacingFactor + 0.02,
+              autoRotate: true,
+            })
+          });
+
+          document.getElementById("rotate180").addEventListener("click", () => {
+            gsap.to(".inner_wrap", {
+              rotation: -97.2,
+              duration: 1.5,
+              ease: "power2.inOut"
+            });
+          });
+
+          document.getElementById("resetRotation").addEventListener("click", () => {
+            gsap.to(".inner_wrap", {
+              rotation: 0,
+              duration: 1.5,
+              ease: "power2.inOut"
+            });
+          });
+
+          // Tabs Button
+          const listItems = document.querySelectorAll(".btn_wrap li");
+          listItems.forEach(li => {
+            li.addEventListener("click", () => {
+              listItems.forEach(item => item.classList.remove("active"));
+              li.classList.add("active");
+            });
+          });
+        }
+      });
+    });
+  </script>
+
+  <script>
+    const tabButtons = document.querySelectorAll(".tab_buttons li");
+    const tabContents = document.querySelectorAll(".tab_content");
+
+    tabButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const targetTab = button.getAttribute("data-tab");
+        tabButtons.forEach(btn => btn.classList.remove("active"));
+        tabContents.forEach(content => content.classList.remove("show"));
+        button.classList.add("active");
+        document.getElementById(targetTab).classList.add("show");
+      });
+    });
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      $(window).load(function () {
+        if (window.innerWidth <= 767) {
+          // Cards 4
+          const cardsFour = gsap.utils.toArray(".cards_four .box");;
+          const spacingFactorMobile = 0.026;
+          gsap.set(cardsFour, {
+            motionPath: (i) => ({
+              path: "#ceillingPath",
+              align: "#ceillingPath",
+              alignOrigin: [0.5, 0.5],
+              start: (i - (cardsFour.length - 1) / 2) * spacingFactorMobile - 0.212,
+              end: (i - (cardsFour.length - 1) / 2) * spacingFactorMobile - 0.212,
+              autoRotate: true,
+            })
+          });
+          const fourFan = document.querySelector(".ceilingFans_wrap");
+
+          Draggable.create(fourFan, {
+            type: "rotation",
+            inertia: true,
+
+            onDrag: function () {
+              const clamped = gsap.utils.clamp(-28, 0, this.rotation);
+              gsap.set(fourFan, { rotation: clamped });
+              this.rotation = clamped;
+              this.endRotation = clamped;
+            },
+            onThrowUpdate: function () {
+              const clamped = gsap.utils.clamp(-28, 0, this.rotation);
+              gsap.set(fourFan, { rotation: clamped });
+              this.rotation = clamped;
+              this.endRotation = clamped;
+            },
+            snap: (endVal) => gsap.utils.clamp(-28, 0, endVal)
+          });
+
+          // Ensure taps on cards navigate while draggable rotation stays active.
+          // Detect pointer down/up and treat as a tap when rotation doesn't change.
+          // Make tap-navigation handler reusable and enable it for both mobile wrappers
+          function enableTapNavigation(wrapperSelector, cardSelector) {
+            const wrapper = document.querySelector(wrapperSelector);
+            if (!wrapper) return;
+
+            let pointerId = null;
+            let startRotation = null;
+            const ROTATION_THRESHOLD = 1.5; // degrees
+
+            wrapper.addEventListener('pointerdown', (e) => {
+              pointerId = e.pointerId;
+              // store current computed rotation from transform
+              const style = window.getComputedStyle(wrapper);
+              const transform = style.transform || style.webkitTransform;
+              startRotation = 0;
+              if (transform && transform !== 'none') {
+                // transform is like: matrix(a, b, c, d, tx, ty)
+                const values = transform.match(/matrix\(([^)]+)\)/);
+                if (values && values[1]) {
+                  const parts = values[1].split(',');
+                  const a = parseFloat(parts[0]);
+                  const b = parseFloat(parts[1]);
+                  startRotation = Math.atan2(b, a) * (180 / Math.PI);
+                }
+              }
+            }, { passive: true });
+
+            wrapper.addEventListener('pointerup', (e) => {
+              if (e.pointerId !== pointerId) return;
+              pointerId = null;
+
+              // read rotation again
+              const style = window.getComputedStyle(wrapper);
+              const transform = style.transform || style.webkitTransform;
+              let endRotation = 0;
+              if (transform && transform !== 'none') {
+                const values = transform.match(/matrix\(([^)]+)\)/);
+                if (values && values[1]) {
+                  const parts = values[1].split(',');
+                  const a = parseFloat(parts[0]);
+                  const b = parseFloat(parts[1]);
+                  endRotation = Math.atan2(b, a) * (180 / Math.PI);
+                }
+              }
+
+              const diff = Math.abs(endRotation - (startRotation || 0));
+              // If rotation changed very little, treat as a tap and follow link if target is .fansCards or inside it
+              if (diff <= ROTATION_THRESHOLD) {
+                // find closest anchor under the pointer
+                const touchX = e.clientX;
+                const touchY = e.clientY;
+                const el = document.elementFromPoint(touchX, touchY);
+                if (!el) return;
+                const cardLink = el.closest ? el.closest(cardSelector) : null;
+                if (cardLink) {
+                  // If anchor, navigate.
+                  const anchor = cardLink.tagName.toLowerCase() === 'a' ? cardLink : cardLink.querySelector('a');
+                  if (anchor && anchor.href) {
+                    // Use location.assign so it behaves like a normal navigation
+                    window.location.assign(anchor.href);
+                  }
+                }
+              }
+            }, { passive: true });
+          }
+
+          // enable for ceiling fans tab
+          enableTapNavigation(".ceilingFans_wrap", ".fansCards");
+          // enable for others fans tab (mobile)
+          enableTapNavigation(".othersFans_wrap", ".fansCards");
+
+
+          // Card 3
+
+          const cardsThree = gsap.utils.toArray(".cards_three .boxOne");;
+          const spacingFactorMobileOne = 0.026;
+          gsap.set(cardsThree, {
+            motionPath: (i) => ({
+              path: "#othersPath",
+              align: "#othersPath",
+              alignOrigin: [0.5, 0.5],
+              start: (i - (cardsThree.length - 1) / 2) * spacingFactorMobileOne - 0.212,
+              end: (i - (cardsThree.length - 1) / 2) * spacingFactorMobileOne - 0.212,
+              autoRotate: true,
+            })
+          });
+
+          const threeFan = document.querySelector(".othersFans_wrap");
+          Draggable.create(threeFan, {
+            type: "rotation",
+            inertia: true,
+
+            onDrag: function () {
+              const clamped = gsap.utils.clamp(-28, 0, this.rotation);
+              gsap.set(threeFan, { rotation: clamped });
+              this.rotation = clamped;
+              this.endRotation = clamped;
+            },
+            onThrowUpdate: function () {
+              const clamped = gsap.utils.clamp(-28, 0, this.rotation);
+              gsap.set(threeFan, { rotation: clamped });
+              this.rotation = clamped;
+              this.endRotation = clamped;
+            },
+            snap: (endVal) => gsap.utils.clamp(-28, 0, endVal)
+          });
+        }
+      });
+    });
+  </script>
+<script>
+  function animateText(elementId, delay = 50, initialDelay = 0, removeCursor = false) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    const text = el.textContent.trim(); 
+    el.textContent = "";
+
+    text.split("").forEach((char, index) => {
+      const span = document.createElement("span");
+      span.classList.add("letter");
+      span.textContent = char === " " && text[index - 1] !== " " ? "\u00A0" : char;
+      el.appendChild(span);
+    });
+
+    const spans = el.querySelectorAll("span.letter");
+    let i = 0;
+
+    function reveal() {
+      if (i < spans.length) {
+        spans[i].classList.add("visible");
+        i++;
+        setTimeout(reveal, delay);
+      } else if (removeCursor) {
+        el.style.borderRight = "none";
+      }
+    }
+
+    setTimeout(reveal, initialDelay);
+  }
+
+  window.onload = () => {
+    animateText("animated-heading", 10, 50);
+    animateText("animated-heading-2", 10, 100);
+    animateText("animated-subtext", 10, 50);
+  };
+</script>
+
+
+  <!-- Gsap Js -->
+  <script>
+    if (window.innerWidth >= 1025) {
+      gsap.registerPlugin(ScrollTrigger);
+      // Silent
+      let tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#smartSilent",
+          start: "top 10%",
+          end: "bottom 15%",
+          scrub: true,
+          pin: true
+        }
+      });
+
+      tl.to("#lFirst", {
+        top: "24%",
+        left: "8%"
+      }, 'smart')
+
+      tl.to("#lSecond", {
+        top: "62%",
+        left: "18%"
+      }, 'smart')
+
+      tl.to("#lThrid", {
+        top: "67%",
+        left: "42%"
+      }, 'smart')
+
+      tl.to("#rFourth", {
+        top: "24%",
+        left: "75%"
+      }, 'smart')
+
+      tl.to("#rFifth", {
+        top: "62%",
+        left: "65%"
+      }, 'smart')
+    }
+
+    if (window.innerWidth >= 1024) {
+      // Showroom
+      let tlShowroom = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#showroom",
+          start: "top 0%",
+          end: "bottom 30%",
+          scrub: true,
+          pin: true
+        }
+      });
+
+      tlShowroom.to("#cards", {
+        yPercent: -65,
+      },);
+
+      tlShowroom.to("#bgScale", {
+        scale: 1.2,
+        ease: "none"
+      }, 0);
+    }
+  </script>
+
+  <script>
+    var swiper = new Swiper(".swiperTestimonials", {
+      spaceBetween: 30,
+      sliderPerView: 3,
+      pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+      },
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+    });
+  </script>
+
+  <script>
+    AOS.init({
+      once: true,
+    });
+  </script>

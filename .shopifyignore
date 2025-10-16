@@ -4,10 +4,30 @@
 # Examples:
 #
 # Ignore a specific file:
-#   templates/product.json
+templates/page.about-us.json
+templates/page.contact-us.json
+templates/page.showroom-locator.json
+templates/collection.by-specialty.json
+templates/collection.by-room.json
+templates/collection.by-need.json
+templates/collection.by-style.json
+templates/collection.pedestal-fans.json
+templates/collection.other-fans.json
+templates/page.privacy-policy.json
+templates/page.terms-conditions.json
+templates/page.refund-policy.json
+templates/product.json
+templates/cart.json
+templates/404.json
+sections/header-group.json
+sections/footer-group.json
 #
 # Ignore templates with a wildcard pattern:
 #   templates/*.json
 #
 # Ignore templates and sections with a regular expression:
 #   /(templates|sections)/.*\.json/
+
+
+
+

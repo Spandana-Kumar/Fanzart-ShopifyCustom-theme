@@ -1,0 +1,12 @@
+{
+  "name": "Refund Policy Page",
+  "sections": {
+    "main": {
+      "type": "refund-policy",
+      "settings": {
+        "title": "Refund Policy"
+      }
+    }
+  },
+  "order": ["main"]
+}

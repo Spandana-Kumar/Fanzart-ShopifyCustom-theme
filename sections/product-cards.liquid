@@ -1,0 +1,30 @@
+<section class="modern__wrapper">
+  {% if product.metafields.custom.modern_features_floating_image != blank %}
+    <img src="{{ product.metafields.custom.modern_features_floating_image | image_url }}" class="floatingImg" alt="Floating Image" />
+  {% endif %}
+  
+  <div class="contents_wrap">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 col-md-12 col-lg-12 col-xl-8">
+          <h2 class="title42 txtDark">{{ product.metafields.custom.modern_features_section_title }}</h2>
+
+          <div class="modern_flex">
+            {% for feature in product.metafields.custom.product_modern_features.value %}
+              <div class="modern_card">
+                {% if feature.icon != blank %}
+                  <img src="{{ feature.icon | image_url }}" alt="{{ feature.heading }}" />
+                {% endif %}
+                <div class="details">
+                  <h4>{{ feature.heading }}</h4>
+                  <p>{{ feature.description }}</p>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

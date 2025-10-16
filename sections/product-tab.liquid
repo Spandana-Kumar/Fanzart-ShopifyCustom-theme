@@ -1,0 +1,123 @@
+<section class="tabs__wrapper"> 
+  <div class="tabs_flex_wrap">
+    <div class="item_left">
+      <!-- Single common image for all tabs -->
+      <img id="tabImage" src="{{ product.metafields.custom.tab_overview_image | image_url }}" alt="Tab Image" />
+    </div>
+
+    <div class="contents_wrap">
+      <div class="item_right">
+        <div class="tabs_wrap">
+          <div class="tabBtn active" data-tab="overview">Overview</div>
+          <div class="tabBtn" data-tab="features">Features</div>
+          <div class="tabBtn" data-tab="specs">Technical Specification</div>
+          <div class="tabBtn" data-tab="accessories">Accessories</div>
+        </div>
+
+        <!-- Overview -->
+        <div id="overview" class="tabContent active">
+          <!-- First item: Product Description -->
+          <h4>Description</h4>
+          <div class="rte">
+            {{ product.description }}
+          </div>
+
+          <!-- Additional Overview Items -->
+          {% if product.metafields.custom.product_overview_items.value != blank %}
+            {% for item in product.metafields.custom.product_overview_items.value %}
+              <h4>{{ item.heading }}</h4>
+              <p>{{ item.content }}</p>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <!-- Features -->
+        <div id="features" class="tabContent">
+          <div class="features_flex">
+            {% if product.metafields.custom.product_features.value != blank %}
+              {% for feature in product.metafields.custom.product_features.value %}
+                <div class="features_card">
+                  <img src="{{ feature.icon | image_url }}" alt="" />
+                  <h5>{{ feature.text }}</h5>
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Specs -->
+        <div id="specs" class="tabContent">
+          <table class="features_table">
+            <tr>
+              <th>Specification</th>
+              <th>Details</th>
+            </tr>
+            {% if product.metafields.custom.product_specifications.value != blank %}
+              {% for spec in product.metafields.custom.product_specifications.value %}
+                <tr>
+                  <td>{{ spec.spec_name }}</td>
+                  <td>
+                    {% assign details = spec.spec_detail | split: ',' %}
+                    {% if details.size > 1 %}
+                      <div class="multi-option">
+                        {% for detail in details %}
+                          <span>{{ detail | strip }}</span>
+                        {% endfor %}
+                      </div>
+                    {% else %}
+                      {{ spec.spec_detail }}
+                    {% endif %}
+                  </td>
+                </tr>
+
+              {% endfor %}
+            {% endif %}
+          </table>
+        </div>
+
+        <!-- Accessories -->
+        <div id="accessories" class="tabContent">
+          <div class="accessories_flex">
+            {% if product.metafields.custom.product_accessories.value != blank %}
+              {% for acc in product.metafields.custom.product_accessories.value %}
+                <div class="accessories_card">
+                  <img src="{{ acc.icon | image_url }}" alt="" />
+                  <h5>{{ acc.text }}</h5>
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const tabs = document.querySelectorAll(".tabBtn");
+      const contents = document.querySelectorAll(".tabContent");
+      const image = document.getElementById("tabImage");
+
+      // Single common image for all tabs
+      const commonImage = "{{ product.metafields.custom.tab_overview_image | image_url }}";
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          // Remove active class from all
+          tabs.forEach((t) => t.classList.remove("active"));
+          contents.forEach((c) => c.classList.remove("active"));
+
+          // Add active class to clicked tab and related content
+          tab.classList.add("active");
+          const tabName = tab.getAttribute("data-tab");
+          document.getElementById(tabName).classList.add("active");
+
+          // Always use the same image
+          if (window.innerWidth > 1025) {
+            image.src = commonImage;
+          }
+        });
+      });
+    });
+  </script>
+</section>

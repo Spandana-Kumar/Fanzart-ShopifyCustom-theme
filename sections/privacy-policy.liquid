@@ -1,0 +1,46 @@
+<section class="banner__component__wrapper">
+  {% if section.settings.banner_image %}
+    <img src="{{ section.settings.banner_image | img_url: 'master' }}" alt="Privacy Banner" />
+  {% endif %}
+</section>
+
+<section class="terms__conditions__policy__wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-md-12 col-lg-10 col-xl-8 mx-auto">
+        <h1 class="title42 txtDark">{{ section.settings.title }}</h1>
+        <div class="rte">
+           {{ shop.privacy_policy }}
+          
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Privacy Policy Section",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner Image"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Page Heading",
+      "default": "Privacy Policy"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Privacy Policy",
+      "category": "Page Sections"
+    }
+  ]
+}
+{% endschema %}

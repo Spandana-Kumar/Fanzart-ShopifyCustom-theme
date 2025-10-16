@@ -1,0 +1,38 @@
+<section class="testimonials__wrapper">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-lg-6">
+        <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
+          {{ product.metafields.custom.product_testimonials_heading }}
+        </h2>
+        <p class="font_18 txtDarkLight" data-aos="fade-up" data-aos-duration="1500">
+          {{ product.metafields.custom.product_testimonials_subtext }}
+        </p>
+
+        {% if product.metafields.custom.product_testimonials_quote_image  != blank %}
+          <img src="{{ product.metafields.custom.product_testimonials_quote_image | image_url }}"
+               data-aos="fade-up"
+               data-aos-duration="2000"
+               class="quote"
+               alt="Quote" />
+        {% endif %}
+
+        <div class="swiper mySwiper swiperTestimonials">
+          <div class="swiper-wrapper">
+            {% for testimonial in product.metafields.custom.product_testimonials_slides.value %}
+              <div class="swiper-slide">
+                <div class="contents">
+                  <p>{{ testimonial.testimonial }}</p>
+                  <h6>{{ testimonial.author }}</h6>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-pagination"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

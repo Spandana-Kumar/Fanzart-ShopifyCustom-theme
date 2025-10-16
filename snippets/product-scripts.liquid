@@ -1,0 +1,308 @@
+
+    <script>
+        function toggleModalTrigger() {
+            const productImg = document.getElementById('productImg');
+            if (window.innerWidth <= 768) {
+                productImg.setAttribute('data-bs-toggle', 'modal');
+                productImg.setAttribute('data-bs-target', '#cartModal');
+            } else {
+                productImg.removeAttribute('data-bs-toggle');
+                productImg.removeAttribute('data-bs-target');
+            }
+        }
+
+        window.addEventListener('load', toggleModalTrigger);
+        window.addEventListener('resize', toggleModalTrigger);
+    </script>
+
+    <script>
+        window.addEventListener("load", () => {
+            const hint = document.getElementById("hint");
+            setTimeout(() => {
+                hint.classList.add("hide");
+            }, 4000);
+        });
+    </script>
+
+    <script>
+        var swiperRelated = new Swiper(".relatedSwiper", {
+            slidesPerView: 4,
+            spaceBetween: 24,
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+
+            breakpoints: {
+                0: {
+                    slidesPerView: 1.2,
+                },
+                768: {
+                    slidesPerView: 3,
+                },
+
+                1024: {
+                    slidesPerView: 4,
+                },
+            },
+        });
+    </script>
+
+    <script>
+        var swiperModalCart = new Swiper(".card_modal_swiper", {
+            slidesPerView: 1,
+            spaceBetween: 24,
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+        });
+    </script>
+
+ 
+
+    <script>
+            let swiperLeftCart;
+        let swiperRightCart;
+        let isMobile = window.innerWidth <= 1025;
+
+        function initSwipers() {
+            if (!isMobile) {
+                // create left/thumb swiper and expose globally
+                swiperLeftCart = new Swiper(".swiperCartLeft", {
+                    direction: "vertical",
+                    spaceBetween: 10,
+                    slidesPerView: 4,
+                    freeMode: true,
+                    watchSlidesProgress: true,
+                });
+                window.swiperLeftCart = swiperLeftCart;
+            } else {
+                // ensure global reference is null on mobile
+                window.swiperLeftCart = null;
+                swiperLeftCart = null;
+            }
+
+            // create right/main swiper and expose globally
+            swiperRightCart = new Swiper(".swiperCartRight", {
+                spaceBetween: 0,
+                slidesPerView: 1,
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+                thumbs: {
+                    // When not mobile, attach the left swiper (may be null on mobile)
+                    swiper: swiperLeftCart || null,
+                },
+            });
+            window.swiperRightCart = swiperRightCart;
+        }
+
+        function destroySwipers() {
+            if (window.swiperLeftCart) {
+                try {
+                    window.swiperLeftCart.destroy(true, true);
+                } catch (e) { console.warn(e); }
+                window.swiperLeftCart = null;
+                swiperLeftCart = null;
+            }
+
+            if (window.swiperRightCart) {
+                try {
+                    window.swiperRightCart.destroy(true, true);
+                } catch (e) { console.warn(e); }
+                window.swiperRightCart = null;
+                swiperRightCart = null;
+            }
+        }
+
+        function handleResize() {
+            const nowMobile = window.innerWidth <= 768;
+
+            if (nowMobile !== isMobile) {
+                isMobile = nowMobile;
+                destroySwipers();
+                initSwipers();
+            }
+        }
+
+        window.addEventListener("load", () => {
+            initSwipers();
+        });
+
+        window.addEventListener("resize", () => {
+            handleResize();
+        });
+        
+        
+    </script>
+
+    <script>
+        function toggleLike(element) {
+            element.classList.toggle('active');
+        }
+    </script>
+
+    <script>
+      (function () {
+        const ZOOM_BREAKPOINT = 768;
+        const ZOOM_LEVEL = 3;
+
+        // remove attached handlers from previous init
+        function cleanupHandlers(productImgs) {
+            productImgs.forEach(img => {
+            const h = img._zoomHandlers;
+            if (h) {
+                img.removeEventListener('mouseenter', h.mouseenter);
+                img.removeEventListener('mouseleave', h.mouseleave);
+                img.removeEventListener('mousemove', h.mousemove);
+                delete img._zoomHandlers;
+            }
+            });
+        }
+
+        function initZoom() {
+            // get fresh DOM nodes each init
+            const productImg = Array.from(document.querySelectorAll("#productImg"));
+            const lens = Array.from(document.querySelectorAll("#lens"));
+            const zoomResult = document.querySelector("#zoomResult");
+
+            if (!zoomResult) return;
+
+            // cleanup previous handlers
+            cleanupHandlers(productImg);
+
+            // disable on small screens
+            if (window.innerWidth <= ZOOM_BREAKPOINT) {
+            lens.forEach(l => l.style.display = "none");
+            zoomResult.style.display = "none";
+            return;
+            }
+
+            for (let i = 0; i < productImg.length; i++) {
+            // guard in case counts differ after rebuild
+            const imgEl = productImg[i];
+            const lensEl = lens[i];
+
+            if (!imgEl || !lensEl) continue;
+
+            const mouseenter = () => {
+                lensEl.style.display = "block";
+                zoomResult.style.display = "block";
+                zoomResult.style.backgroundImage = `url('${imgEl.src}')`;
+                zoomResult.style.backgroundSize = `${imgEl.width * ZOOM_LEVEL}px ${imgEl.height * ZOOM_LEVEL}px`;
+            };
+
+            const mouseleave = () => {
+                lensEl.style.display = "none";
+                zoomResult.style.display = "none";
+            };
+
+            const mousemove = (e) => {
+                const rect = imgEl.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const lensWidth = lensEl.offsetWidth;
+                const lensHeight = lensEl.offsetHeight;
+
+                let lensX = x - lensWidth / 2;
+                let lensY = y - lensHeight / 2;
+
+                if (lensX < 0) lensX = 0;
+                if (lensY < 0) lensY = 0;
+                if (lensX > imgEl.width - lensWidth) lensX = imgEl.width - lensWidth;
+                if (lensY > imgEl.height - lensHeight) lensY = imgEl.height - lensHeight;
+
+                lensEl.style.left = lensX + "px";
+                lensEl.style.top = lensY + "px";
+
+                zoomResult.style.backgroundPosition = `-${lensX * ZOOM_LEVEL}px -${lensY * ZOOM_LEVEL}px`;
+            };
+
+            // attach and save handlers for cleanup
+            imgEl._zoomHandlers = { mouseenter, mouseleave, mousemove };
+            imgEl.addEventListener("mouseenter", mouseenter);
+            imgEl.addEventListener("mouseleave", mouseleave);
+            imgEl.addEventListener("mousemove", mousemove);
+            }
+        }
+
+        // expose so product-main can call window.initZoom()
+        window.initZoom = initZoom;
+
+        // re-init on custom event from your rebuild code
+        document.addEventListener('swipers:rebuild', () => {
+            setTimeout(() => { try { initZoom(); } catch (e) { console.warn(e); } }, 15);
+        });
+
+        // when swiper exists re-init on slide change (keeps zoom working when changing thumb/main)
+        function attachSwiperSlideHandler() {
+            if (window.swiperRightCart && typeof window.swiperRightCart.on === 'function') {
+            try {
+                if (window.__zoomSlideHandler && window.swiperRightCart.off) {
+                window.swiperRightCart.off('slideChange', window.__zoomSlideHandler);
+                }
+            } catch (e) { /* ignore */ }
+
+            window.__zoomSlideHandler = function () {
+                // small delay to allow DOM update
+                setTimeout(() => { try { initZoom(); } catch (e) { console.warn(e); } }, 10);
+            };
+            window.swiperRightCart.on('slideChange', window.__zoomSlideHandler);
+            }
+        }
+
+        // init on load and rebind on resize
+        window.addEventListener('load', () => {
+            initZoom();
+            attachSwiperSlideHandler();
+        });
+        window.addEventListener('resize', () => { setTimeout(() => initZoom(), 60); });
+
+        // if swipers are (re)initialized elsewhere, also attach slide handler after a short delay
+        document.addEventListener('swipers:rebuild', () => { setTimeout(attachSwiperSlideHandler, 30); });
+
+        })();
+    </script>
+
+    <script>
+        document.querySelectorAll('.product_category_wrap').forEach(category => {
+            const cards = category.querySelectorAll('.card_wrap');
+
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    cards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                });
+            });
+        });
+    </script>
+
+    <script>
+        var swiper = new Swiper(".swiperTestimonials", {
+            spaceBetween: 30,
+            sliderPerView: 3,
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+        });
+    </script>
+
+    <script>
+        AOS.init({
+            once: true,
+        });
+    </script>
+
+    

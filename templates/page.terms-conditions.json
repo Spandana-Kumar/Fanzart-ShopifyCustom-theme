@@ -1,0 +1,12 @@
+{
+  "name": "Terms Conditions Page",
+  "sections": {
+    "main": {
+      "type": "terms-Conditions",
+      "settings": {
+        "title": "Terms Conditions "
+      }
+    }
+  },
+  "order": ["main"]
+}

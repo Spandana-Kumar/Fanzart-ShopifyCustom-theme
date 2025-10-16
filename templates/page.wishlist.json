@@ -1,0 +1,9 @@
+{
+  "name": "Contact Us",
+  "sections": {
+    "main": {
+      "type": "wishlist"
+    }
+  },
+  "order": ["main"]
+}

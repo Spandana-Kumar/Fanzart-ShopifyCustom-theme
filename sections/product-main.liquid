@@ -1,0 +1,879 @@
+<section class="product__cart__wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-md-6 col-lg-6 prl_0">
+        <div class="cart_swiper_flex">
+          <!-- Thumbnails Swiper -->
+          <div thumbsSlider="" class="swiper mySwiper swiperCartLeft">
+            <div class="swiper-wrapper">
+              {% for image in product.images %}
+                <div class="swiper-slide">
+                  <img src="{{ image | img_url: '300x' }}" alt="{{ image.alt }}" />
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Main Swiper with Zoom -->
+          <div class="swiperLarge">
+            <div class="likeProduct" onclick="toggleLike(this)">
+              <div class="like"></div>
+            </div>
+            <div class="hint" id="hint">
+              Hover over image to zoom in
+            </div>
+            <div class="swiper mySwiper2 swiperCartRight">
+              <div class="swiper-wrapper">
+                {% for image in product.images %}
+                  <div class="swiper-slide">
+                    <div class="zoom_container">
+                      <img src="{{ image | img_url: '800x' }}" id="productImg" class="productImg" alt="{{ image.alt }}">
+                      <div id="lens"></div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+              <div class="navigation_controls">
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+              </div>
+              <div class="swiper-pagination"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-6">
+        <div class="product_scroll_wrap">
+          <div class="product_deatils_wrap">
+            <nav class="breadcrumb_wrap">
+              <ul>
+                <li><a href="/" class="breadcrumb_link">Home</a></li>
+                {% if product.type != blank %}
+                  <li>
+                    <span class="breadcrumb_link">{{ product.type }}</span>
+                  </li>
+                {% endif %}
+                {%- assign breadcrumb_tag = '' -%}
+                {%- assign tag_label = '' -%}
+                {% for tag in product.tags %}
+                  {% if tag contains 'by-' %}
+                    {% assign tag_parts = tag | split: '-' %}
+                    {% assign main_group = tag_parts[1] %}
+                    {% assign sub_group = tag_parts | slice: 2, tag_parts.size | join: ' ' | capitalize %}
+                    <li>
+                      <a href="/collections/{{ tag | handleize }}" class="breadcrumb_link">
+                        By {{ main_group | capitalize }}
+                      </a>
+                    </li>
+                    {% break %}
+                  {% endif %}
+                {% endfor %}
+                {% assign primary_collection = product.collections.first %}
+                {% if primary_collection %}
+                  <li>
+                    <a href="{{ primary_collection.url }}" class="breadcrumb_link">
+                      {{ primary_collection.title }}
+                    </a>
+                  </li>
+                {% endif %}
+                <li class="active"><span>{{ product.title }}</span></li>
+              </ul>
+            </nav>
+
+            <div class="title">
+              <h1>{{ product.title }}</h1>
+              
+              {% if product.metafields.custom.subtext != blank %}
+                <p>{{ product.metafields.custom.subtext }}</p>
+              {% else %}
+                <p>{{ product.description | strip_html | truncatewords: 12 }}</p>
+              {% endif %}
+            </div>
+
+
+            <div class="flex_price">
+              {% assign highest_price = 0 %}
+              {% for variant in product.variants %}
+                {% if variant.price > highest_price %}
+                  {% assign highest_price = variant.price %}
+                {% endif %}
+              {% endfor %}
+              <div class="price">
+                <span class="label">MRP:</span>
+                 <span class="amount" id="priceDisplay"><span>&#8377;</span>{{ product.selected_or_first_available_variant.price | money_without_currency | split: '.' | first }}</span>
+                <span class="note">(Inclusive all of taxes)</span>
+              </div>
+              
+                <div class="soldOut" id="variantSoldOut">
+                  <h4>Sold Out</h4>
+                  <p>This item is currently out of stock</p>
+                </div>
+              
+            </div>
+
+            <div class="customisation_wrap">
+              {% if product.metafields.custom.customisation_available == true %}
+                               <div class="customTag">
+                                <img src="{{ 'img_product-detail_check.svg' | asset_url }}" alt="" />
+                                    <span>Customisation Available</span>
+                                </div>    
+                
+              {% endif %}
+
+              {% if product.metafields.custom.size_guide %}
+                <div class="tags">
+                  <a href="{{ product.metafields.custom.size_guide | image_url }}" data-bs-toggle="modal" data-bs-target="#sizeGuide">
+                    <img src="{{ 'img_ruler.svg' | asset_url }}" alt="Ruler" />
+                    <span>Size Guide</span>
+                  </a>
+                </div>
+              {% endif %}
+              {% if product.metafields.custom.threed_link %}
+                <div class="tags">
+                  <a href="{{ product.metafields.custom.threed_link }}" target="_blank">
+                    <img src="{{ 'img_download.svg' | asset_url }}" alt="3D" />
+                    <span>3 D</span>
+                  </a>
+                </div>
+              {% endif %}
+              <div class="tags">
+                <a href="https://api.whatsapp.com/send?text={{ shop.url }}{{ product.url | url_encode }}&t={{ product.title | url_encode }}"
+                   onclick="window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600'); return false;">
+                  <img src="{{ 'img_whatsapp.svg' | asset_url }}" alt="Whatsapp" />
+                  <span>Share</span>
+                </a>
+              </div>
+            </div>
+
+            {% assign shown_colors = '' %}
+            {% assign featured_color_price = product.variants.first.price %}
+            <div class="product_category_wrap">
+              <h2 class="titleInner">COLOUR</h2>
+              <div class="product_cards_flex" id="colorOptions">
+                {% for variant in product.variants %}
+                  {% unless shown_colors contains variant.option1 %}
+                    <div class="card_wrap small js-color-option"
+                      data-color="{{ variant.option1 }}"
+                      data-image="{{ variant.featured_image | img_url: '800x' }}"
+                      data-price="{{ variant.price }}"
+                      data-variant-id="{{ variant.id }}"
+                      data-available="{{ variant.available }}">
+                      <div class="inner">
+                        <img src="{{ variant.featured_image | img_url: '300x' }}" class="img" alt="{{ variant.title }}" />
+                        <div class="contents">
+                          <h4>{{ variant.option1 }}</h4>
+                          {% if variant.metafields.custom.housing != blank %}
+                            <p>Housing: {{ variant.metafields.custom.housing }}</p>
+                          {% endif %}
+                          {% if variant.metafields.custom.blade != blank %}
+                            <p>Blades: {{ variant.metafields.custom.blade }}</p>
+                          {% endif %}
+                          {% if variant.price != featured_color_price %}
+                            <h5 class="color-price"><span>&#8377;</span>{{ variant.price | money_without_currency | split: '.' | first }}</h5>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    {% assign shown_colors = shown_colors | append: variant.option1 | append: ',' %}
+                  {% endunless %}
+                {% endfor %}
+              </div>
+            </div>
+
+             {% if product.metafields.custom.material != blank %}
+            <div class="product_category_wrap">
+              <h2 class="titleInner">MATERIAL</h2>
+              <div class="product_cards_flex">
+               
+                  {% for material in product.metafields.custom.material.value %}
+                    <div class="card_wrap small material js-material-option" data-material="{{ material.material_text.value }}">
+                    
+                      <div class="inner">
+                      
+                        <div class="contents">
+                           <h4>{{ material.material_text.value }}</h4>
+                        </div>
+                      </div>
+                    </div>
+
+                  {% endfor %}
+               
+              </div>
+            </div>
+             {% endif %}
+
+           {% assign has_any_sweep = false %}
+            {% for variant in product.variants %}
+              {% if variant.option2 != blank %}
+                {% assign has_any_sweep = true %}
+                {% break %}
+              {% endif %}
+            {% endfor %}
+
+            {% if has_any_sweep %}
+              <div class="product_category_wrap">
+                <h2 class="titleInner">SWEEP</h2>
+                <div class="product_cards_flex" id="sweepOptions">
+                  {% for variant in product.variants %}
+                    {% if variant.option2 != blank %}
+                      <div class="card_wrap sweep js-sweep-option"
+                        data-color="{{ variant.option1 }}"
+                        data-sweep="{{ variant.option2 }}"
+                        data-variant-id="{{ variant.id }}"
+                        data-price="{{ variant.price }}"
+                        data-available="{{ variant.available }}"
+                        style="display:none;">
+                        <div class="inner">
+                          <div class="size">{{ variant.option2 }}</div>
+                          <div class="contents">
+                            {% assign color_price = '' %}
+                            {% for v in product.variants %}
+                              {% if v.option1 == variant.option1 %}
+                                {% assign color_price = v.price %}
+                                {% break %}
+                              {% endif %}
+                            {% endfor %}
+                            {% if variant.price != color_price %}
+                              <h4><span>&#8377;</span>{{ variant.price | money_without_currency | split: '.' | first }}</h4>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+
+            {% if product.metafields.custom.addon != blank %}
+            <div class="product_category_wrap">
+              <h2 class="titleInner">ADD ON</h2>
+              <div class="product_cards_flex">
+                
+                  {% for addon in product.metafields.custom.addon.value %}
+                    <div class="card_wrap addOn js-addon-option">
+                      <div class="inner">
+                        <img src="{{ 'img_remote.svg' | asset_url }}" class="addOnImg" alt="Remote Icon" />
+                        <div class="contents">
+                          <h4>
+                            {{ addon.addon_text }}
+                            {% if addon.addon_price.value > 0 %}
+                              – {{ addon.addon_price.value | money_without_currency | split: '.' | first }}
+                            {% endif %}
+                          </h4>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+               
+              </div>
+            </div>
+             {% endif %}
+
+            {% assign has_any_watt = false %}
+              {% for variant in product.variants %}
+                {% if variant.option3 != blank %}
+                  {% assign has_any_watt = true %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+
+              {% if has_any_watt %}
+                <div class="product_category_wrap">
+                  <h2 class="titleInner">WATT</h2>
+                  <div class="product_cards_flex" id="wattOptions">
+                    {% for variant in product.variants %}
+                      {% if variant.option3 != blank %}
+                        <div class="card_wrap addOn js-watt-option"
+                          data-color="{{ variant.option1 }}"
+                          data-sweep="{{ variant.option2 }}"
+                          data-watt="{{ variant.option3 }}"
+                          data-variant-id="{{ variant.id }}"
+                          data-price="{{ variant.price }}"
+                          data-available="{{ variant.available }}"
+                          style="display:none;">
+                          <div class="inner">
+                            <div>{{ variant.option3 }}</div>
+                          </div>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+
+
+             {% if product.metafields.custom.light != blank %}
+            <div class="product_category_wrap">
+              <h2 class="titleInner">LIGHT</h2>
+              <div class="product_cards_flex">
+               
+                  {% for light in product.metafields.custom.light.value %}
+                    <div class="card_wrap small js-light-option" data-light="{{ light.light_text }}">
+                      <div class="inner">
+                        <img src="{{ light.light_image | file_url }}" class="img" alt="{{ light.light_text }}" />
+                        <div class="contents">
+                          <h4>{{ light.light_text }}</h4>
+                          {% if light.light_price.value > 0 %}
+                            <h5><span>&#8377;</span>{{ light.light_price.value | money_without_currency | split: '.' | first }}</h5>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                
+              </div>
+            </div>
+            {% endif %}
+
+             {% if product.metafields.custom.mount != blank %}
+            <div class="product_category_wrap">
+              <h2 class="titleInner">MOUNT</h2>
+              <div class="product_cards_flex">
+               
+                  {% for mount in product.metafields.custom.mount.value %}
+                    <div class="card_wrap small js-mount-option" data-mount="{{ mount.mount_text }}">
+                      <div class="inner">
+                        <img src="{{ mount.mount_image | file_url }}" class="img" alt="{{ mount.mount_text }}" />
+                        <div class="contents">
+                          <h4>{{ mount.mount_text }}</h4>
+                          {% if mount.mount_price.value > 0 %}
+                            <h5><span>&#8377;</span>{{ mount.mount_price.value | money_without_currency | split: '.' | first }}</h5>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+               
+              </div>
+            </div>
+             {% endif %}
+
+          </div>
+          <div class="actions_btn_wrap">
+            <div class="price">
+              <span class="label">MRP:</span>
+              <span class="amount"><span>&#8377;</span>{{ product.selected_or_first_available_variant.price | money_without_currency | split: '.' | first }}</span>
+              <span class="note">(Inclusive all of taxes)</span>
+            </div>
+           <form method="post" action="/cart/add" class="btns btnDark">
+              <input type="hidden" name="id" id="variantIdInput" value="{{ product.selected_or_first_available_variant.id }}">
+
+              <!-- Custom properties -->
+              <input type="hidden" name="properties[Custom Image]" id="customImageInput" value="">
+              <input type="hidden" name="properties[Custom Label]" id="customLabelInput" value="">
+              <input type="hidden" name="properties[Color]" id="customColorInput" value="">
+              <input type="hidden" name="properties[Material]" id="customMaterialInput" value="">
+              <input type="hidden" name="properties[Sweep]" id="customSweepInput" value="">
+              <input type="hidden" name="properties[Add On]" id="customAddonInput" value="">
+              <input type="hidden" name="properties[Add On Price]" id="addonPriceInput" value="">
+              <input type="hidden" name="properties[Watt]" id="customWattInput" value="">
+              <input type="hidden" name="properties[Light]" id="customLightInput" value="">
+              <input type="hidden" name="properties[Mount]" id="customMountInput" value="">
+
+              <button type="submit" id="addToCartButton">
+                <div class="bg"></div>
+                <div class="btnText">
+                  <span>Add to Cart</span>
+                  <span>Add to Cart</span>
+                </div>
+              </button>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="zoomResult"></div>
+
+  <!-- Modal For Slider Cart mobile screen  -->
+  <div class="modal modal_cart fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-body">
+          <div class="swiper mySwiper card_modal_swiper">
+            <div class="swiper-wrapper">
+              {% for image in product.images %}
+                <div class="swiper-slide">
+                  <img src="{{ image | img_url: '800x' }}" alt="{{ product.title }}" />
+                </div>
+              {% endfor %}
+            </div>
+            <div class="swiper-pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Size Guide -->
+  {% if product.metafields.custom.size_guide %}
+    <div class="modal modalSize fade" id="sizeGuide" tabindex="-1" aria-labelledby="sizeGuideLabel">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="sizeGuideLabel">Size Guide</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <img src="{{ product.metafields.custom.size_guide | image_url }}" alt="Size Guide" />
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const priceDisplay = document.querySelector("#priceDisplay");
+  const variantIdInput = document.querySelector("#variantIdInput");
+  const customPriceInput = document.querySelector("#customPriceInput");
+  const customImageInput = document.querySelector("#customImageInput");
+  const customLabelInput = document.querySelector("#customLabelInput");
+  const soldOutMessage = document.getElementById("variantSoldOut");
+
+  const customColorInput = document.getElementById("customColorInput");
+  const customBladeInput = document.getElementById("customBladeInput");
+  const customHousingInput = document.getElementById("customHousingInput");
+  const customMaterialInput = document.getElementById("customMaterialInput");
+  const customSweepInput = document.getElementById("customSweepInput");
+  const customAddonInput = document.getElementById("customAddonInput");
+  const customWattInput = document.getElementById("customWattInput");
+  const customLightInput = document.getElementById("customLightInput");
+  const customMountInput = document.getElementById("customMountInput");
+
+  let selectedPrices = {
+    color: 0,
+    blade: 0,
+    housing: 0,
+    material: 0,
+    sweep: 0,
+    addon: 0,
+    light: 0,
+    mount: 0,
+  };
+
+  let selectionOrder = [];
+
+  function parsePrice(priceText) {
+    if (!priceText) return 0;
+    return parseFloat(priceText.replace(/[^\d.]/g, '')) * 100;
+  }
+
+  function formatPrice(priceCents) {
+    return Math.round(priceCents / 100).toLocaleString("en-IN");
+  }
+
+  function updateMRP(optionKey) {
+    const newPrice = selectedPrices[optionKey];
+
+    // Update order tracking
+    const index = selectionOrder.indexOf(optionKey);
+    if (index !== -1) selectionOrder.splice(index, 1);
+    if (newPrice > 0) selectionOrder.push(optionKey);
+
+    // Find the last selected non-zero price excluding addon
+    let lastValidPrice = 0;
+    for (let i = selectionOrder.length - 1; i >= 0; i--) {
+      const key = selectionOrder[i];
+      if (key !== "addon" && selectedPrices[key] > 0) {
+        lastValidPrice = selectedPrices[key];
+        break;
+      }
+    }
+
+    // Display price on screen (excluding addon)
+    if (priceDisplay) {
+      priceDisplay.innerHTML = `<span>&#8377;</span>${formatPrice(lastValidPrice)}`;
+    }
+
+    // Hidden input value (including addon)
+    const totalWithAddon = Object.entries(selectedPrices).reduce((sum, [key, val]) => {
+      return sum + (val || 0);
+    }, 0);
+
+    if (customPriceInput) {
+      customPriceInput.value = (totalWithAddon / 100).toFixed(2);
+    }
+  }
+
+  function activateOption(selector, callback) {
+    document.querySelectorAll(selector).forEach(card => {
+      card.addEventListener("click", function () {
+        document.querySelectorAll(selector).forEach(c => c.classList.remove("active"));
+        this.classList.add("active");
+        callback(this);
+      });
+    });
+  }
+
+  // === HANDLERS BELOW ===
+
+  activateOption(".js-variant-option", function (card) {
+    const price = parseInt(card.dataset.price || "0");
+    const image = card.dataset.image?.replace("300x", "800x");
+    const variantId = card.dataset.variantId;
+    const label = card.querySelector("h4")?.innerText || "Variant";
+    const isAvailable = card.dataset.available === "true";
+
+    selectedPrices.color = price;
+    updateMRP("color");
+
+    if (customColorInput) customColorInput.value = label;
+    if (customImageInput && image) customImageInput.value = image;
+    if (variantIdInput && variantId) variantIdInput.value = variantId;
+    if (customLabelInput && label) customLabelInput.value = label;
+
+    // Set featured image directly
+    if (image) {
+      const productImg = document.querySelector("#productImg");
+      if (productImg) productImg.src = image;
+    }
+
+    if (soldOutMessage) {
+      soldOutMessage.style.display = isAvailable ? "none" : "block";
+    }
+
+    const addToCartButton = document.getElementById("addToCartButton");
+    if (addToCartButton) {
+      addToCartButton.disabled = !isAvailable;
+      addToCartButton.classList.toggle("disabled", !isAvailable);
+    }
+  });
+
+  function handleGenericOption(selector, key, customInputElement, changeImage = true) {
+    activateOption(selector, function (card) {
+      const image = changeImage ? card.querySelector("img")?.src?.replace("300x", "800x") : null;
+
+      let label, priceText;
+
+      if (key === "sweep") {
+        label = card.querySelector(".size")?.innerText?.trim() || "";
+        priceText = card.querySelector("h4")?.innerText || "";
+      } else {
+        label = card.querySelector("h4")?.innerText?.trim() || card.dataset.material || key;
+
+        priceText = card.querySelector("h5")?.innerText || card.querySelector("h4")?.innerText || "";
+      }
+
+      const price = parsePrice(priceText);
+
+      selectedPrices[key] = price;
+      updateMRP(key);
+
+      if (customInputElement) {
+        customInputElement.value = label;
+      }
+
+      // Set featured image only when allowed
+      if (changeImage && image) {
+        const productImg = document.querySelector("#productImg");
+        if (productImg) productImg.src = image;
+      }
+    });
+  };
+
+  handleGenericOption(".js-material-option", "material", customMaterialInput, false);
+  handleGenericOption(".js-sweep-option", "sweep", customSweepInput);
+  handleGenericOption(".js-light-option", "light", customLightInput, false);
+  handleGenericOption(".js-mount-option", "mount", customMountInput, false);
+
+  // Add-on is separate since it uses addonPriceCents
+ activateOption(".js-addon-option", function (card) {
+  const priceText = card.querySelector("h4")?.innerText || "0";
+  const label = card.querySelector("h4")?.innerText || "Add-on";
+  const price = parsePrice(priceText); // this is the addon price in paise
+
+  // Store addon label
+  if (customAddonInput) customAddonInput.value = label;
+
+  // Store only addon price (not full custom price)
+  const addonPriceInput = document.getElementById("addonPriceInput");
+  if (addonPriceInput) {
+    addonPriceInput.value = (price / 100).toFixed(0); // in rupees
+  }
+});
+
+// WATT selection (variant-based, linked with color + sweep)
+document.querySelectorAll('.js-watt-option').forEach(card => {
+  card.addEventListener('click', function () {
+    document.querySelectorAll('.js-watt-option').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+
+    const price = parseInt(this.dataset.price || "0");
+    const variantId = this.dataset.variantId;
+    const isAvailable = this.dataset.available === "true";
+    const wattLabel = this.dataset.watt || '';
+
+    selectedPrices.watt = price;
+    updateMRP("watt");
+
+    if (customWattInput) customWattInput.value = wattLabel;
+    if (variantIdInput && variantId) variantIdInput.value = variantId;
+
+    if (soldOutMessage) {
+      soldOutMessage.style.display = isAvailable ? "none" : "block";
+    }
+    const addToCartButton = document.getElementById("addToCartButton");
+    if (addToCartButton) {
+      addToCartButton.disabled = !isAvailable;
+      addToCartButton.classList.toggle("disabled", !isAvailable);
+    }
+  });
+});
+
+// Show only valid WATTs for selected Color + Sweep
+function showWattsForSelection(color, sweep) {
+  let firstVisible = null;
+
+  document.querySelectorAll('.js-watt-option').forEach(card => {
+    if (card.dataset.color === color && card.dataset.sweep === sweep) {
+      card.style.display = '';
+      if (!firstVisible) firstVisible = card; // capture first match
+    } else {
+      card.style.display = 'none';
+      card.classList.remove('active');
+    }
+  });
+
+  //Auto-select the first available watt
+  if (firstVisible) {
+    firstVisible.click();
+  }
+}
+
+  // Image thumbnails
+  document.querySelectorAll(".swiperCartLeft .swiper-slide img").forEach(img => {
+    img.addEventListener("click", function () {
+      const src = this.src.replace("300x", "800x");
+      const productImg = document.querySelector("#productImg");
+      if (productImg) productImg.src = src;
+    });
+  });
+
+  // === COLOR & SWEEP LOGIC FOR UNIQUE COLOR/SWEEP SELECTION ===
+
+   // Show sweeps for selected color only
+  function showSweepsForColor(color) {
+    document.querySelectorAll('.js-sweep-option').forEach(card => {
+      if (card.dataset.color === color) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+        card.classList.remove('active');
+      }
+    });
+  }
+
+
+
+  // Cache original images once (use this as the master pool for rebuilding)
+  const ORIGINAL_RIGHT_IMAGES = Array.from(document.querySelectorAll('.swiperCartRight .swiper-slide img')).map(img => {
+    return { src: img.getAttribute('src') || img.src, alt: (img.getAttribute('alt') || img.alt || '').trim() };
+  });
+
+  function rebuildSwipersForColor(color) {
+    const norm = c => (c || '').trim().toLowerCase();
+    const productImg = document.querySelector("#productImg");
+
+    // Use original cached pool so each color rebuild filters from the full set
+    const allRightImgs = ORIGINAL_RIGHT_IMAGES.slice();
+    const matches = allRightImgs.filter(img => norm(img.alt) === norm(color));
+
+    // If no matches, fallback to showing all images
+    const rightImgsToUse = matches.length ? matches : allRightImgs;
+
+    // Helper: build slide HTML for swiper.appendSlide
+    const buildRightSlideHtml = img => {
+      // preserve original classes/ids and lens element so zoom & styles keep working
+      return `<div class="swiper-slide"><div class="zoom_container"><img src="${img.src}" id="productImg" class="productImg" alt="${img.alt}"><div id="lens"></div></div></div>`;
+    };
+    const buildLeftSlideHtml = img => {
+      let thumbSrc = img.src;
+      if (thumbSrc.indexOf('800x') !== -1) thumbSrc = thumbSrc.replace('800x', '300x');
+      // keep thumbnail img class matching original markup
+      return `<div class="swiper-slide"><img src="${thumbSrc}" class="img" alt="${img.alt}"></div>`;
+    };
+
+    // re-attach thumbnail click handlers (avoid duplicates using dataset flag)
+    function attachThumbnailClicks() {
+      document.querySelectorAll(".swiperCartLeft .swiper-slide img").forEach(img => {
+        if (img.dataset.thumbAttached) return;
+        img.addEventListener("click", function () {
+          const src = this.src.replace("300x", "800x");
+          const productImgEl = document.querySelector("#productImg");
+          if (productImgEl) productImgEl.src = src;
+        });
+        img.dataset.thumbAttached = "1";
+      });
+    }
+
+    try {
+      // Main (right) swiper
+      if (window.swiperRightCart) {
+        if (typeof window.swiperRightCart.removeAllSlides === 'function') {
+          window.swiperRightCart.removeAllSlides();
+        } else {
+          Array.from(window.swiperRightCart.slides || []).forEach(s => s.remove());
+        }
+
+        const rightHtml = rightImgsToUse.map(buildRightSlideHtml);
+        if (rightHtml.length) window.swiperRightCart.appendSlide(rightHtml);
+        window.swiperRightCart.update();
+        if (window.swiperRightCart.slides && window.swiperRightCart.slides.length) {
+          window.swiperRightCart.slideTo(0);
+        }
+      } else {
+        // fallback: show/hide DOM slides (if swipers not initialized)
+        document.querySelectorAll('.swiperCartRight .swiper-slide').forEach(slide => {
+          const imgEl = slide.querySelector('img');
+          if (imgEl && norm(imgEl.alt) === norm(color)) slide.style.display = '';
+          else slide.style.display = 'none';
+        });
+      }
+
+      // Left (thumbnails) swiper
+      if (window.swiperLeftCart) {
+        if (typeof window.swiperLeftCart.removeAllSlides === 'function') {
+          window.swiperLeftCart.removeAllSlides();
+        } else {
+          Array.from(window.swiperLeftCart.slides || []).forEach(s => s.remove());
+        }
+
+        const leftHtml = rightImgsToUse.map(buildLeftSlideHtml);
+        if (leftHtml.length) window.swiperLeftCart.appendSlide(leftHtml);
+        window.swiperLeftCart.update();
+
+        if (window.swiperLeftCart.slides && window.swiperLeftCart.slides.length) {
+          window.swiperLeftCart.slideTo(0);
+          window.swiperLeftCart.slides.forEach(s => s.classList.remove('swiper-slide-thumb-active'));
+          if (window.swiperLeftCart.slides[0]) window.swiperLeftCart.slides[0].classList.add('swiper-slide-thumb-active');
+        }
+      } else {
+        document.querySelectorAll('.swiperCartLeft .swiper-slide').forEach(slide => {
+          const imgEl = slide.querySelector('img');
+          if (imgEl && norm(imgEl.alt) === norm(color)) slide.style.display = '';
+          else slide.style.display = 'none';
+        });
+      }
+
+      // Re-link thumbs if used
+      if (window.swiperRightCart && window.swiperLeftCart) {
+        try {
+          window.swiperRightCart.thumbs = window.swiperRightCart.thumbs || {};
+          window.swiperRightCart.thumbs.swiper = window.swiperLeftCart;
+          if (typeof window.swiperRightCart.thumbs.update === 'function') window.swiperRightCart.thumbs.update();
+        } catch (e) { /* non-fatal */ }
+      }
+
+      // Update featured image to first available slide
+      if (rightImgsToUse.length && productImg) {
+        productImg.src = rightImgsToUse[0].src;
+      }
+
+      // ensure thumbnail click handlers are attached to the newly added DOM nodes
+      attachThumbnailClicks();
+
+      // if you have a zoom init function in product-scripts.liquid, call it to re-bind lens/zoom
+      if (typeof window.initZoom === 'function') {
+        try { window.initZoom(); } catch (e) { /* non-fatal */ }
+      } else {
+        // dispatch event so other scripts can listen and re-init zoom if needed
+        try { document.dispatchEvent(new CustomEvent('swipers:rebuild')); } catch (e) { /* ignore */ }
+      }
+    } catch (err) {
+      console.warn('rebuildSwipersForColor failed', err);
+    }
+  }
+  // Activate color selection (preserving metafields)
+  document.querySelectorAll('.js-color-option').forEach(card => {
+    card.addEventListener('click', function () {
+      document.querySelectorAll('.js-color-option').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      const color = this.dataset.color;
+      showSweepsForColor(color);
+
+      // Filter images by color
+      rebuildSwipersForColor(color);
+
+      // Set featured image directly
+      const image = this.dataset.image;
+      const productImg = document.querySelector("#productImg");
+      if (productImg && image) productImg.src = image;
+
+      // Optionally auto-select first sweep for this color
+      const firstSweep = document.querySelector('.js-sweep-option[data-color="' + color + '"]');
+      if (firstSweep) {
+        firstSweep.click();
+      }
+    });
+  });
+
+  // Activate sweep selection
+document.querySelectorAll('.js-sweep-option').forEach(card => {
+  card.addEventListener('click', function () {
+    document.querySelectorAll('.js-sweep-option').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+
+    const price = parseInt(this.dataset.price || "0");
+    const variantId = this.dataset.variantId;
+    const isAvailable = this.dataset.available === "true";
+    const sweepLabel = this.querySelector('.size')?.innerText || '';
+
+    selectedPrices.sweep = price;
+    updateMRP("sweep");
+
+    if (customSweepInput) customSweepInput.value = sweepLabel;
+    if (variantIdInput && variantId) variantIdInput.value = variantId;
+
+    if (soldOutMessage) {
+      soldOutMessage.style.display = isAvailable ? "none" : "block";
+    }
+    const addToCartButton = document.getElementById("addToCartButton");
+    if (addToCartButton) {
+      addToCartButton.disabled = !isAvailable;
+      addToCartButton.classList.toggle("disabled", !isAvailable);
+    }
+
+    // ✅ NEW: filter WATTS based on selected color + sweep
+    const color = document.querySelector('.js-color-option.active')?.dataset.color || '';
+    showWattsForSelection(color, sweepLabel);
+
+  });
+});
+
+  // Auto-select first visible option for each group on load
+  function autoSelectFirstOption(selector) {
+    const first = document.querySelector(selector + ':not([style*="display: none"])');
+    if (first) first.click();
+  }
+
+  autoSelectFirstOption('.js-color-option');
+  autoSelectFirstOption('.js-sweep-option');
+  autoSelectFirstOption('.js-material-option');
+  autoSelectFirstOption('.js-light-option');
+  autoSelectFirstOption('.js-mount-option');
+  autoSelectFirstOption('.js-watt-option');
+
+});
+
+//Add 'lastProduct' class to the last visible .product_category_wrap
+document.addEventListener("DOMContentLoaded", function () {
+  const wraps = Array.from(document.querySelectorAll(".product_category_wrap"))
+    .filter(el => el.offsetParent !== null); // only visible ones
+  
+  if (wraps.length > 0) {
+    wraps.forEach(w => w.classList.remove("lastProduct"));
+    wraps[wraps.length - 1].classList.add("lastProduct");
+  }
+});
+
+</script>
+
+
+
+
+</section>

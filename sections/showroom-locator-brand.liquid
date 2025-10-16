@@ -1,0 +1,80 @@
+<section class="brand__wrapper">
+  <div class="container">
+    {% if section.settings.heading != blank %}
+      <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
+        {{ section.settings.heading }}
+      </h2>
+    {% endif %}
+
+    {% assign block_index = 0 %}
+    {% for block in section.blocks %}
+      {% if forloop.first or block_index == 0 %}
+        <div class="brand_flex">
+      {% endif %}
+
+      <div class="brand-inner" data-aos="fade-up" data-aos-duration="1000">
+        {% if block.settings.title != blank %}
+          <h3>{{ block.settings.title }}</h3>
+        {% endif %}
+        {% if block.settings.number != blank %}
+          <span class="brand-num">{{ block.settings.number }}</span>
+        {% endif %}
+        {% if block.settings.label != blank %}
+          <span class="num-text">{{ block.settings.label }}</span>
+        {% endif %}
+      </div>
+
+      {% assign block_index = block_index | plus: 1 %}
+      {% if block_index == 6 %}
+        </div>
+        {% assign block_index = 0 %}
+      {% endif %}
+    {% endfor %}
+
+    {% if block_index != 0 %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+
+{% schema %}
+{
+  "name": "Brand Highlight",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "More Than Just a Brand"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "brand_stat",
+      "name": "Brand Stat",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Walk into"
+        },
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Number or Highlight",
+          "default": "150+"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Showrooms"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 20,
+}
+{% endschema %}

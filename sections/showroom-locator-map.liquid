@@ -1,0 +1,173 @@
+{% comment %} Section: sections/showroom-map.liquid {% endcomment %}
+<section class="map_wrapper">
+  <div class="container">
+    <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
+      {{ section.settings.title }}
+    </h2>
+    <div class="map-outer">
+      <div id="map"></div>
+
+      <div class="dropdown-section">
+        <div class="sticky-sec">
+          <div class="select_wrap">
+            <label for="stateSelect">Select the State</label>
+            <select id="stateSelect" class="select2">
+              <option value="">Choose State (India)</option>
+            </select>
+            <div class="countTag">
+              {% assign unique_states = section.blocks | map: "settings" | map: "state" | uniq %}
+              <div>{{ unique_states.size }}</div>
+              <div>Cities</div>
+            </div>
+          </div>
+
+          <div class="select_wrap">
+            <label for="citySelect">Select the City</label>
+            <select id="citySelect" class="select2" disabled>
+              <option value="">Choose City (India)</option>
+            </select>
+            <div class="countTag">
+              <div>{{ section.blocks.size }}</div>
+              <div>Showrooms</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="addresses-sec">
+          <span class="mobile-clicker"></span>
+          <div class="addresses-outer" id="addressOuter">
+            {% for block in section.blocks %}
+              <div class="address-wrap" data-state="{{ block.settings.state }}" data-city="{{ block.settings.city }}">
+                <h4>{{ block.settings.title }}</h4>
+                <div class="full-address">{{ block.settings.address }}</div>
+                <div class="icon-flex">
+                  <img src="{{ 'img_showroomlocator_mail-icon-black.svg' | asset_url }}" alt="mail-img">
+                  <a href="mailto:{{ block.settings.email }}" class="mail-link">{{ block.settings.email }}</a>
+                </div>
+                <div class="icon-flex">
+                  <img src="{{ 'img_showroomlocator_smartphone-icon-black.svg' | asset_url }}" alt="smartphone-img">
+                  <ul class="mobile_list">
+                    {% assign phones = block.settings.phone_numbers | split: ',' %}
+                    {% for phone in phones %}
+                      <li><a href="tel:{{ phone | strip }}">{{ phone }}</a></li>
+                    {% endfor %}
+                  </ul>
+                </div>
+                <div class="icon-flex last">
+                  <img src="{{ 'img_showroomlocator_clock-icon-black.svg' | asset_url }}" alt="clock-img">
+                  {{ block.settings.weekday_hours }}
+                </div>
+                <div class="icon-flex last">
+                  <img src="{{ 'img_showroomlocator_calendar-black.svg' | asset_url }}" alt="calendar-img">
+                  {{ block.settings.sunday_hours }}
+                </div>
+                <div class="full-link">
+                  <a href="{{ block.settings.directions_url }}" target="_blank">
+                    <span>Get Direction</span>
+                    <img src="{{ 'img_showroomlocator_navigation-icon-black.svg' | asset_url }}" alt="Navigation-img">
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  window.locationData = {
+    {% assign seen_states = "" %}
+    {% for block in section.blocks %}
+      {% assign state = block.settings.state | strip %}
+      {% assign city = block.settings.city | strip %}
+      {% assign state_key = state | handle %}
+      {% assign city_key = city | handle %}
+
+      {% unless seen_states contains state_key %}
+        {% assign seen_states = seen_states | append: state_key | append: "," %}
+        "{{ state }}": {
+          center: [{{ block.settings.state_lat | default: "0" }}, {{ block.settings.state_lng | default: "0" }}],
+          cities: {
+            {% assign seen_cities = "" %}
+            {% for city_block in section.blocks %}
+              {% if city_block.settings.state == state %}
+                {% assign city_name = city_block.settings.city | strip %}
+                {% assign city_key = city_name | handle %}
+                {% unless seen_cities contains city_key %}
+                  {% assign seen_cities = seen_cities | append: city_key | append: "," %}
+                  "{{ city_name }}": {
+                    center: [{{ city_block.settings.city_lat | default: "0" }}, {{ city_block.settings.city_lng | default: "0" }}],
+                    locations: [
+                      {% assign matched = false %}
+                      {% for loc in section.blocks %}
+                        {% if loc.settings.state == state and loc.settings.city == city_name %}
+                          {% assign matched = true %}
+                          {
+                            latlng: [{{ loc.settings.lat | default: "0" }}, {{ loc.settings.lng | default: "0" }}],
+                            title: "{{ loc.settings.title | escape }}",
+                            address: "{{ loc.settings.address | strip_newlines | escape }}",
+                            email: "{{ loc.settings.email | escape }}",
+                            phone: "{{ loc.settings.phone_numbers | escape }}",
+                            weekday: "{{ loc.settings.weekday_hours | escape }}",
+                            sunday: "{{ loc.settings.sunday_hours | escape }}",
+                            direction: "{{ loc.settings.directions_url | escape }}"
+                          }{% unless forloop.last %},{% endunless %}
+                        {% endif %}
+                      {% endfor %}
+                      {% unless matched %}{}{% endunless %}
+                    ]
+                  }{% unless forloop.last %},{% endunless %}
+                {% endunless %}
+              {% endif %}
+            {% endfor %}
+          }
+        }{% unless forloop.last %},{% endunless %}
+      {% endunless %}
+    {% endfor %}
+  };
+</script>
+</section>
+
+{% schema %}
+{
+  "name": "Showroom Map",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Heading",
+      "default": "We're Closer than You Think"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "location",
+      "name": "Showroom Location",
+      "settings": [
+        { "type": "text", "id": "state", "label": "State Name" },
+        { "type": "text", "id": "state_lat", "label": "State Latitude" },
+        { "type": "text", "id": "state_lng", "label": "State Longitude" },
+        { "type": "text", "id": "city", "label": "City Name" },
+        { "type": "text", "id": "city_lat", "label": "City Latitude" },
+        { "type": "text", "id": "city_lng", "label": "City Longitude" },
+        { "type": "text", "id": "title", "label": "Location Title" },
+        { "type": "textarea", "id": "address", "label": "Full Address" },
+        { "type": "text", "id": "email", "label": "Email" },
+        { "type": "text", "id": "phone_numbers", "label": "Phone Numbers (comma separated)" },
+        { "type": "text", "id": "weekday_hours", "label": "Weekday Hours" },
+        { "type": "text", "id": "sunday_hours", "label": "Sunday Hours" },
+        { "type": "url", "id": "directions_url", "label": "Google Maps Direction URL" },
+        { "type": "text", "id": "lat", "label": "Marker Latitude" },
+        { "type": "text", "id": "lng", "label": "Marker Longitude" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Showroom Map",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}

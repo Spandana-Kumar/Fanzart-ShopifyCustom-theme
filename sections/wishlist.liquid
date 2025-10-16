@@ -1,0 +1,1504 @@
+<div id="wishlistPage">
+  <!-- Login screen -->
+  <section class="login__wishlist__wrapper" id="wishlistLogin" style="display:none;">
+    <div class="container">
+      <div class="login__wishlist__inn">
+        <h1>Login to view products in your Wishlist.</h1>
+        <img src="{{ 'img_login-wishlist.svg' | asset_url }}" alt="">
+        <a href="javascript:" class="btns btnDark btnProceed" data-bs-toggle="modal" data-bs-target="#loginModal">
+          <div class="bg"></div>
+          <div class="btnText">
+            <span>Login</span>
+            <span>Login</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+  <!-- Wishlist folders / lists UI -->
+  <section class="myWishList__products__wrapper" id="wishlistFolders" style="display:none;">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-12 col-lg-10">
+          <div class="wishlist_title">
+            <h2>My Wishlist</h2>
+            <div class="inner">
+              <h4><span id="folderCount">0</span> List</h4>
+              <h4><span id="productCount">0</span> Products</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-5 col-lg-4 col-xl-4">
+          <div class="myList_wrap">
+            <h3>My List </h3>
+            <div class="wishlist_list" id="foldersList">
+              <!-- folders rendered here -->
+            </div>
+
+            <button type="button" class="btns btnDark" id="openCreateListBtn" data-bs-toggle="modal" data-bs-target="#wishlistCreate">
+              <div class="bg"></div>
+              <div class="btnText">
+                <span>Create New List</span>
+                <span>Create New List</span>
+              </div>
+            </button>
+          </div>
+        </div>
+        <div class="col-12 col-md-7 col-lg-6 col-xl-5 offset-xl-1">
+          <div class="products_cards_wrap" id="folderProducts">
+            <!-- products for selected folder will appear here -->
+          </div>
+        </div>
+      </div>
+      
+    <!-- ===== Mobile Wishlist UI (Dynamically populated) ===== -->
+    <div class="mobileOnly">
+      <div class="myList_wrap_mobile">
+        <div class="create_wishlist_wrap">
+          <div class="titleBtn_flex">
+            <h2>My List</h2>
+             <button type="button" class="btns btnDark" id="createWhislistBtn">
+              <div class="bg"></div>
+              <div class="btnText">
+                <span>Create New List</span>
+                <span>Create New List</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- Create Wishlist Modal -->
+                            <div class="create_wishlist_modal_wrap" id="createWishList_modal">
+                                <h4>Create a Wishlist</h4>
+
+                                <div class="input_flex">
+                                    <label for="wishlist">Enter the name of the Wishlist</label>
+                                    <input type="text" name="wishlist" id="wishlist" class="wishlistInput">
+                                </div>
+
+                                <div class="btns_wrap">
+                                    <button type="button" class="btns btnWhite" id="cancelBtn">
+                                        <div class="bg"></div>
+                                        <div class="btnText">
+                                            <span>Cancel</span>
+                                            <span>Cancel</span>
+                                        </div>
+                                    </button>
+                                    <button type="button" class="btns btnDark">
+                                        <div class="bg"></div>
+                                        <div class="btnText">
+                                            <span>Create</span>
+                                            <span>Create</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+        </div>
+
+        <!-- Folder Dropdown -->
+        <div class="wishlist_dropdown">
+          <div class="customSelect">
+            <div class="selected">
+              <div class="title">
+                <h4 id="mobileActiveListName">Default List</h4>
+                <span>(<span id="mobileActiveListCount">0</span> Products)</span>
+              </div>
+            </div>
+            <ul class="options" id="mobileFoldersList">
+              <!-- folders injected dynamically via JS -->
+            </ul>
+          </div>
+
+          <!-- Rename / Remove -->
+          <div class="renameRemove_wrap">
+            <button class="renameRemoveBtn" id="renameRemoveBtn">
+              <img src="{{ 'img_wishlist-create_dots.svg' | asset_url }}" alt="" />
+            </button>
+          </div>
+           <!-- Rename Remove Modal -->
+                            <div class="renameRemove_modal_wrap" id="renameRemove_modal">
+                                <div class="project_list_wrap">
+                                    <h4 id="mobileRenameRemoveFolderName">Project-1</h4>
+                                    <ul>
+                                        <li>
+                                            <button type="button" class="btnsAction"
+                                                id="mobileReanmeBtn">Rename</button>
+                                        </li>
+                                        <li>
+                                            <button type="button" id="btnsAction" class="btnsAction"
+                                                data-bs-toggle="modal" data-bs-target="#removeFolderModal">Remove</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+        </div>
+      </div>
+<!-- Rename Input Field Modal -->
+                    <div class="renameInput_modal_wrap" id="renameInput_modal">
+                        <div class="fieldsMobile">
+                            <label for="rename">Rename this list</label>
+                            <input type="text" class="mobileInput" name="rename">
+                        </div>
+                        <div class="mobileBtns">
+                            <button class="btns btnWhite" id="mobileCancelBtn">
+                                <div class="bg"></div>
+                                <div class="btnText">
+                                    <span>Cancel</span>
+                                    <span>Cancel</span>
+                                </div>
+                            </button>
+                            <button class="btns btnDark">
+                                <div class="bg"></div>
+                                <div class="btnText">
+                                    <span>Create</span>
+                                    <span>Create</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+      <!-- Products Section -->
+      <div class="products_cards_wrap" id="mobileFolderProducts">
+        <!-- products for active folder injected here via JS -->
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- Empty Wishlist -->
+  <section class="empty__wishlist__wrapper" id="wishlistEmpty" style="display:none;">
+    <div class="container">
+      <div class="empty__wishlist__inn">
+        <img src="{{ 'img_empty-wishlist.svg' | asset_url }}" alt="">
+        <h1>Your Wishlist is empty</h1>
+        <p>You haven’t yet added anything to your Wishlist. Add a product before checking out</p>
+      </div>
+    </div>
+  </section>
+    <!-- Wishlist with products -->
+  <section class="filled__wishlist__wrapper" id="wishlistFilled" style="display:none;">
+    <div class="container">
+      <div class="filled__wishlist__inn">
+        <h1>My Wishlist</h1>
+        <div id="wishlistItems" class="wishlist-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Create Wishlist Modal -->
+ <div class="modal wishListModal fade" id="wishlistCreate" tabindex="-1" aria-labelledby="wishlistCreateLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4>Create a Wishlist </h4>
+                    <div class="field_flex">
+                        <label for="">Enter the List name</label>
+                        <input type="text" class="wishlistInput">
+                        <p class="wishlist-error-msg text-danger hidden" style="margin-top:5px; font-size:13px;"></p>
+                    </div>
+                    <div class="btnsFlex">
+                        <button type="button" class="btns btnWhite" data-bs-dismiss="modal">
+                            <div class="bg"></div>
+                            <div class="btnText">
+                                <span>Close</span>
+                                <span>Close</span>
+                            </div>
+                        </button>
+                        <button type="button" class="btns btnDark">
+                            <div class="bg"></div>
+                            <div class="btnText">
+                                <span>Create</span>
+                                <span>Create</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  </div>
+  <!-- Remove Folder Modal -->
+<div class="modal modal_remove fade" id="removeFolderModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="removeFolderLabel">Are you sure you want to remove this folder?</h1>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btns btnWhite" data-bs-dismiss="modal">
+          <div class="bg"></div>
+          <div class="btnText"><span>Cancel</span><span>Cancel</span></div>
+        </button>
+        <button type="button" class="btns btnDark" id="confirmRemoveBtn" data-bs-dismiss="modal">
+          <div class="bg"></div>
+          <div class="btnText"><span>Remove</span><span>Remove</span></div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Remove Product Modal -->
+<div class="modal modal_remove fade" id="removeProductModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title" id="removeProductLabel">Are you sure you want to remove this product from wishlist?</h1>
+      </div>
+      <div class="modal-body">
+        <div class="product_remove">
+          <img id="removeProductImg" src="" class="img" alt="" />
+          <div class="contents">
+            <h5 id="removeProductTitle"></h5>
+            <p id="removeProductDesc"></p>
+            <div class="mrp">
+              <h6>MRP: <span>&#8377;</span><span id="removeProductPrice"></span></h6>
+              <p>(Inclusive all of taxes)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btns btnWhite" data-bs-dismiss="modal">
+          <div class="bg"></div>
+          <div class="btnText">
+            <span>Cancel</span>
+            <span>Cancel</span>
+          </div>
+        </button>
+        <button type="button" class="btns btnDark" id="confirmRemoveProduct" data-bs-dismiss="modal">
+          <div class="bg"></div>
+          <div class="btnText">
+            <span>Remove</span>
+            <span>Remove</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Undo Toast -->
+<div id="toast" class="toastUndo" style="display:none;">
+  <div class="flex_wrap">
+    <p id="toastMessage">Action performed</p>
+    <button class="btnUndo" onclick="undoAction()">UNDO</button>
+  </div>
+  <button class="close" onclick="hideToast()">
+    <img src="{{ 'img_cart_x.svg' | asset_url }}" alt="" />
+  </button>
+</div>
+
+  
+  
+  {% render 'login-modal' %}
+  <script>
+    // Inject minimal CSS to visually disable add-to-cart buttons and remove pointer interactions
+    (function(){
+      try {
+        var s = document.createElement('style');
+        s.type = 'text/css';
+        s.appendChild(document.createTextNode('\n.btns.add-to-cart-btn.disabled,\n.btns.add-to-cart-btn[aria-disabled="true"] {\n  opacity: 0.5 !important;\n  pointer-events: none !important;\n  cursor: default !important;\n}\n'));
+        document.head.appendChild(s);
+      } catch(e) { /* ignore if document not ready */ }
+    })();
+        document.addEventListener("DOMContentLoaded", function () {
+      // Set initial modal folder name to selected folder on page load
+      setTimeout(function() {
+        const folders = JSON.parse(localStorage.getItem('wishlist_folders')||'[]');
+        const idx = window.selectedFolderIndex || 0;
+        var modalFolderName = document.getElementById('mobileRenameRemoveFolderName');
+        if (modalFolderName) {
+          if (folders[idx]) {
+            modalFolderName.textContent = folders[idx].name;
+          } else {
+            modalFolderName.textContent = 'Untitled';
+          }
+        }
+      }, 0);
+            const button = document.getElementById("renameRemoveBtn");
+            const box = document.getElementById("renameRemove_modal");
+            const btnsAction = document.getElementById("btnsAction");
+            const body = document.querySelector("body");
+            button.addEventListener("click", function () {
+                box.classList.toggle("show");
+                body.classList.toggle("bgOverlay");
+            });
+
+            // Mobile Remove button should set folderToRemoveIndex and open the confirm modal
+            btnsAction.addEventListener("click", function () {
+                const idx = (typeof window.selectedFolderIndex !== 'undefined') ? window.selectedFolderIndex : 0;
+                // set the folderToRemoveIndex so confirm dialog removes the correct folder
+                window.folderToRemoveIndex = idx;
+                // update the modal label text
+                const folders = JSON.parse(localStorage.getItem('wishlist_folders')||'[]');
+                const f = folders[idx];
+                const label = document.getElementById("removeFolderLabel");
+                if (label) label.textContent = `Are you sure you want to remove "${f ? f.name : 'this folder'}" from wishlist?`;
+                // Open bootstrap modal for confirmation
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                  const modal = new bootstrap.Modal(document.getElementById('removeFolderModal'));
+                  modal.show();
+                } else {
+                  document.getElementById('removeFolderModal').style.display = 'block';
+                }
+                // Hide the rename/remove modal overlay
+                box.classList.remove("show");
+                body.classList.remove("bgOverlay");
+            });
+        });
+    </script>
+    <script>
+      // Keep the rename/remove modal title synced to the currently-selected folder when the three-dots button is clicked
+      document.addEventListener('DOMContentLoaded', function () {
+        const renameRemoveBtn = document.getElementById('renameRemoveBtn');
+        if (!renameRemoveBtn) return;
+        renameRemoveBtn.addEventListener('click', function () {
+          const folders = JSON.parse(localStorage.getItem('wishlist_folders')||'[]');
+          const idx = (typeof window.selectedFolderIndex !== 'undefined') ? window.selectedFolderIndex : 0;
+          var modalFolderName = document.getElementById('mobileRenameRemoveFolderName');
+          if (modalFolderName) {
+            if (folders[idx]) {
+              modalFolderName.textContent = folders[idx].name;
+            } else {
+              modalFolderName.textContent = 'Untitled';
+            }
+          }
+        });
+      });
+    </script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          // Ensure cancel inside Remove Folder modal clears backdrops and overlays (mobile flow)
+          const removeModal = document.getElementById('removeFolderModal');
+          if (!removeModal) return;
+          const cancelBtn = removeModal.querySelector('.btns.btnWhite');
+          if (!cancelBtn) return;
+          cancelBtn.addEventListener('click', function () {
+            // remove any bootstrap modal-backdrop elements
+            document.querySelectorAll('.modal-backdrop.fade.show').forEach(function (el) { el.remove(); });
+            // also clear generic modal backdrops (if not using fade/show class)
+            document.querySelectorAll('.modal-backdrop').forEach(function (el) { el.remove(); });
+            // remove custom overlay class
+            document.body.classList.remove('bgOverlay');
+            // clear temporary remove index
+            try { window.folderToRemoveIndex = null; } catch (e) {}
+            try { folderToRemoveIndex = null; } catch (e) {}
+          });
+        });
+      </script>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+      const mobileReanmeBtn = document.getElementById("mobileReanmeBtn");
+      const renameInput_modal = document.getElementById("renameInput_modal");
+      const mobileCancelBtn = document.getElementById("mobileCancelBtn");
+      const mobileRenameCreateBtn = renameInput_modal.querySelector(".btns.btnDark");
+      const mobileRenameInput = renameInput_modal.querySelector(".mobileInput");
+      const body = document.querySelector("body");
+      let mobileRenameFolderIdx = null;
+
+      // Open rename modal and set folder index
+      mobileReanmeBtn.addEventListener("click", function () {
+        renameInput_modal.classList.add("open");
+        renameRemove_modal.classList.remove("show");
+        body.classList.add("bgOverlay");
+        // Set input value only
+        const folders = JSON.parse(localStorage.getItem('wishlist_folders')||'[]');
+        mobileRenameFolderIdx = window.selectedFolderIndex || 0;
+        if (folders[mobileRenameFolderIdx]) {
+          mobileRenameInput.value = folders[mobileRenameFolderIdx].name;
+        } else {
+          mobileRenameInput.value = '';
+        }
+      // (No-op here) - modal title update handled by top-level listener to keep behavior consistent
+      });
+
+      // Cancel button closes modal
+      mobileCancelBtn.addEventListener("click", function () {
+        renameInput_modal.classList.remove("open");
+        body.classList.remove("bgOverlay");
+      });
+
+      // Create button updates folder name
+      mobileRenameCreateBtn.addEventListener("click", function () {
+        const newName = mobileRenameInput.value.trim() || 'Untitled';
+        const folders = JSON.parse(localStorage.getItem('wishlist_folders')||'[]');
+        if (folders[mobileRenameFolderIdx]) {
+          folders[mobileRenameFolderIdx].name = newName;
+          localStorage.setItem('wishlist_folders', JSON.stringify(folders));
+          // Refresh UI for both desktop and mobile
+          if (typeof renderFolders === 'function') renderFolders();
+          if (typeof renderMobileFoldersDropdown === 'function') renderMobileFoldersDropdown();
+          if (typeof renderMobileFolderProducts === 'function') renderMobileFolderProducts(mobileRenameFolderIdx);
+          // Force update active name in dropdown immediately
+          var activeName = document.getElementById('mobileActiveListName');
+          if (activeName) activeName.textContent = newName;
+          // Also update desktop folder name if visible
+          var desktopList = document.getElementById('foldersList');
+          if (desktopList) {
+            var items = desktopList.getElementsByClassName('wishlistItem');
+            if (items && items[mobileRenameFolderIdx]) {
+              var nameSpan = items[mobileRenameFolderIdx].querySelector('.itemName');
+              if (nameSpan) nameSpan.textContent = newName;
+            }
+          }
+        }
+        renameInput_modal.classList.remove("open");
+        body.classList.remove("bgOverlay");
+      });
+    })
+    </script>
+    
+
+   <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const button = document.getElementById("createWhislistBtn");
+          const box = document.getElementById("createWishList_modal");
+          const cancelBtn = document.getElementById("cancelBtn");
+          const body = document.querySelector("body");
+          const input = box.querySelector(".wishlistInput");
+          const errorMsg = box.querySelector(".wishlist-error-msg") || (() => {
+            let msg = document.createElement('p');
+            msg.className = 'wishlist-error-msg text-danger hidden';
+            msg.style.marginTop = '5px';
+            msg.style.fontSize = '13px';
+            input.parentNode.appendChild(msg);
+            return msg;
+          })();
+
+        button.addEventListener("click", function () {
+          box.classList.toggle("show");
+          body.classList.toggle("bgOverlay");
+          input.value = '';
+          errorMsg.classList.add('hidden');
+          input.classList.remove('error');
+          // Always refresh dropdown when opening modal
+          if (typeof renderMobileFoldersDropdown === 'function') renderMobileFoldersDropdown();
+        });
+
+          cancelBtn.addEventListener("click", function () {
+            box.classList.remove("show");
+            body.classList.remove("bgOverlay");
+          });
+
+          // Create button logic for mobile
+          const createBtn = box.querySelector(".btns.btnDark");
+          if (createBtn) {
+            createBtn.addEventListener("click", function () {
+              const name = input.value.trim();
+              let folders = JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+              errorMsg.classList.add('hidden');
+              input.classList.remove('error');
+              if (!name) {
+                errorMsg.textContent = 'Please enter a project name.';
+                errorMsg.classList.remove('hidden');
+                input.classList.add('error');
+                return;
+              }
+              const duplicate = folders.some(f => f.name.toLowerCase() === name.toLowerCase());
+              if (duplicate) {
+                errorMsg.textContent = 'Project name already exists!';
+                errorMsg.classList.remove('hidden');
+                input.classList.add('error');
+                return;
+              }
+              const newFolder = { id: Date.now(), name: name, products: [] };
+              const pending = JSON.parse(localStorage.getItem('wishlist_pending_product') || 'null');
+              if (pending) {
+                newFolder.products.push(pending);
+                localStorage.removeItem('wishlist_pending_product');
+              }
+              folders.push(newFolder);
+              localStorage.setItem('wishlist_folders', JSON.stringify(folders));
+              input.value = '';
+              input.classList.remove('error');
+              errorMsg.classList.add('hidden');
+              box.classList.remove("show");
+              body.classList.remove("bgOverlay");
+              // Re-render UI
+              if (typeof renderFolders === 'function') renderFolders();
+              if (typeof renderMobileFoldersDropdown === 'function') renderMobileFoldersDropdown();
+              if (typeof renderMobileFolderProducts === 'function') renderMobileFolderProducts(folders.length - 1);
+              // Always show toast after creating a project
+              if (typeof showToast === 'function') showToast(`Project "${name}" created successfully`);
+            });
+          }
+        });
+    </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  
+  // Mobile customSelect dropdown toggle logic
+  const mobileCustomSelect = document.querySelector('.mobileOnly .customSelect');
+  const mobileSelected = mobileCustomSelect ? mobileCustomSelect.querySelector('.selected') : null;
+  const mobileOptions = mobileCustomSelect ? mobileCustomSelect.querySelector('.options') : null;
+
+  if (mobileSelected && mobileOptions) {
+    mobileSelected.addEventListener('click', function(e) {
+      e.stopPropagation();
+      // Always refresh dropdown when opening
+      if (typeof renderMobileFoldersDropdown === 'function') renderMobileFoldersDropdown();
+      mobileSelected.classList.toggle('active');
+      mobileOptions.classList.toggle('show');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.customSelect')) {
+        mobileSelected.classList.remove('active');
+        mobileOptions.classList.remove('show');
+      }
+    });
+  }
+   // folders/lists storage format: { id, name, products: [{title,variant,...}] }
+  function getFolders() { return JSON.parse(localStorage.getItem('wishlist_folders')||'[]'); }
+  function saveFolders(f) { localStorage.setItem('wishlist_folders', JSON.stringify(f)); }
+
+  let toastTimeout;
+  let lastRemovedFolder = null;
+  let lastRemovedIndex = null;
+  let folderToRemoveIndex = null;
+  // Track currently selected folder index and expose to window for other handlers
+  let selectedFolderIndex = 0;
+  window.selectedFolderIndex = 0;
+  // ===== Product removal variables =====
+let productToRemove = null;
+let productToRemoveFolder = null;
+let productToRemoveIndex = null;
+let lastRemovedProduct = null;
+let lastRemovedFromFolder = null;
+let lastRemovedProductIndex = null;
+
+// Open Remove Product modal
+window.removeProduct = function(folderIdx, productIdx) {
+  const folders = getFolders();
+  const product = folders[folderIdx].products[productIdx];
+  if (!product) return;
+
+  // Save selected product for modal confirmation
+  productToRemove = product;
+  productToRemoveFolder = folderIdx;
+  productToRemoveIndex = productIdx;
+
+  // Populate modal with product info
+  document.getElementById('removeProductImg').src = product.image || '../assets/img/wishlist-create/product.png';
+  document.getElementById('removeProductTitle').textContent = product.title;
+  document.getElementById('removeProductDesc').textContent = product.description || '';
+  document.getElementById('removeProductPrice').textContent = product.price || '';
+
+  // Show modal (Bootstrap)
+  const modalEl = document.getElementById('removeProductModal');
+  if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+  }
+};
+
+// Confirm product removal from modal
+document.getElementById('confirmRemoveProduct').addEventListener('click', function() {
+  if (productToRemove === null || productToRemoveFolder === null || productToRemoveIndex === null) return;
+
+  const folders = getFolders();
+
+  // Save for undo
+  lastRemovedProduct = productToRemove;
+  lastRemovedFromFolder = productToRemoveFolder;
+  lastRemovedProductIndex = productToRemoveIndex;
+
+  // Remove product
+  folders[productToRemoveFolder].products.splice(productToRemoveIndex, 1);
+  saveFolders(folders);
+
+  // Re-render UI
+  renderFolderProducts(productToRemoveFolder);
+  renderFolders();
+   renderMobileFolderProducts(selectedFolderIndex);
+  renderMobileFoldersDropdown();
+
+  // Show toast
+  showToast("Product removed from wishlist");
+
+  // Clear temporary modal vars
+  productToRemove = null;
+  productToRemoveFolder = null;
+  productToRemoveIndex = null;
+});
+
+  
+
+
+  // Show Toast (local helper)
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+
+  // Set dynamic message
+  const p = document.getElementById("toastMessage");
+  if (p) p.textContent = message;
+
+  toast.style.display = "block";
+  toast.classList.add('show'); // Ensure toast is visible
+
+  clearTimeout(window.toastTimeout);
+  window.toastTimeout = setTimeout(() => {
+    hideToast();
+  }, 3000);
+}
+
+// Make showToast globally available
+window.showToast = showToast;
+
+
+
+
+ // expose hideToast globally (used by inline onclick)
+window.hideToast = function() {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+  toast.style.display = "none";
+  clearTimeout(toastTimeout);
+
+  const folders = getFolders();
+  const wishlistFolders = document.getElementById("wishlistFolders");
+  const wishlistEmpty = document.getElementById("wishlistEmpty");
+
+ if (folders.length === 0) {
+  wishlistFolders.style.display = "none";
+  wishlistEmpty.style.display = "block";
+} else {
+  wishlistEmpty.style.display = "none";
+  wishlistFolders.style.display = "block";
+  selectedFolderIndex = 0;   // ✅ auto-select first folder
+  renderFolders();
+  renderFolderProducts(selectedFolderIndex);
+}
+};
+
+
+// expose undoAction globally (used by inline onclick)
+  window.undoAction = function() {
+  // hide toast immediately
+  window.hideToast();
+
+  // Undo folder removal
+    if (lastRemovedFolder !== null && lastRemovedIndex !== null) {
+    const folders = getFolders();
+    const insertIndex = Math.min(Math.max(0, lastRemovedIndex), folders.length);
+    folders.splice(insertIndex, 0, lastRemovedFolder);
+    saveFolders(folders);
+
+    renderFolders();
+      // Restore selection to the restored folder
+      selectedFolderIndex = insertIndex;
+      window.selectedFolderIndex = selectedFolderIndex;
+      renderFolderProducts(insertIndex);
+      renderMobileFoldersDropdown();
+      renderMobileFolderProducts(insertIndex);
+
+    document.getElementById("wishlistEmpty").style.display = "none";
+    document.getElementById("wishlistFolders").style.display = "block";
+
+    lastRemovedFolder = null;
+    lastRemovedIndex = null;
+    return;
+  }
+
+  // Undo product removal
+  if (lastRemovedProduct !== null && lastRemovedFromFolder !== null) {
+    const folders = getFolders();
+    if (folders[lastRemovedFromFolder]) {
+      const insertIndex = Math.min(Math.max(0, lastRemovedProductIndex), folders[lastRemovedFromFolder].products.length);
+      folders[lastRemovedFromFolder].products.splice(insertIndex, 0, lastRemovedProduct);
+      saveFolders(folders);
+
+      renderFolders();
+      renderFolderProducts(lastRemovedFromFolder);
+      renderMobileFoldersDropdown();
+      renderMobileFolderProducts(lastRemovedFromFolder);
+    }
+
+    lastRemovedProduct = null;
+    lastRemovedProductIndex = null;
+    lastRemovedFromFolder = null;
+  }
+};
+
+
+
+  // Trigger removeFolder with modal (exposed globally earlier as well)
+  window.removeFolder = function(idx) {
+    folderToRemoveIndex = idx;
+    const folders = getFolders();
+    const f = folders[idx];
+    const label = document.getElementById("removeFolderLabel");
+    if (label) label.textContent = `Are you sure you want to remove "${f ? f.name : 'this folder'}" from wishlist?`;
+
+    // Open bootstrap modal
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      const modal = new bootstrap.Modal(document.getElementById("removeFolderModal"));
+      modal.show();
+    } else {
+      document.getElementById("removeFolderModal").style.display = "block";
+    }
+    
+  };
+
+  // Confirm removal - bind only if button exists
+document.getElementById("confirmRemoveBtn").addEventListener("click", function() {
+  // prefer local folderToRemoveIndex, fallback to window.folderToRemoveIndex (set by mobile handler)
+  const idxToRemove = (folderToRemoveIndex !== null && typeof folderToRemoveIndex !== 'undefined') ? folderToRemoveIndex : (typeof window.folderToRemoveIndex !== 'undefined' ? window.folderToRemoveIndex : null);
+  if (idxToRemove === null) return;
+  const folders = getFolders();
+  lastRemovedFolder = folders[idxToRemove]; // save for undo
+  lastRemovedIndex = idxToRemove;
+
+  folders.splice(idxToRemove, 1);
+  saveFolders(folders);
+  renderFolders();
+  // After removal, update product panes and mobile dropdown. Select first folder as active for mobile.
+  document.querySelector(".products_cards_wrap").innerHTML = "";
+  // Reset mobile selection to first folder
+  selectedFolderIndex = 0;
+  window.selectedFolderIndex = 0;
+  renderMobileFoldersDropdown();
+  renderMobileFolderProducts(0);
+
+  showToast("Folder removed from wishlist");
+  folderToRemoveIndex = null;
+  if (typeof window.folderToRemoveIndex !== 'undefined') window.folderToRemoveIndex = null;
+
+  // Remove lingering modal backdrop and overlay
+  document.querySelectorAll('.modal-backdrop').forEach(function(el) { el.parentNode.removeChild(el); });
+  document.body.classList.remove('bgOverlay');
+});
+
+
+  // ===== Render Folders =====
+  function renderFolders() {
+    const folders = getFolders();
+    const list = document.querySelector('.wishlist_list');
+    const folderCount = document.getElementById('folderCount');
+    const productCount = document.getElementById('productCount');
+    if (!list) return;
+
+    list.innerHTML = '';
+    let prodTotal = 0;
+
+    folders.forEach((f, idx) => {
+  prodTotal += (f.products || []).length;
+  const el = document.createElement('div');
+  el.className = 'wishlistItem' + (idx === selectedFolderIndex ? ' active' : '');
+
+  el.innerHTML = `
+    <span class="itemName">${f.name}</span>
+    <input type="text" class="editInput" value="${f.name}" style="display:none" />
+    <div class="products">
+      <span class="productCount">(${(f.products || []).length} Products)</span>
+      <div class="menuDropdown">
+        <button class="menuBtn" onclick="toggleMenu(this)">
+          <img src="{{ 'img_wishlist-create_dots.svg' | asset_url }}" alt="" />
+        </button>
+        <ul class="buttons_list">
+          <li><button type="button" class="editBtn">Rename</button></li>
+          <li><button type="button" onclick="removeFolder(${idx})">Remove</button></li>
+        </ul>
+      </div>
+    </div>
+  `;
+
+
+      // ===== Rename Functionality =====
+      const nameSpan = el.querySelector('.itemName');
+      const inputField = el.querySelector('.editInput');
+      const editBtn = el.querySelector('.editBtn');
+
+      editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        nameSpan.style.display = 'none';
+        inputField.style.display = 'block';
+
+        // Clear the field when Rename is clicked
+        inputField.value = '';
+        inputField.focus();
+      });
+
+      inputField.addEventListener('blur', () => {
+        const newName = inputField.value.trim() || 'Untitled';
+        nameSpan.textContent = newName;
+        nameSpan.style.display = 'block';
+        inputField.style.display = 'none';
+
+        const updatedFolders = getFolders();
+        if (updatedFolders[idx]) {
+          updatedFolders[idx].name = newName;
+          saveFolders(updatedFolders);
+        }
+
+        renderFolders(); // re-render to pick up updated counts / names
+      });
+
+      inputField.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') inputField.blur();
+      });
+
+      // Open folder products on click (ignore clicks on inputs/menus)
+       // Open folder products on click
+        el.addEventListener('click', (ev) => {
+          if (!ev.target.closest('.menuDropdown') && !ev.target.classList.contains('editInput')) {
+            selectedFolderIndex = idx;   // ✅ update selected folder
+            // Keep global window reference in sync so other handlers (mobile modals) see the current folder
+            window.selectedFolderIndex = selectedFolderIndex;
+            renderFolders();             // re-render with highlight
+            // Show desktop products only on desktop
+            if (window.innerWidth > 991) {
+              document.getElementById('folderProducts').style.display = 'block';
+              document.getElementById('mobileFolderProducts').style.display = 'none';
+              renderFolderProducts(idx);
+            } else {
+              // Show mobile products only on mobile
+              document.getElementById('folderProducts').style.display = 'none';
+              document.getElementById('mobileFolderProducts').style.display = 'block';
+              renderMobileFolderProducts(idx);
+            }
+          }
+        });
+
+        list.appendChild(el);
+      });
+
+    folderCount.textContent = folders.length;
+    productCount.textContent = prodTotal;
+  }
+
+    // ===== Render Mobile Folders Dropdown =====
+    function renderMobileFoldersDropdown() {
+      const folders = getFolders();
+      const list = document.getElementById('mobileFoldersList');
+      const activeName = document.getElementById('mobileActiveListName');
+      const activeCount = document.getElementById('mobileActiveListCount');
+      if (!list || !activeName || !activeCount) return;
+
+      list.innerHTML = '';
+      folders.forEach((f, idx) => {
+        const li = document.createElement('li');
+        li.className = 'mobileFolderItem' + (idx === selectedFolderIndex ? ' active' : '');
+        li.innerHTML = `<span class=\"folderName\">${f.name}</span> <span class=\"folderCount\">(${(f.products||[]).length} Products)</span>`;
+        li.addEventListener('click', function(e) {
+          e.stopPropagation();
+          selectedFolderIndex = idx;
+          // Keep global window reference in sync so other handlers (mobile modals) see the current folder
+          window.selectedFolderIndex = selectedFolderIndex;
+          renderMobileFoldersDropdown();
+          renderMobileFolderProducts(idx);
+          // Close dropdown after selection
+          const mobileSelected = document.querySelector('.mobileOnly .customSelect .selected');
+          const mobileOptions = document.querySelector('.mobileOnly .customSelect .options');
+          if (mobileSelected && mobileOptions) {
+            mobileSelected.classList.remove('active');
+            mobileOptions.classList.remove('show');
+          }
+        });
+        list.appendChild(li);
+      });
+
+      // Update active folder name and count
+      if (folders[selectedFolderIndex]) {
+        activeName.textContent = folders[selectedFolderIndex].name;
+        activeCount.textContent = (folders[selectedFolderIndex].products||[]).length;
+      } else {
+        activeName.textContent = 'Default List';
+        activeCount.textContent = '0';
+      }
+    }
+
+  // ===== Render Products inside Folder =====
+  function renderFolderProducts(folderIdx) {
+    const folders = getFolders();
+    const container = document.querySelector('.products_cards_wrap');
+    if (!container) return;
+
+    container.innerHTML = '';
+    const f = folders[folderIdx];
+    if (!f) return;
+
+    f.products.forEach((p, pIdx) => {
+      const card = document.createElement('div');
+      card.className = 'card_flex' + (p.outOfStock ? ' outOfStock' : '');
+      card.innerHTML = `
+        <div class="img"><img src="${p.image || '../assets/img/wishlist-create/product.png'}" alt="" /></div>
+        <div class="contents">
+          <div class="titleFlex">
+            <div class="title"><h3>${p.title}</h3></div>
+            <div class="actionsFlex">
+              <button type="button" class="share">
+                <a href="https://api.whatsapp.com/send?text={% if canonical_url %}{{ canonical_url | url_encode }}{% else %}{{ shop.url }}/products/{{ product.handle | url_encode }}{% endif %}%0A{{ product.title | url_encode }}"
+                  onclick="window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600'); return false;">
+                  <img src="{{ 'img_whatsapp.svg' | asset_url }}" alt="Whatsapp" />
+                  <span>Share</span>
+                </a>
+
+
+              </button>
+              <div class="dropdownNestedMenu">
+                <button class="dropdownToggle" onclick="toggleDropdown(this)">
+                  <img src="{{ 'img_wishlist-create_dots.svg' | asset_url }}" alt="" />
+                </button>
+                <ul class="dropdownMenu">
+                  <li class="has_submenu">
+                    <div class="text">Move</div>
+                    <ul class="submenu">
+                      ${folders.map((fld, i) => `<li class="subMenuItem" onclick="moveProduct(${folderIdx},${pIdx},${i})">${fld.name}</li>`).join('')}
+                    </ul>
+
+                  </li>
+                  <li class="has_submenu"><button onclick="removeProduct(${folderIdx},${pIdx})" class="text">Remove</button></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="priceFlex">
+            <div class="mrp"><h4>MRP: ₹${p.price}</h4><p>(Inclusive all of taxes)</p></div>
+<a href="javascript:" 
+  class="btns btnDark add-to-cart-btn ${p.outOfStock ? 'disabled' : ''}"
+  ${p.outOfStock ? 'aria-disabled="true" tabindex="-1"' : ''}
+  data-variant-id="${p.variantId || ''}"
+  data-option-color="${p.options.color || ''}"
+  data-option-sweep="${p.options.sweep || ''}"
+  data-option-watt="${p.options.watt || ''}"
+  data-option-material="${p.options.material || ''}"
+  data-option-light="${p.options.light || ''}"
+  data-option-mount="${p.options.mount || ''}"
+  data-option-addon="${p.options.addon || ''}"
+>
+  <div class="bg"></div>
+  <div class="btnText">
+    <span>Add to Cart</span>
+    <span>Add to Cart</span>
+  </div>
+</a>
+
+
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+  // Move a product to another folder/project
+window.moveProduct = function(fromFolderIdx, productIdx, toFolderIdx) {
+  const folders = getFolders();
+
+  if (!folders[fromFolderIdx] || !folders[toFolderIdx]) return; // safety check
+  if (fromFolderIdx === toFolderIdx) return; // no move if same folder
+
+  const product = folders[fromFolderIdx].products[productIdx];
+  if (!product) return;
+
+  // Remove product from original folder
+  folders[fromFolderIdx].products.splice(productIdx, 1);
+
+  // Add product to target folder
+  folders[toFolderIdx].products.push(product);
+
+  // Save updated folders
+  saveFolders(folders);
+
+  // Re-render folders and selected products
+  renderFolders();
+  renderFolderProducts(selectedFolderIndex);
+// Show toast message
+  const fromFolderName = folders[fromFolderIdx]?.name || 'Source Folder';
+  const toFolderName = folders[toFolderIdx]?.name || 'Target Folder';
+  showToast(`Product moved from "${fromFolderName}" to "${toFolderName}"`);
+
+};
+
+  // ===== Dropdown Menu for Folders =====
+  window.toggleMenu = function(element) {
+    const ul = element.nextElementSibling;
+    if (!ul) return;
+
+    document.querySelectorAll('.buttons_list').forEach(menu => {
+      if (menu !== ul) menu.classList.remove('active');
+    });
+
+    ul.classList.toggle('active');
+  };
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === 'Escape') {
+      document.querySelectorAll('.buttons_list').forEach(menu => {
+        menu.classList.remove('active');
+      });
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.menuDropdown')) {
+      document.querySelectorAll('.buttons_list').forEach(el => el.classList.remove('active'));
+    }
+  });
+
+
+// Toggle dropdown inside product card
+window.toggleDropdown = function(button) {
+    const menu = button.nextElementSibling;
+
+    // Close all other dropdowns
+    document.querySelectorAll('.dropdownMenu').forEach(el => {
+        if (el !== menu) el.classList.remove('active');
+    });
+
+    // Toggle current dropdown
+    menu.classList.toggle('active');
+}
+
+// Click outside to close dropdown
+document.addEventListener('click', function (e) {
+    if (!e.target.closest('.dropdownNestedMenu')) {
+        document.querySelectorAll('.dropdownMenu').forEach(el => el.classList.remove('active'));
+    }
+});
+
+
+  // ===== Render Products inside Folder for Mobile =====
+// ===== Render Products inside Folder for Mobile =====
+function renderMobileFolderProducts(folderIdx) {
+  const folders = getFolders();
+  const container = document.getElementById('mobileFolderProducts');
+  if (!container) return;
+  container.innerHTML = '';
+  const f = folders[folderIdx];
+  if (!f) return;
+
+  f.products.forEach((p, pIdx) => {
+    const card = document.createElement('div');
+    card.className = 'card_flex' + (p.outOfStock ? ' outOfStock' : '');
+    card.innerHTML = `
+      <div class="img"><img src="${p.image || '../assets/img/wishlist-create/product.png'}" alt="" /></div>
+      <div class="contents">
+        <div class="titleFlex">
+          <div class="title"><h3>${p.title}</h3></div>
+          <div class="mobileBtnsMoveRemove_wrap">
+            <button type="button" class="mobileMoveRemoveBtnDropdown" id="mobileMoveRemoveBtnDropdown${folderIdx}_${pIdx}">
+               <img src="{{ 'img_wishlist-create_dots.svg' | asset_url }}" alt="" />
+            </button>
+            <div class="mobile_dropdown_wrap" id="mobileDropdown${folderIdx}_${pIdx}">
+              <div class="mobileMoveRemoveContents">
+                <div class="moveBtn_wrap">
+                  <button type="button" class="moveAccordionBtn" id="moveAccordionBtn${folderIdx}_${pIdx}">Move</button>
+                  <ul id="moveList${folderIdx}_${pIdx}" class="moveListWraps">
+                    ${folders.map((fld, i) => `<li><a href="javascript:">${fld.name}</a></li>`).join('')}
+                  </ul>
+                </div>
+              </div>
+              <button type="button" id="mobileRemoveBtn${folderIdx}_${pIdx}" class="mobileRemoveBtn">Remove</button>
+            </div>
+          </div>
+        </div>
+        <div class="priceFlex">
+          <div class="mrp"><h4>MRP: ₹${p.price}</h4><p>(Inclusive all of taxes)</p></div>
+
+          <!-- Mobile-only Share and Add to Cart buttons -->
+          <div class="mobileActions">
+            <!-- Share via WhatsApp (uses product handle if available) -->
+            <button type="button" class="share mobileShareBtn">
+              <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(p.title + (p.handle ? ('%0A' + (window.location.origin + '/products/' + p.handle)) : ''))}" target="_blank" rel="noopener noreferrer">
+                <img src="{{ 'img_whatsapp.svg' | asset_url }}" alt="Whatsapp" />
+                <span>Share</span>
+              </a>
+            </button>
+
+            <!-- Add to Cart button delegates to existing handler via .add-to-cart-btn class -->
+            <a href="javascript:" 
+               class="btns btnDark add-to-cart-btn mobileAddToCart ${p.outOfStock ? 'disabled' : ''}"
+               ${p.outOfStock ? 'aria-disabled="true" tabindex="-1"' : ''}
+               data-variant-id="${p.variantId || ''}"
+               data-option-color="${p.options.color || ''}"
+               data-option-sweep="${p.options.sweep || ''}"
+               data-option-watt="${p.options.watt || ''}"
+               data-option-material="${p.options.material || ''}"
+               data-option-light="${p.options.light || ''}"
+               data-option-mount="${p.options.mount || ''}"
+               data-option-addon="${p.options.addon || ''}"
+            >
+              <div class="bg"></div>
+              <div class="btnText">
+                <span>Add to Cart</span>
+                <span>Add to Cart</span>
+              </div>
+            </a>
+          </div>
+          <!-- /Mobile-only buttons -->
+      </div>
+    `;
+    container.appendChild(card);
+
+    // Attach dropdown logic
+    const mobileMoveRemoveBtnDropdown = document.getElementById(`mobileMoveRemoveBtnDropdown${folderIdx}_${pIdx}`);
+    const mobileDropdown = document.getElementById(`mobileDropdown${folderIdx}_${pIdx}`);
+    const moveButton = document.getElementById(`moveAccordionBtn${folderIdx}_${pIdx}`);
+    const moveList = document.getElementById(`moveList${folderIdx}_${pIdx}`);
+    const mobileRemoveBtn = document.getElementById(`mobileRemoveBtn${folderIdx}_${pIdx}`);
+    const body = document.querySelector("body");
+
+    if (mobileMoveRemoveBtnDropdown && mobileDropdown && moveButton && moveList && mobileRemoveBtn) {
+      // Toggle main dropdown
+      mobileMoveRemoveBtnDropdown.addEventListener("click", function (e) {
+        e.stopPropagation();
+        mobileDropdown.classList.toggle("open");
+        body.classList.toggle("bgOverlay");
+      });
+
+      // Toggle Move accordion
+      moveButton.addEventListener("click", function (e) {
+        e.stopPropagation();
+        moveList.classList.toggle("show");
+        moveButton.classList.toggle("rotate");
+      });
+
+      // Attach move product links
+      moveList.querySelectorAll('a').forEach((moveLink, targetIdx) => {
+        moveLink.addEventListener('click', function (e) {
+          e.stopPropagation();
+          window.moveProduct(folderIdx, pIdx, targetIdx);
+          // Close dropdown and accordion
+          mobileDropdown.classList.remove("open");
+          body.classList.remove("bgOverlay");
+          moveList.classList.remove("show");
+          moveButton.classList.remove("rotate");
+          // Re-render mobile products and dropdown
+          renderMobileFolderProducts(selectedFolderIndex);
+          renderMobileFoldersDropdown();
+        });
+      });
+
+      // Attach remove product
+      mobileRemoveBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        window.removeProduct(folderIdx, pIdx);
+        mobileDropdown.classList.remove("open");
+        body.classList.remove("bgOverlay");
+        moveList.classList.remove("show");
+        moveButton.classList.remove("rotate");
+        renderMobileFolderProducts(selectedFolderIndex);
+        renderMobileFoldersDropdown();
+      });
+
+      // Close dropdown if clicked outside
+      document.addEventListener('click', function(event) {
+        if (!event.target.closest(`#mobileDropdown${folderIdx}_${pIdx}`) &&
+            !event.target.closest(`#mobileMoveRemoveBtnDropdown${folderIdx}_${pIdx}`)) {
+          mobileDropdown.classList.remove("open");
+          moveList.classList.remove("show");
+          moveButton.classList.remove("rotate");
+          
+        }
+      });
+    }
+  });
+}
+
+// Universal Add to Cart function
+window.addToCart = function(variantId, quantity = 1, options = {}) {
+  if (!variantId) return alert("This product cannot be added to cart (missing variant ID).");
+
+  const properties = {};
+  for (let key in options) {
+    if (options[key]) properties[key] = options[key];
+  }
+
+  fetch('/cart/add.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: variantId,
+      quantity: quantity,
+      properties: properties
+    })
+  })
+  .then(res => res.ok ? res.json() : Promise.reject("Add to cart failed"))
+  .then(data => { window.location.href = '/cart'; })
+  .catch(err => { console.error(err); alert("Sorry, could not add this product to cart."); });
+};
+
+// Attach click listeners to all add-to-cart buttons
+// Event delegation for dynamically generated Add to Cart buttons
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.add-to-cart-btn');
+  if (!btn) return;
+
+  // silently ignore clicks on disabled/out-of-stock buttons
+  if (btn.classList.contains('disabled') || btn.getAttribute('aria-disabled') === 'true') return;
+
+  const variantId = btn.dataset.variantId;
+  const options = {
+    Color: btn.dataset.optionColor || '',
+    Sweep: btn.dataset.optionSweep || '',
+    Watt: btn.dataset.optionWatt || '',
+    Material: btn.dataset.optionMaterial || '',
+    Light: btn.dataset.optionLight || '',
+    Mount: btn.dataset.optionMount || '',
+    Addon: btn.dataset.optionAddon || ''
+  };
+
+  addToCart(variantId, 1, options);
+});
+
+
+
+
+  // Create new list and optionally move pending product into it
+  document.querySelectorAll('#wishlistCreate .btns.btnDark, #openCreateListBtn').forEach(btn => {
+    btn && btn.addEventListener('click', function (e) {
+      // open modal handled by bootstrap; creation is handled below
+    });
+  });
+
+  // hook create button inside modal
+const modalCreateBtn = document.querySelector('#wishlistCreate .btns.btnDark');
+
+if (modalCreateBtn) {
+  modalCreateBtn.addEventListener('click', function () {
+    const input = document.querySelector('#wishlistCreate .wishlistInput');
+    const errorMsg = document.querySelector('#wishlistCreate .wishlist-error-msg');
+    if (!input) return;
+
+    const name = input.value.trim();
+    const folders = getFolders();
+
+    // Reset error before validation
+    errorMsg.classList.add('hidden');
+    input.classList.remove('error');
+
+    if (!name) {
+      errorMsg.textContent = 'Please enter a project name.';
+      errorMsg.classList.remove('hidden');
+      input.classList.add('error');
+      return;
+    }
+
+    const duplicate = folders.some(f => f.name.toLowerCase() === name.toLowerCase());
+    if (duplicate) {
+      errorMsg.textContent = 'Project name already exists!';
+      errorMsg.classList.remove('hidden');
+      input.classList.add('error');
+      return;
+    }
+
+    // Create new folder
+    const newFolder = { id: Date.now(), name: name, products: [] };
+    const pending = JSON.parse(localStorage.getItem('wishlist_pending_product') || 'null');
+    if (pending) {
+      newFolder.products.push(pending);
+      localStorage.removeItem('wishlist_pending_product');
+    }
+
+    folders.push(newFolder);
+    saveFolders(folders);
+
+    // Close modal
+    try {
+      document.querySelector('#wishlistCreate .btns.btnWhite').click();
+    } catch (e) {}
+
+    input.value = '';
+    input.classList.remove('error');
+    errorMsg.classList.add('hidden');
+
+    renderFolders();
+    document.getElementById('wishlistFolders').style.display = 'block';
+    renderFolderProducts(folders.length - 1);
+
+    showToast(`Project "${name}" created successfully`);
+  });
+}
+
+// ✅ Reset input & error state every time modal is opened
+const wishlistCreateModal = document.getElementById('wishlistCreate');
+if (wishlistCreateModal) {
+  wishlistCreateModal.addEventListener('show.bs.modal', function () {
+    const input = wishlistCreateModal.querySelector('.wishlistInput');
+    const errorMsg = wishlistCreateModal.querySelector('.wishlist-error-msg');
+    if (input) input.value = '';
+    if (errorMsg) errorMsg.classList.add('hidden');
+    if (input) input.classList.remove('error');
+  });
+}
+
+
+
+  const wishlistLogin = document.getElementById("wishlistLogin");
+  const wishlistEmpty = document.getElementById("wishlistEmpty");
+  const wishlistFilled = document.getElementById("wishlistFilled");
+  const wishlistItems = document.getElementById("wishlistItems");
+
+  // --- Check login state ---
+  let userEmail = localStorage.getItem("sml_user_email");
+  let loginTimestamp = localStorage.getItem("sml_login_time");
+
+  const now = Date.now();
+  const session24hrs = 24 * 60 * 60 * 1000;
+
+  let isLoggedIn = false;
+  // Consider the user logged in if a valid login timestamp exists (covers OTP-only flows
+  // where email may not be present). Keep sml_user_email if available.
+  if (loginTimestamp && (now - loginTimestamp < session24hrs)) {
+    isLoggedIn = true;
+  } else {
+    // clear expired login timestamp but keep stored email (so we don't ask for email again)
+    localStorage.removeItem("sml_login_time");
+  }
+
+  // --- Check wishlist items ---
+  let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+  function showSection(section) {
+    wishlistLogin.style.display = 'none';
+    wishlistEmpty.style.display = 'none';
+    wishlistFilled.style.display = 'none';
+    if (section) section.style.display = 'block';
+  }
+
+  function renderWishlist() {
+    wishlistItems.innerHTML = '';
+    wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+    const folders = JSON.parse(localStorage.getItem('wishlist_folders')||'[]');
+    const pending = JSON.parse(localStorage.getItem('wishlist_pending_product')||'null');
+    if (!isLoggedIn) {
+      showSection(wishlistLogin);
+      return;
+    }
+    // If user has folders or a pending product, show folders UI
+    if (folders.length > 0 || pending) {
+      document.getElementById('wishlistFolders').style.display = 'block';
+      // If there are no folders but a pending product, prompt to create a new list and add the product
+      if (folders.length === 0 && pending) {
+        // Open the create list modal automatically
+        setTimeout(function() {
+          if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            var modal = new bootstrap.Modal(document.getElementById('wishlistCreate'));
+            modal.show();
+          } else {
+            document.getElementById('wishlistCreate').style.display = 'block';
+          }
+        }, 300);
+      }
+      renderFolders();
+      // If folders exist, show products for the first folder by default
+      if (folders.length > 0) {
+        renderFolderProducts(0);
+        renderMobileFoldersDropdown();
+        renderMobileFolderProducts(0);
+      }
+      return;
+    }
+    // If no folders and no pending, show empty wishlist
+    showSection(wishlistEmpty);
+  }
+
+  // initial render
+  // Responsive initial render for products
+  function renderResponsiveProducts() {
+    if (window.innerWidth > 991) {
+      document.getElementById('folderProducts').style.display = 'block';
+      document.getElementById('mobileFolderProducts').style.display = 'none';
+      renderFolderProducts(selectedFolderIndex);
+    } else {
+      document.getElementById('folderProducts').style.display = 'none';
+      document.getElementById('mobileFolderProducts').style.display = 'block';
+      renderMobileFoldersDropdown();
+      renderMobileFolderProducts(selectedFolderIndex);
+    }
+  }
+
+  renderWishlist();
+  renderResponsiveProducts();
+
+  // Listen for window resize to toggle product views
+  window.addEventListener('resize', function() {
+    renderResponsiveProducts();
+  });
+
+  // Listen for custom event dispatched by login-modal on successful login
+  window.addEventListener('sml_user_logged_in', function(e) {
+    userEmail = localStorage.getItem('sml_user_email');
+    loginTimestamp = localStorage.getItem('sml_login_time');
+    // If the login timestamp isn't set yet due to timing, poll briefly (up to 2s)
+    // for sml_login_time before concluding.
+    function finalizeLogin() {
+      loginTimestamp = localStorage.getItem('sml_login_time');
+      isLoggedIn = !!(loginTimestamp && (Date.now() - loginTimestamp < session24hrs));
+      // Hide login screen explicitly
+      var loginSection = document.getElementById('wishlistLogin');
+      if (loginSection) loginSection.style.display = 'none';
+      renderWishlist();
+    }
+
+    if (loginTimestamp) {
+      finalizeLogin();
+      return;
+    }
+
+    // Poll for up to 2 seconds
+    let attempts = 0;
+    const maxAttempts = 10;
+    const poll = setInterval(() => {
+      attempts++;
+      if (localStorage.getItem('sml_login_time')) {
+        clearInterval(poll);
+        finalizeLogin();
+      } else if (attempts >= maxAttempts) {
+        clearInterval(poll);
+        // fallback: ensure UI shows login prompt (not stuck)
+        isLoggedIn = false;
+        renderWishlist();
+      }
+    }, 200);
+  });
+
+  // Also handle storage events (another tab)
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'sml_user_email' || e.key === 'sml_login_time' || e.key === 'wishlist') {
+      userEmail = localStorage.getItem('sml_user_email');
+      loginTimestamp = localStorage.getItem('sml_login_time');
+      // rely on login timestamp alone for logged-in state (OTP-only flows)
+      isLoggedIn = !!(loginTimestamp && (Date.now() - loginTimestamp < session24hrs));
+      renderWishlist();
+    }
+  });
+
+  // For demo: helper to add dummy items when not present (dev only)
+  document.addEventListener('click', function(e) {
+    const t = e.target;
+    if (t && t.matches && t.matches('.add-demo-wishlist')) {
+      const demo = JSON.parse(localStorage.getItem('wishlist')||'[]');
+      demo.push({ title: 'Sample Product ' + (demo.length+1), variant: 'Default' });
+      localStorage.setItem('wishlist', JSON.stringify(demo));
+      renderWishlist();
+    }
+  });
+});
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const dropdown = document.getElementById("renameRemove_modal");
+    const button = document.getElementById("renameRemoveBtn");
+    const body = document.querySelector("body");
+
+    document.addEventListener("click", function (event) {
+      const isClickInsideDropdown = dropdown.contains(event.target);
+      const isClickOnButton = button.contains(event.target);
+
+      if (!isClickInsideDropdown && !isClickOnButton) {
+        dropdown.classList.remove("show");
+        body.classList.remove("bgOverlay");
+      }
+    });
+  });
+</script>

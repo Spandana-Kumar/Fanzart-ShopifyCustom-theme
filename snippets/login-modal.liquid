@@ -1,0 +1,324 @@
+<style>
+{% render 'sml-client-css' %}
+</style>
+{% render 'sml-main' %}
+<script>
+{% render 'sml-client-js' %}
+</script>
+
+<form id="customer_login" style="display:none !important;"></form>
+
+<!-- Login Modal -->
+<div class="modal logIn_modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+        <img src="{{ 'img_cart_close.svg' | asset_url }}" alt="close" />
+      </button>
+      <div class="modal-body">
+        <div class="logIn_bg">
+          <img src="{{ 'img_cart_logIn.png' | asset_url }}" alt="logIn" />
+        </div>
+
+        <div class="logIn_form">
+          <!-- Login Block -->
+          <div class="inner_wrap" id="logInBlock">
+            <div class="title">
+              <h3>Log In</h3>
+              <p>Get access to your orders</p>
+            </div>
+
+            <form action="" class="form">
+              <div class="logIn_field">
+                <label for="phone">Enter 10 digit Mobile Number</label>
+                <input type="text" class="controls" name="phone" id="phone" />
+                <div class="waring" id="warningMsg">Please enter a valid 10-digit mobile number.</div>
+              </div>
+              <button type="button" id="logInNum" class="btns btnDark">
+                <div class="bg"></div>
+                <div class="btnText">
+                  <span>Get Verification Code</span>
+                  <span>Get Verification Code</span>
+                </div>
+              </button>
+            </form>
+
+            <div class="contents">
+              <p>By logging in, you agree to our</p>
+              <ul class="linksList">
+                <li><a href="{{ pages['terms-and-conditions'].url }}">Terms and Conditions</a></li>
+                <li><span>&</span></li>
+                <li><a href="{{ pages['privacy-policy'].url }}">Privacy Policy</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- OTP Block -->
+          <div class="otp_wrapper" id="otpBlock" style="display:none;">
+            <div class="title">
+              <h3>Verify OTP</h3>
+              <p>Provide OTP sent to <strong id="displayNumber"></strong> <a href="#" id="editNumber">Edit</a></p>
+            </div>
+            <form action="" id="otpForm">
+              <div class="logIn_field">
+                <label for="otpInputs">Enter the verification code here</label>
+                <div class="otp_inputs" id="otpInputs">
+                  <input type="text" class="otpControls" maxlength="1" />
+                  <input type="text" class="otpControls" maxlength="1" />
+                  <input type="text" class="otpControls" maxlength="1" />
+                  <input type="text" class="otpControls" maxlength="1" />
+                </div>
+
+                <div id="otpErrorMsg" style="color:red; display:none; font-size:12px; margin-top:5px;">
+                  Invalid OTP. Please try again.
+                </div>
+              </div>
+
+              <p class="resendCounter">
+                Didn't get the code? Resend in <span id="resendTimer">00:30</span>
+              </p>
+              <p class="resend_text" style="display:none;">Didn't get the code? <br>
+                <a href="#" id="resendSMS">Resend code on SMS</a>
+              </p>
+            </form>
+
+            <div class="contents">
+              <p>By logging in, you agree to our</p>
+              <ul class="linksList">
+                <li><a href="{{ pages['terms-and-conditions'].url }}">Terms and Conditions</a></li>
+                <li><span>&</span></li>
+                <li><a href="{{ pages['privacy-policy'].url }}">Privacy Policy</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Email Block -->
+          <div class="email_wrapper inner_wrap" id="emailBlock" style="display:none;">
+            <div class="title">
+              <h3>Enter Your Email</h3>
+              <p>We need your email to complete your login</p>
+            </div>
+            <form id="emailForm">
+              <div class="logIn_field">
+                <label for="userEmail">Email Address</label>
+                <input type="email" class="controls" name="userEmail" id="userEmail" placeholder="Enter your email" required>
+              </div>
+              <button type="submit" id="submitEmail" class="btns btnDark">
+                <div class="bg"></div>
+                <div class="btnText">
+                  <span>Done</span>
+                  <span>Done</span>
+                </div>
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Login Modal -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  let resendTimerInterval;
+  let otpStartTime = null;
+  const otpValidDuration = 30; // seconds
+
+  function clearOTPInputs() {
+    document.querySelectorAll("#otpInputs .otpControls").forEach(i => i.value = "");
+  }
+
+  function isOtpExpired() {
+    if (!otpStartTime) return true;
+    const elapsed = (Date.now() - otpStartTime) / 1000;
+    return elapsed > otpValidDuration;
+  }
+
+  function startResendCountdown(seconds = 30) {
+    otpStartTime = Date.now(); // Reset OTP timer start
+    clearInterval(resendTimerInterval);
+
+    const counter = document.querySelector(".resendCounter");
+    const timerSpan = document.getElementById("resendTimer");
+    const resendText = document.querySelector(".resend_text");
+
+    if (!counter || !timerSpan || !resendText) return;
+
+    counter.style.display = "block";
+    resendText.style.display = "none";
+
+    let remaining = seconds;
+
+    function updateTimer() {
+      const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
+      const ss = String(remaining % 60).padStart(2, "0");
+      timerSpan.textContent = `${mm}:${ss}`;
+
+      if (remaining <= 0) {
+        clearInterval(resendTimerInterval);
+        counter.style.display = "none";
+        resendText.style.display = "block";
+      }
+      remaining--;
+    }
+
+    updateTimer();
+    resendTimerInterval = setInterval(updateTimer, 1000);
+  }
+
+  // STEP 1: Send OTP
+  document.getElementById("logInNum").addEventListener("click", function () {
+    const phone = document.getElementById("phone").value.trim();
+
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      document.getElementById("warningMsg").style.display = "block";
+      return;
+    }
+    document.getElementById("warningMsg").style.display = "none";
+
+    document.getElementById("smlPhoneNumberInput").value = phone;
+    document.getElementById("getOTPButton").click();
+
+    document.getElementById("displayNumber").innerText = phone;
+    document.getElementById("logInBlock").style.display = "none";
+    document.getElementById("otpBlock").style.display = "block";
+
+    clearOTPInputs();
+    startResendCountdown(30);
+    
+    document.querySelector('#otpInputs .otpControls')?.focus();
+    
+    const otpError = document.getElementById("otpErrorMsg");
+    if (otpError) otpError.style.display = "none";
+  });
+
+  // STEP 2: Capture OTP and validate
+  document.querySelectorAll("#otpInputs .otpControls").forEach((input, idx, arr) => {
+    input.addEventListener("input", function () {
+      if (this.value.length === 1 && idx < arr.length - 1) arr[idx + 1].focus();
+
+      const otp = Array.from(arr).map(i => i.value).join("");
+
+      if (otp.length === 4) {
+        const otpError = document.getElementById("otpErrorMsg");
+
+        if (isOtpExpired()) {
+          otpError.style.display = "block";
+          otpError.textContent = "OTP expired. Please request a new one.";
+          clearOTPInputs();
+          return;
+        }
+
+        otpError.style.display = "none";
+        document.getElementById("otpInput").value = otp;
+        document.getElementById("submitOTPButton").click();
+      }
+    });
+  });
+
+  // STEP 3: Email for new users
+  document.getElementById("emailForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const email = document.getElementById("userEmail").value.trim();
+    if (!email) return;
+    localStorage.setItem("sml_user_email", email);
+    document.getElementById("userEmailInput").value = email;
+    document.getElementById("registerUserButton").click();
+  });
+
+  // STEP 4: Edit number
+  document.getElementById("editNumber").addEventListener("click", function (e) {
+    e.preventDefault();
+    document.getElementById("otpBlock").style.display = "none";
+    document.getElementById("logInBlock").style.display = "block";
+    clearOTPInputs();
+    clearInterval(resendTimerInterval);
+  });
+
+  // STEP 5: Resend OTP
+  document.getElementById("resendSMS").addEventListener("click", function (e) {
+    e.preventDefault();
+    clearOTPInputs();
+    document.getElementById("resendOTPButton").click();
+
+    otpStartTime = Date.now();
+    startResendCountdown(30);
+
+    const otpError = document.getElementById("otpErrorMsg");
+    if (otpError) otpError.style.display = "none";
+  });
+
+  // STEP 6: Hook into SML events
+  window.runOnSMLEvent = function (event, data) {
+    console.log("SML Event:", event, data);
+
+    if (event === "PHONE_OTP_SCREEN_TYPE_CHANGE") {
+      if (data.screen_type === "ENTER_OTP") {
+        document.getElementById("logInBlock").style.display = "none";
+        document.getElementById("otpBlock").style.display = "block";
+        clearOTPInputs();
+        startResendCountdown(30);
+        const otpError = document.getElementById("otpErrorMsg");
+        if (otpError) otpError.style.display = "none";
+      }
+      if (data.screen_type === "ENTER_EMAIL") {
+        document.getElementById("otpBlock").style.display = "none";
+        document.getElementById("emailBlock").style.display = "block";
+        clearInterval(resendTimerInterval);
+      }
+    }
+
+    if (event === "LOGIN_SUCCESSFUL" || event === "USER_REGISTERED_SUCCESSFULLY") {
+      if (data && data.email) {
+        localStorage.setItem("sml_user_email", data.email);
+      }
+      localStorage.setItem("sml_login_time", Date.now());
+      try {
+        window.dispatchEvent(new CustomEvent('sml_user_logged_in', { detail: data || {} }));
+      } catch (e) { }
+      if (window.jQuery && jQuery('#loginModal').modal) {
+        try { jQuery('#loginModal').modal('hide'); } catch (e) { }
+      }
+      try {
+        if (!window.location.pathname.toLowerCase().includes('wishlist')) {
+          window.location.href = '/pages/wishlist';
+        }
+      } catch (e) { }
+    }
+  };
+
+  // STEP 7: AJAX OTP failure
+  if (window.jQuery) {
+    jQuery(document).ajaxError(function (event, jqxhr, settings, thrownError) {
+      if (settings && settings.url && settings.url.includes("validateOTP")) {
+        console.error("OTP API error caught:", jqxhr);
+        const otpError = document.getElementById("otpErrorMsg");
+        if (otpError) {
+          otpError.style.display = "block";
+          otpError.textContent = "Invalid or expired OTP. Please try again.";
+        }
+        clearOTPInputs();
+      }
+    });
+  }
+
+  // STEP 8: Timeout fallback
+  document.getElementById("submitOTPButton").addEventListener("click", function () {
+    
+    setTimeout(() => {
+      const otpBlock = document.getElementById("otpBlock");
+      if (otpBlock && otpBlock.style.display !== "none") {
+        const otpError = document.getElementById("otpErrorMsg");
+        if (otpError) {
+          otpError.style.display = "block";
+          otpError.textContent = "Invalid or expired OTP. Please try again.";
+        }
+      }
+    }, 4000);
+  });
+
+});
+</script>

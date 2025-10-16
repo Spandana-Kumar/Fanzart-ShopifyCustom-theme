@@ -1,23 +1,115 @@
-<!doctype html>
-<html lang="{{ request.locale.iso_code }}">
-  <head>
-    {% # Inlined CSS Variables %}
-    {% render 'css-variables' %}
+<!DOCTYPE html>
+<html lang="{{ shop.locale }}">
 
-    {% # Load and preload the critical CSS %}
-    {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
 
-    {% # Social, title, etc. %}
-    {% render 'meta-tags' %}
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="{{ page_description | escape }}">
+  <title>{{ page_title }}</title>
 
-    {{ content_for_header }}
-  </head>
+  {% if settings.favicon %}
+    <link rel="shortcut icon" href="{{ settings.favicon | img_url: '32x32' }}" />
+  {% endif %}
 
-  <body>
-    {% sections 'header-group' %}
+  <link rel="stylesheet" href="{{ 'css-bootstrap.min.css' | asset_url }}" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    {% if template == 'page.contact-us' %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"
+        integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/25.3.1/build/css/intlTelInput.min.css" integrity="sha512-X3pJz9m4oT4uHCYS6UjxVdWk1yxSJJIJOJMIkf7TjPpb1BzugjiFyHu7WsXQvMMMZTnGUA9Q/GyxxCWNDZpdHA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+       {% endif %}  
 
-    {{ content_for_layout }}
+       {% if template == 'page.showroom-locator' %}
+       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"
+        integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"
+        integrity="sha512-wOeEC+9qERAzhliwBFPDb6t8TiFFxdxG8vhK/Ygs7TuC44bpg8pg/X2/U/u+0X4fK05wb9id1EIipnF02+CFQw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    {% endif %} 
 
-    {% sections 'footer-group' %}
-  </body>
+    {% if template == 'collection.product-listing' or template == 'search' %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css" />
+    {% endif %}
+    
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="{{ 'css-apps.min.css' | asset_url }}" rel="stylesheet" />
+ 
+
+
+  {{ content_for_header }}
+  
+</head>
+
+<body class="{% if customer %}customer-logged-in{% else %}customer-guest{% endif %}">
+
+
+
+  {% sections 'header-group' %}
+
+  {{ content_for_layout }}
+
+  {% sections 'footer-group' %}
+
+ 
+
+
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"
+    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+  <script src="{{ 'js-bootstrap.min.js' | asset_url }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"
+    integrity="sha512-NcZdtrT77bJr4STcmsGAESr06BYGE8woZdSdEgqnpyqac7sugNO+Tr4bGwGF3MsnEkGKhU2KL2xh6Ec+BqsaHA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"
+    integrity="sha512-P2IDYZfqSwjcSjX0BKeNhwRUH8zRPGlgcWl5n6gBLzdi4Y5/0O4zaXrtO4K9TZK6Hn1BenYpKowuCavNandERg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="{{ 'js-app.min.js' | asset_url }}"></script>
+
+    <script>
+        AOS.init({
+            once: true,
+        });
+    </script>
+
+  {% if template == 'index' %}
+    {% render 'homepage-scripts' %}
+  {% elsif template == 'page.about-us' %}
+    {% render 'aboutus-scripts' %}
+  {% elsif template == 'page.contact-us' %}
+     {% render 'contactus-scripts' %}
+  {% elsif template == 'page.showroom-locator' %}
+     {% render 'showroomlocator-scripts' %}
+  {% elsif template == 'page.wishlist' %}
+     {% render 'wishlist-scripts' %}
+  {% elsif template == 'collection.by-specialty' %}
+     {% render 'collections-scripts' %}
+  {% elsif template == 'collection.by-room' %}
+     {% render 'collections-scripts' %}
+  {% elsif template == 'collection.by-need' %}
+     {% render 'collections-scripts' %}
+  {% elsif template == 'collection.by-style' %}
+     {% render 'collections-scripts' %}
+  {% elsif template == 'collection.pedestal-fans' %}
+     {% render 'collections-scripts' %}
+  {% elsif template == 'collection.product-listing' %}
+    {% render 'product-listing-scripts' %}
+  {% elsif template == 'search' %}
+    {% render 'search-scripts' %}
+  {% elsif template == 'product' %}
+     {% render 'product-scripts' %}
+ 
+  {% endif %}
+  
+
+
+  {{ content_for_footer }}
+</body>
 </html>

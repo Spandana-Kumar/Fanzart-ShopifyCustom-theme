@@ -1,0 +1,87 @@
+<section class="testimonials__wrapper">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-lg-6">
+        <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
+          {{ section.settings.heading }}
+        </h2>
+        <p class="font_18 txtDarkLight" data-aos="fade-up" data-aos-duration="1500">
+          {{ section.settings.subtext }}
+        </p>
+        {% if section.settings.quote_image %}
+          <img src="{{ section.settings.quote_image | img_url: 'medium' }}"
+               data-aos="fade-up"
+               data-aos-duration="2000"
+               class="quote"
+               alt="Quote" />
+        {% endif %}
+        <div class="swiper mySwiper swiperTestimonials">
+          <div class="swiper-wrapper">
+            {% for block in section.blocks %}
+              <div class="swiper-slide">
+                <div class="contents">
+                  <p>{{ block.settings.testimonial }}</p>
+                  <h6>{{ block.settings.author }}</h6>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-pagination"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "About - Testimonials",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Where the Most Beautiful Rooms Breathe"
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Subtext",
+      "default": "Our fans don’t demand attention. They simply belong in homes designed with care, and spaces that reflect quiet luxury."
+    },
+    {
+      "type": "image_picker",
+      "id": "quote_image",
+      "label": "Quote Icon"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial_slide",
+      "name": "Testimonial Slide",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "testimonial",
+          "label": "Testimonial",
+          "default": "From the moment we installed our fan, the room transformed—not just in comfort, but in character..."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Author Name & Title",
+          "default": "– Sonia Kapoor, Interior Designer, Company Name"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "About - Testimonials",
+    }
+  ]
+}
+{% endschema %}

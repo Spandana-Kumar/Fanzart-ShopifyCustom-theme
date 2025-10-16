@@ -1,0 +1,125 @@
+<section class="showcase__wrapper">
+  <div class="container">
+    <div class="contents">
+      {% if section.settings.title != blank %}
+        <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
+          {{ section.settings.title }}
+        </h2>
+      {% endif %}
+
+      {% if section.settings.description != blank %}
+        <p class="font_18 txtDarkLight" data-aos="fade-up" data-aos-duration="2000">
+          {{ section.settings.description }}
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="row row-gap-4 justify-content-center">
+      {% for block in section.blocks %}
+        {% assign sub_collection = block.settings.collection %}
+        {% if sub_collection != blank %}
+          <div class="col-6 col-md-4 col-lg-3">
+            <div class="showcase_card" data-aos="fade-up" data-aos-duration="2500" data-href="{{ sub_collection.url }}" role="link" tabindex="0">
+              {% if sub_collection.featured_image != blank %}
+                <img 
+                  src="{{ sub_collection.featured_image | image_url: width: 600 }}" 
+                  class="img-fluid" 
+                  alt="{{ sub_collection.title | escape }}"
+                />
+              {% endif %}
+
+              <h4>{{ sub_collection.title }}</h4>
+
+              <a href="{{ sub_collection.url }}" class="btn_wrap" aria-label="{{ sub_collection.title | escape }}">
+                <button type="button" class="btns btnWhite" aria-hidden="true">
+                  <div class="bg"></div>
+                  <div class="btnText">
+                    <span>Explore</span>
+                    <span>Explore</span>
+                  </div>
+                </button>
+              </a>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    if (typeof document === 'undefined') return;
+    function isInteractive(el) {
+      while (el && el !== document.body) {
+        if (el.tagName === 'A' || el.tagName === 'BUTTON' || el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA') return true;
+        el = el.parentElement;
+      }
+      return false;
+    }
+
+    document.querySelectorAll('.showcase__wrapper .showcase_card[data-href]').forEach(function (card) {
+      try {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', function (e) {
+          if (isInteractive(e.target)) return; // let native controls handle it
+          var href = card.getAttribute('data-href');
+          if (href) window.location.href = href;
+        });
+
+        card.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            var href = card.getAttribute('data-href');
+            if (href) {
+              e.preventDefault();
+              window.location.href = href;
+            }
+          }
+        });
+      } catch (err) {
+        // fail silently
+        console && console.error && console.error(err);
+      }
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Collection Showcase",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "A Curated Showcase of Statement Makers."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Section Description",
+      "default": "From tasteful & stylish ceiling fans to ceiling fans with jhumar elegance, our collection mesmerizes, not just moves air."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection",
+      "name": "Sub-Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Sub-Collection"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 500,
+  "presets": [
+    {
+      "name": "Collection Showcase",
+      "blocks": []
+    }
+  ]
+}
+{% endschema %}

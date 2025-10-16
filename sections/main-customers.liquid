@@ -1,0 +1,18 @@
+{% comment %}
+  Master customer section.
+  Loads login, register, account, or reset_password section
+  depending on template.name.
+{% endcomment %}
+
+<div class="customer-page">
+  {%- case template.name -%}
+    {%- when 'login' -%}
+      {% section 'login' %}
+    {%- when 'register' -%}
+      {% section 'register' %}
+    {%- when 'account' -%}
+      {% section 'account' %}
+    {%- when 'reset_password' -%}
+      {% section 'reset_password' %}
+  {%- endcase -%}
+</div>

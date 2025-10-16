@@ -1,0 +1,63 @@
+<section class="showroom__banner_wrapper">
+  {% if section.settings.desktop_image != blank %}
+    <img 
+      src="{{ section.settings.desktop_image | image_url }}" 
+      alt="" 
+      class="desk-show"
+    >
+  {% endif %}
+
+  {% if section.settings.mobile_image != blank %}
+    <img 
+      src="{{ section.settings.mobile_image | image_url }}" 
+      alt="" 
+      class="mob-show"
+    >
+  {% endif %}
+
+  <div class="container">
+    <div class="banner-cont">
+      {% if section.settings.heading != blank %}
+        <h2 class="title56 txtDark animated">
+          {{ section.settings.heading }}
+        </h2>
+      {% endif %}
+
+      {% if section.settings.subheading != blank %}
+        <p class="font_20 txtDarkLight animated">
+          {{ section.settings.subheading }}
+        </p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Showroom Locator Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop Banner Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile Banner Image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Come Fall in Love with Fans"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Visit a Fanzart experience centre near you and explore the best ceiling fans the way they were meant to be. Seen, felt, and chosen."
+    }
+  ],
+}
+{% endschema %}

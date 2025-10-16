@@ -1,0 +1,56 @@
+<section class="impression__wrapper">
+  
+
+  <div class="container">
+  <div class="wrapper">
+  {% if section.settings.background_image != blank %}
+    
+      <img src="{{ section.settings.background_image | image_url: width: 1500 }}" alt="{{ section.settings.heading | escape }}" class="img">
+    
+  {% endif %}
+    <div class="contents">
+      {% if section.settings.heading != blank %}
+        <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
+          {{ section.settings.heading }}
+        </h2>
+      {% endif %}
+
+      {% if section.settings.description != blank %}
+        <p class="font_18 txtDarkLight" data-aos="fade-up" data-aos-duration="2000">
+          {{ section.settings.description }}
+        </p>
+      {% endif %}
+    </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collection Impression",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Fans designed to leave an impression."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "You’ve seen a thousand ceiling fans. But once in a while, one stops you. It glows, it floats, it turns with presence and you wonder, how did they make that? These are the fans that spark conversation, ignite curiosity, and quietly elevate a space."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Impression"
+    }
+  ]
+}
+{% endschema %}

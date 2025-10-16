@@ -1,0 +1,15 @@
+{
+"name": "Showroom Locator",
+"sections": {
+"banner": {
+"type": "showroom-locator-banner"
+},
+"brand": {
+"type": "showroom-locator-brand"
+},
+"map": {
+"type": "showroom-locator-map"
+}
+},
+"order": ["banner" , "brand" , "map"]
+}

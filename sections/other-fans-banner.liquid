@@ -1,0 +1,56 @@
+<section class="specialty__banner__wrapper other_banner">
+  <div class="container">
+    <div class="wrapper">
+      {% if section.settings.image != blank %}
+        <img src="{{ section.settings.image | image_url: width: 1600 }}" class="img" alt="Banner Background" />
+      {% endif %}
+      <div class="contents">
+        {% if section.settings.category %}
+          <div class="tag">{{ section.settings.category }}</div>
+        {% endif %}
+        {% if section.settings.title %}
+          <h1 class="title32 txtDark">{{ section.settings.title }}</h1>
+        {% endif %}
+        {% if section.settings.description %}
+          <p class="font_18 txtDarkLight">{{ section.settings.description }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Custom Banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "category",
+      "label": "Category Tag",
+      "default": "Other Fans"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "A Fan for Every Corner and Space."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "From cozy homes to bustling businesses, explore the best fans in India, designed for every space that matters."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Banner"
+    }
+  ]
+}
+{% endschema %}

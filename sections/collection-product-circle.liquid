@@ -1,0 +1,92 @@
+<section class="products__circle__wrapper moreWays__wrapper">
+  <div class="title_wrap">
+    {% if section.settings.title != blank %}
+      <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
+        {{ section.settings.title }}
+      </h2>
+    {% endif %}
+    {% if section.settings.description != blank %}
+      <p class="font_18 txtDarkLight" data-aos="fade-up" data-aos-duration="1500">
+        {{ section.settings.description }}
+      </p>
+    {% endif %}
+  </div>
+
+  <div class="wrapper">
+    <div class="inner_wrap">
+      <svg viewBox="0 0 400 400">
+        <path stroke-width="2" stroke="#ffffff" id="myPath" fill="none"
+          d="M396,200 C396,308.24781 308.24781,396 200,396 91.75219,396 4,308.24781 4,200 4,91.75219 91.75219,4 200,4 308.24781,4 396,91.75219 396,200 z" />
+      </svg>
+
+      <div class="box_four">
+        {% for block in section.blocks %}
+          {% assign collection = block.settings.collection %}
+          {% assign image = block.settings.image %}
+          {% assign card_title = block.settings.title %}
+          {% if collection %}
+            <div class="box">
+              <a href="{{ collection.url }}" class="fansCards">
+                <div class="img">
+                  {% if image %}
+                    <img src="{{ image | image_url: width: 300 }}" alt="{{ card_title | escape }}">
+                  {% endif %}
+                </div>
+                <h4>{{ collection.title }}</h4>
+              </a>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+{% schema %}
+{
+  "name": "More Ways to Find",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Heading",
+      "default": "More Ways to Find The One."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Section Description",
+      "default": "From room-specific picks to mood-driven styles, discover stylish ceiling fans and beyond."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "collection_card",
+      "name": "Collection Card",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select Collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Custom Image"
+        },
+      ]
+    }
+  ],
+  "max_blocks": 20,
+  "presets": [
+    {
+      "name": "Collection list",
+      "blocks": []
+    }
+  ]
+}
+{% endschema %}

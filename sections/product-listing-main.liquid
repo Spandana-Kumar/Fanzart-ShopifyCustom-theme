@@ -1,0 +1,878 @@
+<!-- Banner -->
+<section class="wishlist_banner">
+  <div class="container">
+    <div class="wishlist_banner_cont">
+      
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb_wrap">
+        <ul>
+          <li>
+            <a href="{{ routes.root_url }}" class="breadcrumb_link">Home</a>
+          </li>
+
+          {% if collection.metafields.custom.parent_collection %}
+            {% assign parent_handle = collection.metafields.custom.parent_collection | handleize %}
+            <li>
+              <a href="/collections/{{ parent_handle }}" class="breadcrumb_link">
+                {{ collection.metafields.custom.parent_collection }}
+              </a>
+            </li>
+          {% endif %}
+
+          <li class="active">
+            <span>{{ collection.title }}</span>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Title -->
+      <h1 class="title42 text-center">{{ collection.title }}</h1>
+    </div>
+  </div>
+</section>
+
+<!-- No Results First, Then Products -->
+{% if collection.products_count == 0 %}
+  <section class="no_result_wrapper">
+    <div class="container">
+      <h1 class="title32">No Results..</h1>
+      <p>Sorry there are no products available matching your filters.</p>
+    </div>
+  </section>
+{% else %}
+   <section class="wishlist_product_list">
+        <div class="wishlist_product_list_innn">
+            <div class="container">
+                <div class="wishlist_product_list_top_sticky">
+
+                    <div class="wishlist_product_list_top">
+            <a href="javascript:;" id="filterLinkToggle" class="filterLink">
+                            <img src="{{ 'img_icons_filter-icon.svg' | asset_url }}" alt="">
+                            <span>Filters</span>
+                        </a>
+                        <div class="wishlist_product_top_right">
+                                    <span class="res-num">{{ collection.products_count }} Results</span>
+
+                                    <div class="customDropdown">
+                                      <div class="selected">
+                                        {% case collection.sort_by %}
+                                          {% when "price-ascending" %}
+                                           
+                                              Price (Low - High)
+                                          {% when "price-descending" %}
+                                            Price (High - Low)
+                                          {% else %}
+                                            Sort by
+                                        {% endcase %}
+                                      </div>
+                                      <ul class="options">
+                                        <li 
+                                          data-value="price-ascending" 
+                                          class="{% if collection.sort_by == 'price-ascending' %}active{% endif %}">
+                                         Price (Low - High)
+                                        </li>
+                                        <li 
+                                          data-value="price-descending" 
+                                          class="{% if collection.sort_by == 'price-descending' %}active{% endif %}">
+                                          
+                                           Price (High - Low)
+                                        </li>
+                                      </ul>
+                                    </div>
+                                  </div>
+
+                       <!-- filter -->
+       <div class="filter_outer">
+    <div class="filter-sidebar">
+        <div class="filter-header">
+            <span>Filter</span>
+            <button class="close-filter">×</button>
+        </div>
+
+        <!-- Dynamic Facets from Search & Discovery App -->
+        {% if collection.filters.size > 0 %}
+            {% for filter in collection.filters %}
+                <div class="filter-group accordion {% if forloop.first %}open{% endif %}">
+                    <div class="accordion-header">
+                        {{ filter.label }}
+                        <span class="selected-count"></span>
+                    </div>
+                    <div class="accordion-body" {% unless forloop.first %}style="display:none"{% endunless %}>
+                        {% for value in filter.values %}
+                            <label>
+                                <input type="checkbox" 
+                                       id="filter-{{ filter.param_name }}-{{ forloop.index }}" 
+                                       data-filter="{{ filter.param_name }}" 
+                                       value="{{ value.value }}" 
+                                       {% if value.active %}checked{% endif %} 
+                                       {% if value.count == 0 and value.active == false %}disabled{% endif %}>
+                                {{ value.label }}
+                                {% if value.count %}<span>{{ value.count }}</span>{% endif %}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No filters available</p>
+        {% endif %}
+
+        <!-- Price Range -->
+        <div class="filter-group accordion">
+            <div class="accordion-header">Price Range <span class="selected-count"></span></div>
+            <div class="accordion-body" style="display:none">
+                <div class="price-range">
+                    <div id="price-slider"></div>
+                    <div class="price-inputs">
+                        <input type="text" id="price-min" readonly>
+                        <input type="text" id="price-max" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Actions -->
+        <div class="filter-action">
+            <a href="javascript:;" class="clearAllBtn">Clear All</a>
+            <button class="filter-apply-btn btns btnDark">
+                <div class="bg"></div>
+                <div class="btnText">
+                    <span>Apply</span>
+                    <span>Apply</span>
+                </div>
+            </button>
+        </div>
+    </div>
+</div>
+
+                    </div>
+                </div>
+
+               <div class="wishlist_product_list_middle">
+                <a href="javascript:;" class="clearAllBtn">Clear all</a>
+                <div class="filterAdded"></div>
+              </div>
+
+               <div class="wishlist_product_list_bottom">
+
+                  {% paginate collection.products by 12 %}
+                    <div class="listing__card__wrapper">
+                      {% comment %} Loop over collection products and render dynamic product cards {% endcomment %}
+                      {% for product in collection.products %}
+                        <div class="listing_card {% unless product.available %}outOfStock{% endunless %}" data-product-id="{{ product.id }}" data-product-handle="{{ product.handle }}" data-product-title="{{ product.title | escape }}">
+                          <a href="{{ product.url }}" class="mainImg">
+                            {%- assign first_media = product.media.first -%}
+                            {%- assign second_media = product.media[1] -%}
+                            
+                            <!-- lifestyle image -->
+                            <img src="{{ product.featured_image | img_url: '800x' }}" class="lifestyleImg" alt="{{ product.featured_image.alt | escape }}" />
+
+                            <div class="magicImg">
+                              {% if first_media %}
+                                <img src="{{ first_media.preview_image | img_url: '600x' }}" class="defaultImg" alt="{{ first_media.alt | escape }}" />
+                              {% elsif product.featured_image %}
+                                <img src="{{ product.featured_image | img_url: '600x' }}" class="defaultImg" alt="{{ product.featured_image.alt | escape }}" />
+                              {% endif %}
+
+                              {% if second_media %}
+                                <img src="{{ second_media.preview_image | img_url: '600x' }}" class="colorImg" alt="{{ second_media.alt | escape }}" />
+                              {% elsif first_media %}
+                                <img src="{{ first_media.preview_image | img_url: '600x' }}" class="colorImg" alt="{{ first_media.alt | escape }}" />
+                              {% endif %}
+                            </div>
+                          </a>
+
+                          <div class="floatingItem_flex">
+                            {% if product.tags contains 'new' %}
+                              <div class="tagNew">New</div>
+                            {% endif %}
+                            {% unless product.available %}
+                              <div class="outOfStockTag">Out of stock</div>
+                            {% endunless %}
+                           <div class="wishList_wrap">
+       <button class="likes actionBtn add-to-wishlist"
+    data-id="{{ product.id }}"
+    data-title="{{ product.title | escape }}"
+    data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+    data-image="{{ product.selected_or_first_available_variant.featured_image | img_url: '800x' }}"
+    data-price="{{ product.selected_or_first_available_variant.price | money_without_currency | split: '.' | first }}"
+    data-handle="{{ product.url }}"
+
+    data-option-color="{{ product.selected_or_first_available_variant.option1 }}"
+    data-option-sweep="{{ product.selected_or_first_available_variant.option2 }}"
+    data-option-watt="{{ product.selected_or_first_available_variant.option3 }}"
+
+    {% comment %} Material, Light, Mount, Addon come from metafields, not variant options {% endcomment %}
+    data-option-material="{% if product.metafields.custom.material != blank %}{{ product.metafields.custom.material.value | map: 'material_text' | join: ', ' }}{% endif %}"
+    data-option-light="{% if product.metafields.custom.light != blank %}{{ product.metafields.custom.light.value | map: 'light_text' | join: ', ' }}{% endif %}"
+    data-option-mount="{% if product.metafields.custom.mount != blank %}{{ product.metafields.custom.mount.value | map: 'mount_text' | join: ', ' }}{% endif %}"
+    data-option-addon="{% if product.metafields.custom.addon != blank %}{{ product.metafields.custom.addon.value | map: 'addon_text' | join: ', ' }}{% endif %}"
+>
+</button>
+
+
+
+
+                            <!-- Static dropdown template (will be updated dynamically) -->
+                            <div class="wishlist-dropdown">
+                              <div class="wishlist-inner">
+                                <div class="list"><!-- JS will inject projects here --></div>
+                                <div class="list-create">
+                                  <div class="create-btn">Create a New Project</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          </div>
+
+                          <a href="{{ product.url }}" class="product_details">
+                            <div class="colorTitleFlex">
+                              {% assign _color_values = '' %}
+                              {% for variant in product.variants %}
+                                {% assign color_value = variant.option1 %}
+                                {% if color_value != blank %}
+                                  {% unless _color_values contains color_value %}
+                                    {% if _color_values == '' %}
+                                      {% assign _color_values = color_value %}
+                                    {% else %}
+                                      {% assign _color_values = _color_values | append: '||' | append: color_value %}
+                                    {% endif %}
+                                  {% endunless %}
+                                {% endif %}
+                              {% endfor %}
+                              {% assign color_list = _color_values | split: '||' %}
+
+                              {% assign _size_values = '' %}
+                              {% for variant in product.variants %}
+                                {% assign size_value = variant.option2 %}
+                                {% if size_value != blank %}
+                                  {% unless _size_values contains size_value %}
+                                    {% if _size_values == '' %}
+                                      {% assign _size_values = size_value %}
+                                    {% else %}
+                                      {% assign _size_values = _size_values | append: '||' | append: size_value %}
+                                    {% endif %}
+                                  {% endunless %}
+                                {% endif %}
+                              {% endfor %}
+                              {% assign size_list_header = _size_values | split: '||' %}
+
+                              <h6>{{ color_list.size }} colours</h6>
+                              <h6>{{ size_list_header.size }} sizes</h6>
+                            </div>
+
+                            <div class="hiddenDetails">
+                              <div class="colorFlex">
+                                {% for color in color_list %}
+                                  <div class="colorImg{% if forloop.first %} active{% endif %}" data-color="{{ color | escape }}">
+                                    {%- assign swatch_found = false -%}
+                                    {% for media in product.media %}
+                                      {% assign media_alt = media.alt | default: '' | downcase %}
+                                      {% assign color_key = color | default: '' | downcase %}
+                                      {% if media_alt != '' and media_alt == color_key %}
+                                        <img src="{{ media.preview_image | img_url: '80x80' }}" data-target-src="{{ media.preview_image | img_url: '600x' }}" alt="{{ media.alt | escape }}" />
+                                        {% assign swatch_found = true %}
+                                        {% break %}
+                                      {% endif %}
+                                    {% endfor %}
+                                    {% unless swatch_found %}
+                                      {% if first_media %}
+                                        <img src="{{ first_media.preview_image | img_url: '80x80' }}" data-target-src="{{ first_media.preview_image | img_url: '600x' }}" alt="{{ first_media.alt | escape }}" />
+                                      {% elsif product.featured_image %}
+                                        <img src="{{ product.featured_image | img_url: '80x80' }}" data-target-src="{{ product.featured_image | img_url: '600x' }}" alt="{{ product.featured_image.alt | escape }}" />
+                                      {% else %}
+                                        <div class="swatchFallback" data-target-src="">{{ color }}</div>
+                                      {% endif %}
+                                    {% endunless %}
+                                  </div>
+                                {% endfor %}
+                              </div>
+
+                              <div class="sizeFlex">
+                                <h6>Sweep size</h6>
+                                <ul class="size">
+                                  {%- assign size_values = '' -%}
+                                  {% for variant in product.variants %}
+                                    {% assign size_value = variant.option2 %}
+                                    {% if size_value != blank %}
+                                      {% unless size_values contains size_value %}
+                                        {% if size_values == '' %}
+                                          {% assign size_values = size_value %}
+                                        {% else %}
+                                          {% assign size_values = size_values | append: '||' | append: size_value %}
+                                        {% endif %}
+                                      {% endunless %}
+                                    {% endif %}
+                                  {% endfor %}
+                                  {% assign size_list = size_values | split: '||' %}
+                                  {% for s in size_list limit:2 %}
+                                    {% assign ds = s | split: '(' | last | remove: ')' | strip %}
+                                    <li{% if forloop.first %} class="active"{% endif %} data-raw-size="{{ s | escape }}">{{ ds }}</li>
+                                  {% endfor %}
+                                </ul>
+                              </div>
+                            </div>
+
+                            <div class="defaultDetails">
+                              <h4>{{ product.title }}</h4>
+                              <h3>
+                                <span>&#8377;</span>
+                                <span class="priceValue">
+                                  {{ product.selected_or_first_available_variant.price | money_without_currency | split: '.' | first }}
+                                </span> Incl. Tax
+                              </h3>
+                            </div>
+                          </a>
+
+                          <script type="application/json" class="product-variants-json">
+                            {{ product.variants | json }}
+                          </script>
+                        </div>
+                      {% endfor %}
+                    </div> 
+
+                    <!-- Pagination -->
+                    {% if paginate.pages > 1 %}
+                      <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                          <!-- Prev -->
+                          <li class="page-item {% if paginate.previous == nil %}disabled{% endif %}">
+                            {% if paginate.previous %}
+                              <a class="page-link" href="{{ paginate.previous.url }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" fill="none" viewBox="0 0 21 20">
+                                  <path d="M18.5 10H2.5" stroke="#49516D" stroke-width="1.5"/>
+                                  <path d="M10.5 18L2.5 10L10.5 2" stroke="#49516D" stroke-width="1.5"/>
+                                </svg>
+                              </a>
+                            {% else %}
+                              <a class="page-link">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" fill="none" viewBox="0 0 21 20">
+                                  <path d="M18.5 10H2.5" stroke="#49516D" stroke-width="1.5"/>
+                                  <path d="M10.5 18L2.5 10L10.5 2" stroke="#49516D" stroke-width="1.5"/>
+                                </svg>
+                              </a>
+                            {% endif %}
+                          </li>
+
+                          <!-- Page numbers -->
+                          {% for part in paginate.parts %}
+                            {% if part.is_link %}
+                              <li class="page-item"><a class="page-link" href="{{ part.url }}">{{ part.title }}</a></li>
+                            {% elsif part.title == paginate.current_page %}
+                              <li class="page-item active"><a class="page-link" aria-current="page">{{ part.title }}</a></li>
+                            {% else %}
+                              <li class="page-item disabled"><span class="page-link">{{ part.title }}</span></li>
+                            {% endif %}
+                          {% endfor %}
+
+                          <!-- Next -->
+                          <li class="page-item {% if paginate.next == nil %}disabled{% endif %}">
+                            {% if paginate.next %}
+                              <a class="page-link" href="{{ paginate.next.url }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" fill="none" viewBox="0 0 21 20">
+                                  <path d="M2.5 10H18.5" stroke="#A1A1AA" stroke-width="1.5"/>
+                                  <path d="M10.5 18L18.5 10L10.5 2" stroke="#A1A1AA" stroke-width="1.5"/>
+                                </svg>
+                              </a>
+                            {% else %}
+                              <a class="page-link">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" fill="none" viewBox="0 0 21 20">
+                                  <path d="M2.5 10H18.5" stroke="#A1A1AA" stroke-width="1.5"/>
+                                  <path d="M10.5 18L18.5 10L10.5 2" stroke="#A1A1AA" stroke-width="1.5"/>
+                                </svg>
+                              </a>
+                            {% endif %}
+                          </li>
+                        </ul>
+                      </nav>
+                    {% endif %}
+                  {% endpaginate %}
+
+                </div>
+
+
+            </div>
+        </div>
+        <!-- whishlist Toast -->
+        <div class="tooltip-msg">
+            <div class="container">
+                <div class="tooltip-msg-inn">
+                    <span class="tooltip-text">Product successfully added to 'Project - 2'</span>
+                    <span class="tooltip-close">
+                        <img src="{{ 'img_icons_x.svg' | asset_url }}" alt="">
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Popup for New Project -->
+    <div class="popup-overlay">
+        <div class="popup-box">
+            <h4>Create a Wishlist</h4>
+            <p>Enter the List name</p>
+            <div class="form-group">
+                <input type="text" id="new-wishlist-name" placeholder="Enter wishlist name" />
+                <div class="wishlist-error-msg ">Please enter a wishlist name</div>
+            </div>
+            <div class="btn-wrap">
+                <button id="closePopup-wishlist" class="btns btnWhite">
+                    <div class="bg"></div>
+                    <div class="btnText">
+                        <span>Cancel</span>
+                        <span>Cancel</span>
+                    </div>
+                </button>
+                <button id="add-wishlist" class="btns btnDark">
+                    <div class="bg"></div>
+                    <div class="btnText">
+                        <span>Create</span>
+                        <span>Create</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const dropdown = document.querySelector(".customDropdown");
+        const selected = dropdown.querySelector(".selected");
+        const options = dropdown.querySelectorAll(".options li");
+        const productWrapper = document.querySelector(".listing__card__wrapper");
+
+        // Function to sort current page products
+        function sortProducts(type) {
+            const cards = Array.from(productWrapper.querySelectorAll(".listing_card"));
+
+            cards.sort((a, b) => {
+                const priceA = parseFloat(a.querySelector(".priceValue").textContent.replace(/,/g, ""));
+                const priceB = parseFloat(b.querySelector(".priceValue").textContent.replace(/,/g, ""));
+
+                if (type === "price-ascending") {
+                    return priceA - priceB; // Low → High
+                } else if (type === "price-descending") {
+                    return priceB - priceA; // High → Low
+                }
+                return 0;
+            });
+
+            // Put sorted cards back
+            cards.forEach(card => productWrapper.appendChild(card));
+        }
+
+    // Initialization: respect server-side active option if present.
+    // If an option already has the 'active' class (rendered server-side via collection.sort_by),
+    // use that option and apply sorting. Otherwise show a non-selectable placeholder 'Sort by'
+    // and do not auto-sort the current page.
+    const activeOption = Array.from(options).find(opt => opt.classList.contains('active'));
+    if (activeOption) {
+      selected.textContent = activeOption.textContent.trim();
+      sortProducts(activeOption.dataset.value);
+    } else {
+      selected.textContent = 'Sort by';
+    }
+
+        // Toggle dropdown
+        selected.addEventListener("click", () => {
+            dropdown.classList.toggle("open");
+            selected.classList.toggle("open");
+        });
+
+        // Select option
+        options.forEach(option => {
+            option.addEventListener("click", () => {
+                options.forEach(opt => opt.classList.remove("active"));
+                option.classList.add("active");
+                selected.textContent = option.textContent;
+                dropdown.classList.remove("open");
+                selected.classList.remove("open");
+
+                // Sort based on selected option
+                sortProducts(option.dataset.value);
+            });
+        });
+
+        // Close dropdown if clicking outside
+        document.addEventListener("click", (e) => {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove("open");
+                selected.classList.remove("open");
+            }
+        });
+    });
+
+</script>
+
+
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (window.innerWidth >= 767) {
+                const cards = document.querySelectorAll(".listing_card");
+                const outOfStock = document.querySelectorAll(".outOfStock");
+                cards.forEach(card => {
+                    const lifestyleImg = card.querySelector(".lifestyleImg");
+                    const magicImgs = card.querySelectorAll(".magicImg img");
+                    const colorOptions = card.querySelectorAll(".colorFlex .colorImg");
+                    const defaultImg = card.querySelector(".magicImg .defaultImg");
+                    const productDetails = card.querySelector(".product_details");
+                    const hiddenDetails = card.querySelector(".hiddenDetails");
+                    const colorTitleFlex = card.querySelector(".colorTitleFlex");
+                    let selectedSrc = (defaultImg.dataset && defaultImg.dataset.src) ? defaultImg.dataset.src : defaultImg.getAttribute("src"); // Default selected
+                    const originalSrc = selectedSrc; // keep original for restore on mouseleave
+                    // Helper: Hide all magic images
+                    function hideAllMagicImages() {
+                        magicImgs.forEach(img => {
+                            img.classList.remove("show");
+                            img.classList.add("hide");
+                        });
+                    }
+                    // Show selected image in magicImg
+                    // showSelectedImage(optionalSrc) - if optionalSrc provided, show that src without modifying selectedSrc
+                    function showSelectedImage(optionalSrc) {
+                        const srcToShow = optionalSrc || selectedSrc;
+                        hideAllMagicImages();
+                        lifestyleImg.classList.remove("show");
+                        lifestyleImg.classList.add("hide");
+                        const targetImg = Array.from(magicImgs).find(img => (img.dataset && img.dataset.src ? img.dataset.src : img.getAttribute("src")) === srcToShow);
+                        if (targetImg) {
+                            targetImg.classList.remove("hide");
+                            targetImg.classList.add("show");
+                        } else if (srcToShow) {
+                            // fallback: set the defaultImg src to the srcToShow and show it
+                            try {
+                                defaultImg.setAttribute('src', srcToShow);
+                                if (defaultImg.dataset) defaultImg.dataset.src = srcToShow;
+                                defaultImg.classList.remove('hide');
+                                defaultImg.classList.add('show');
+                            } catch (e) {
+                                // ignore
+                            }
+                        }
+                    }
+                    // Initial state
+                    showSelectedImage();
+                    // Hover on card: show hover image (second magic image) if present, otherwise show lifestyle image
+                    card.addEventListener("mouseenter", function () {
+                        productDetails.classList.add("floating");
+                        hiddenDetails.classList.add("expend");
+                        colorTitleFlex.classList.add("hidden");
+                        // try to find hover image inside magicImgs (prefer element with class 'colorImg')
+                        const hoverImg = card.querySelector('.magicImg .colorImg');
+                        if (hoverImg) {
+                            hideAllMagicImages();
+                            // hide lifestyle
+                            lifestyleImg.classList.remove("show");
+                            lifestyleImg.classList.add("hide");
+                            // show hover
+                            hoverImg.classList.remove("hide");
+                            hoverImg.classList.add("show");
+                        } else {
+                            // fallback: show lifestyle image
+                            lifestyleImg.classList.remove("hide");
+                            lifestyleImg.classList.add("show");
+                            hideAllMagicImages();
+                        }
+                    });
+                    // On leave: restore the original default image (hover is temporary)
+                    card.addEventListener("mouseleave", function () {
+                        // Restore image
+                        showSelectedImage(originalSrc);
+                        // Set first color as active (default) when coming back from hover
+                        const firstColor = colorOptions && colorOptions.length ? colorOptions[0] : null;
+                        if (firstColor) {
+                            // reset active classes
+                            colorOptions.forEach(opt => opt.classList.remove('active'));
+                            firstColor.classList.add('active');
+                            // update selectedSrc to first color's target (but we won't show it, image remains original)
+                            const swatchImg = firstColor.querySelector('img');
+                            let firstTarget = '';
+                            if (swatchImg && swatchImg.dataset && swatchImg.dataset.targetSrc) firstTarget = swatchImg.dataset.targetSrc;
+                            else if (firstColor.dataset && firstColor.dataset.targetSrc) firstTarget = firstColor.dataset.targetSrc;
+                            else if (swatchImg) firstTarget = swatchImg.getAttribute('src');
+                            if (firstTarget) selectedSrc = firstTarget;
+                            // update sizes for the first color
+                            try {
+                                const variantsJsonEl = card.querySelector('.product-variants-json');
+                                if (variantsJsonEl) {
+                                    const variants = JSON.parse(variantsJsonEl.textContent || '[]');
+                  const selectedColor = firstColor.dataset.color || (firstColor.textContent || '').trim();
+                                    const sizes = [];
+                                    variants.forEach(v => {
+                                        const vColor = (v.option1 || '').toString();
+                                        const vSize = (v.option2 || '').toString();
+                                        if (vColor.toLowerCase() === selectedColor.toLowerCase()) {
+                                            if (vSize && sizes.indexOf(vSize) === -1) sizes.push(vSize);
+                                        }
+                                    });
+                                    const sizeUl = card.querySelector('.size');
+                                    if (sizeUl) {
+                                        sizeUl.innerHTML = '';
+                                        if (sizes.length === 0) {
+                                            const li = document.createElement('li');
+                                            li.classList.add('active');
+                                            li.textContent = '-';
+                                            sizeUl.appendChild(li);
+                                        } else {
+                                            sizes.forEach((s, idx) => {
+                                                const li = document.createElement('li');
+                                                if (idx === 0) li.classList.add('active');
+                                                // keep raw size for logic and show trimmed version to user
+                                                li.dataset.rawSize = s;
+                                                li.textContent = (function(raw){
+                                                    try{
+                                                        const m = raw.match(/\(([^)]+)\)/);
+                                                        if(m && m[1]) return m[1].trim();
+                                                        const parts = raw.split('-');
+                                                        return parts.length>1? parts[parts.length-1].trim(): raw.trim();
+                                                    }catch(e){return raw;}
+                                                })(s);
+                                                sizeUl.appendChild(li);
+                                            });
+                                        }
+                    // After updating sizes, also update the displayed price to match the restored first color (and first size if present)
+                    try {
+                      const activeLi = sizeUl.querySelector('li.active');
+                      const selectedSizeRaw = activeLi && (activeLi.dataset && activeLi.dataset.rawSize) ? activeLi.dataset.rawSize : (activeLi ? activeLi.textContent : null);
+                      updateCardPrice(card, variants, { color: selectedColor, size: selectedSizeRaw });
+                    } catch (err) {
+                      // ignore price update errors
+                    }
+                                    }
+                                }
+                            } catch (e) {
+                                // ignore
+                            }
+                        }
+                        productDetails.classList.remove("floating");
+                        colorTitleFlex.classList.remove("hidden");
+                        hiddenDetails.classList.remove("expend");
+                    });
+                    // Click on color options
+                    colorOptions.forEach(option => {
+                        option.addEventListener("click", function (evt) {
+                            // prevent any anchor or parent handlers from navigating/refreshing
+                            evt.preventDefault();
+                            evt.stopPropagation();
+                            // Remove active class from all and set on clicked
+                            colorOptions.forEach(opt => opt.classList.remove("active"));
+                            this.classList.add("active");
+                            // Get the target image source (prefer data-target-src on swatch img)
+                            const swatchImg = this.querySelector("img");
+                            let targetSrc = '';
+                            if (swatchImg && swatchImg.dataset && swatchImg.dataset.targetSrc) {
+                                targetSrc = swatchImg.dataset.targetSrc;
+                            } else {
+                                // fallback: if swatch contains data-target-src attribute itself (e.g., swatchFallback)
+                                if (this.dataset && this.dataset.targetSrc) targetSrc = this.dataset.targetSrc;
+                                else if (swatchImg) targetSrc = swatchImg.getAttribute("src");
+                            }
+                            if (targetSrc) {
+                                selectedSrc = targetSrc;
+                            }
+                            showSelectedImage();
+                            // Update size list: find variants JSON and filter by selected color
+                            try {
+                                const variantsJsonEl = card.querySelector('.product-variants-json');
+                                if (variantsJsonEl) {
+                                    const variants = JSON.parse(variantsJsonEl.textContent || '[]');
+                                    const selectedColor = option.dataset.color || (option.textContent || '').trim();
+                                    const sizes = [];
+                                    variants.forEach(v => {
+                                        const vColor = (v.option1 || '').toString();
+                                        const vSize = (v.option2 || '').toString();
+                                        if (vColor.toLowerCase() === selectedColor.toLowerCase()) {
+                                            if (vSize && sizes.indexOf(vSize) === -1) sizes.push(vSize);
+                                        }
+                                    });
+                                    // Update the size list markup (ul.size)
+                                    const sizeUl = card.querySelector('.size');
+                                    if (sizeUl) {
+                                        sizeUl.innerHTML = '';
+                                        if (sizes.length === 0) {
+                                            const li = document.createElement('li');
+                                            li.classList.add('active');
+                                            li.textContent = '-';
+                                            sizeUl.appendChild(li);
+                                        } else {
+                                            sizes.forEach((s, idx) => {
+                                                const li = document.createElement('li');
+                                                if (idx === 0) li.classList.add('active');
+                                                li.dataset.rawSize = s;
+                                                li.textContent = (function(raw){
+                                                    try{
+                                                        const m = raw.match(/\(([^)]+)\)/);
+                                                        if(m && m[1]) return m[1].trim();
+                                                        const parts = raw.split('-');
+                                                        return parts.length>1? parts[parts.length-1].trim(): raw.trim();
+                                                    }catch(e){return raw;}
+                                                })(s);
+                                                sizeUl.appendChild(li);
+                                            });
+                                        }
+                                    }
+                                    // Update price when color is selected
+                                    updateCardPrice(card, variants, { color: selectedColor });
+                                }
+                            } catch (e) {
+                                // ignore JSON parse errors
+                            }
+                        });
+                    });
+
+                    // Listen for size (sweep) clicks to update price
+                    const sizeContainer = card.querySelector('.size');
+                    if (sizeContainer) {
+                        sizeContainer.addEventListener('click', function (ev) {
+                            const targetLi = ev.target.closest('li');
+                            if (!targetLi) return;
+                            // set active
+                            Array.from(sizeContainer.querySelectorAll('li')).forEach(li => li.classList.remove('active'));
+                            targetLi.classList.add('active');
+                            try {
+                                const variantsJsonEl = card.querySelector('.product-variants-json');
+                                if (variantsJsonEl) {
+                                    const variants = JSON.parse(variantsJsonEl.textContent || '[]');
+                                    const activeColorEl = card.querySelector('.colorFlex .colorImg.active');
+                                    const selectedColor = activeColorEl ? (activeColorEl.dataset.color || activeColorEl.textContent.trim()) : null;
+                                    // prefer rawSize data when present (used for matching variants), fallback to visible text
+                                    const selectedSize = targetLi.dataset && targetLi.dataset.rawSize ? targetLi.dataset.rawSize.trim() : targetLi.textContent.trim();
+                                    updateCardPrice(card, variants, { color: selectedColor, size: selectedSize });
+                                }
+                            } catch (e) { /* ignore */ }
+                        });
+                    }
+                    outOfStock.forEach(outOfStockCard => {
+                        outOfStockCard.addEventListener("mouseenter", function () {
+                            showSelectedImage();
+                            productDetails.classList.remove("floating");
+                            colorTitleFlex.classList.remove("hidden");
+                            hiddenDetails.classList.remove("expend");
+                        });
+                    })
+                });
+            }
+        });
+    </script>
+
+    <script>
+    // Toggle 'indicatorGreen' on filter link when any filter is active
+    (function(){
+      function filtersAreActive(){
+        try {
+          // any checked checkboxes/radios inside filter groups
+          var anyChecked = document.querySelectorAll('.accordion-body input[type="checkbox"]:checked, .accordion-body input[type="radio"]:checked').length > 0;
+          if (anyChecked) return true;
+
+          // price slider: if present and not default (assumes slider sets hidden inputs or updates UI)
+          var priceSlider = document.getElementById('price-slider');
+          if (priceSlider && window.noUiSlider && priceSlider.noUiSlider) {
+            try {
+              var vals = priceSlider.noUiSlider.get();
+              // default in this theme is [0,200000]
+              if (Array.isArray(vals)) {
+                var a = Number(String(vals[0]).replace(/[^0-9.-]/g,'')) || 0;
+                var b = Number(String(vals[1]).replace(/[^0-9.-]/g,'')) || 200000;
+                if (a > 0 || b < 200000) return true;
+              }
+            } catch(e) {}
+          }
+
+          // filterAdded tags
+          var filterTags = document.querySelectorAll('.filterAdded > span').length > 0;
+          if (filterTags) return true;
+
+        } catch (e) {}
+        return false;
+      }
+
+      function updateFilterIndicator(){
+        var el = document.getElementById('filterLinkToggle');
+        if (!el) return;
+        if (filtersAreActive()) el.classList.add('indicatorGreen'); else el.classList.remove('indicatorGreen');
+      }
+
+      // wire common events that can change filters
+      document.addEventListener('change', function(e){
+        if (e.target && (e.target.matches('.accordion-body input[type="checkbox"]') || e.target.matches('.accordion-body input[type="radio"]'))) updateFilterIndicator();
+      }, true);
+
+      // price slider change: if noUiSlider present, listen for 'change' on its instance
+      document.addEventListener('DOMContentLoaded', function(){
+        var ps = document.getElementById('price-slider');
+        if (ps && ps.noUiSlider && typeof ps.noUiSlider.on === 'function'){
+          ps.noUiSlider.on('change', updateFilterIndicator);
+        }
+        // also observe DOM changes in .filterAdded (tags added/removed)
+        var fa = document.querySelector('.filterAdded');
+        if (fa) {
+          var mo = new MutationObserver(updateFilterIndicator);
+          mo.observe(fa, { childList: true, subtree: true });
+        }
+
+        // initial check
+        updateFilterIndicator();
+      });
+
+      // Also update when pagination or other scripts modify DOM
+      window.addEventListener('popstate', updateFilterIndicator);
+    })();
+    </script>
+
+    <script>
+        // Helper: update displayed price on a product card based on selected color/size
+        function updateCardPrice(card, variants, opts) {
+            try {
+                opts = opts || {};
+                const color = (opts.color || '').toString().trim().toLowerCase();
+                const size = (opts.size || '').toString().trim().toLowerCase();
+                // Filter matching variants by provided attributes. If an attribute is empty, it's ignored.
+                let matches = variants.filter(v => {
+                    const vColor = (v.option1 || '').toString().trim().toLowerCase();
+                    const vSize = (v.option2 || '').toString().trim().toLowerCase();
+                    if (color && vColor !== color) return false;
+                    if (size && vSize !== size) return false;
+                    return true;
+                });
+                // If no matches found and color provided, fall back to color-only matches, then to any available variant
+                if (matches.length === 0 && color) {
+                    matches = variants.filter(v => (v.option1 || '').toString().trim().toLowerCase() === color);
+                }
+                if (matches.length === 0) matches = variants.slice();
+
+                // Pick lowest price among matches
+                let lowest = null;
+                matches.forEach(v => {
+                    // Variant price may be provided in different shapes (string/number, cents or units).
+                    let priceRaw = v.price || v.compare_at_price || v.presentment_price || 0;
+                    let price = Number(priceRaw);
+                    if (isNaN(price)) {
+                        // try parsing string with decimal
+                        price = parseFloat((priceRaw || '').toString().replace(/[^0-9.\-]/g, '')) || 0;
+                    }
+                    // Heuristic: if price looks like cents (divisible by 100 and > 1000), convert to units
+                    if (price >= 1000 && Math.round(price) % 100 === 0) {
+                        price = price / 100;
+                    }
+                    if (lowest === null || price < lowest) lowest = price;
+                });
+                if (lowest === null) return; // nothing to show
+
+                // price value element
+                const priceEl = card.querySelector('.priceValue');
+                if (!priceEl) return;
+
+                // Format INR without currency symbol and without decimals (match existing markup)
+                const formatted = Math.round(lowest).toLocaleString('en-IN');
+                priceEl.textContent = formatted;
+            } catch (e) {
+                // ignore failures
+            }
+        }
+    </script>
+
+

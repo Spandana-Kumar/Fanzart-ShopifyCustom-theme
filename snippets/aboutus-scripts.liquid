@@ -1,0 +1,166 @@
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"
+        integrity="sha512-wOeEC+9qERAzhliwBFPDb6t8TiFFxdxG8vhK/Ygs7TuC44bpg8pg/X2/U/u+0X4fK05wb9id1EIipnF02+CFQw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+<script>
+        gsap.registerPlugin(SplitText, ScrollTrigger);
+        if (window.innerWidth >= 768) {
+            // Image Rotation
+            gsap.to("#img", {
+                rotate: -180,
+                duration: 1,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: ".about__section",
+                    start: "top 60%",
+                    toggleActions: "play none none none",
+                }
+            });
+
+            // Revealing Text
+            let splitContent = SplitText.create(".revealText", {
+                type: "words"
+            });
+            gsap.to(splitContent.words, {
+                color: "#121212",
+                stagger: 0.10,
+                scrollTrigger: {
+                    trigger: ".about__section",
+                    start: "top 60%",
+                    toggleActions: "play none none none",
+                },
+            });
+        }
+
+        // Banner Title
+        let splitTitle = SplitText.create(".animated", {
+            type: "words"
+        });
+        gsap.from(splitTitle.words, {
+            x: -40,
+            opacity: 0,
+            autoAlpha: 0,
+            stagger: 0.05
+        })
+    </script>
+
+     <script>
+        const tabButtons = document.querySelectorAll(".tabBtn");
+        const tabContents = document.querySelectorAll(".tabContent");
+        const nextBtn = document.getElementById("nextTab");
+        const prevBtn = document.getElementById("prevTab");
+
+        let currentTabIndex = 0;
+
+        // Click on tab buttons
+        tabButtons.forEach((button, index) => {
+            button.addEventListener("click", () => {
+                currentTabIndex = index;
+                const tabId = button.dataset.tab;
+                setActiveTab(tabId);
+            });
+        });
+
+        // Next button
+        nextBtn.addEventListener("click", () => {
+            if (currentTabIndex < tabButtons.length - 1) {
+                currentTabIndex++;
+                const nextTabId = tabButtons[currentTabIndex].dataset.tab;
+                setActiveTab(nextTabId);
+            }
+        });
+
+        // Prev button
+        prevBtn.addEventListener("click", () => {
+            if (currentTabIndex > 0) {
+                currentTabIndex--;
+                const prevTabId = tabButtons[currentTabIndex].dataset.tab;
+                setActiveTab(prevTabId);
+            }
+        });
+
+        // Function to update tab and buttons
+        function setActiveTab(tabId) {
+            tabButtons.forEach(btn =>
+                btn.classList.toggle("active", btn.dataset.tab === tabId)
+            );
+
+            tabContents.forEach(content =>
+                content.classList.toggle("active", content.dataset.tab === tabId)
+            );
+
+            // Disable or enable buttons at the edges
+            prevBtn.disabled = currentTabIndex === 0;
+            nextBtn.disabled = currentTabIndex === tabButtons.length - 1;
+        }
+
+        // Initialize first tab
+        setActiveTab(tabButtons[0].dataset.tab);
+    </script>
+
+
+    <script>
+        if (window.innerWidth >= 768) {
+            const images = document.querySelectorAll('.img_wrap .img');
+            const listItems = document.querySelectorAll('.listing li');
+
+            images.forEach((img, i) => img.classList.toggle('show', i === 0));
+            listItems.forEach((li, i) => li.classList.toggle('active', i === 0));
+
+            listItems.forEach((li, index) => {
+                li.addEventListener('mouseenter', () => {
+                    images.forEach(img => img.classList.remove('show'));
+                    listItems.forEach(item => item.classList.remove('active'));
+                    images[index].classList.add('show');
+                    li.classList.add('active');
+                });
+            });
+        }
+    </script>
+
+    <script>
+        var swiper = new Swiper(".swiperTestimonials", {
+            spaceBetween: 30,
+            sliderPerView: 3,
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+        });
+    </script>
+
+    <script>
+        var swiper = new Swiper(".visualsSwiper", {
+            slidesPerView: 1,
+            spaceBetween: 12,
+            loop: true,
+            speed: 3000,
+            autoplay: {
+                delay: 0,
+                disableOnInteraction: false,
+                reverseDirection: true,
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 2,
+                },
+                768: {
+                    slidesPerView: 2,
+                },
+                1024: {
+                    slidesPerView: 3,
+                },
+            },
+        });
+    </script>
+
+    <script>
+        AOS.init({
+            once: true,
+        });
+    </script>

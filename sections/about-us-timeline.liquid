@@ -1,0 +1,108 @@
+<section class="titmeline__slider___wrapper">
+  <div class="container">
+    <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
+      {{ section.settings.heading }}
+    </h2>
+    <p class="font_20 txtDarkLight" data-aos="fade-up" data-aos-duration="1500">
+      {{ section.settings.subtext }}
+    </p>
+
+    <div class="row align-items-center">
+      <div class="col-12 col-md-12 col-lg-5">
+        <div class="timeline_left">
+          <div class="tab_column_details">
+            {% for block in section.blocks %}
+              {% if block.type == 'timeline_item' %}
+                <div class="tabContent {% if forloop.first %}active{% endif %}" data-tab="{{ forloop.index }}">
+                  <h3>{{ block.settings.year }}</h3>
+                  <h4>{{ block.settings.description }}</h4>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          <div class="controls">
+            <button id="prevTab" class="navBtnPrev">
+              <img src="{{ 'img_arrow.svg' | asset_url }}" alt="Previous">
+            </button>
+            <button id="nextTab" class="navBtnNext">
+              <img src="{{ 'img_arrow.svg' | asset_url }}" alt="Next">
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-12 col-lg-6 offset-lg-1">
+        <div class="tab_column_img">
+          {% for block in section.blocks %}
+            {% if block.type == 'timeline_item' %}
+              <div class="tabContent {% if forloop.first %}active{% endif %}" data-tab="{{ forloop.index }}">
+                <div class="img">
+                  {% if block.settings.image %}
+                    <img src="{{ block.settings.image | image_url: width: 1000 }}" alt="Timeline {{ block.settings.year }}">
+                  {% endif %}
+                  <div class="overlay"></div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline_buttons">
+      {% for block in section.blocks %}
+        {% if block.type == 'timeline_item' %}
+          <button class="tabBtn {% if forloop.first %}active{% endif %}" data-tab="{{ forloop.index }}">
+            {{ block.settings.year }}
+          </button>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "About Timeline",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Main Heading",
+      "default": "A Legacy of Firsts. A Future of Design."
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Subtext",
+      "default": "What began as a quiet rebellion became a nationwide movement, one milestone at a time."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "timeline_item",
+      "name": "Timeline Entry",
+      "settings": [
+        {
+          "type": "text",
+          "id": "year",
+          "label": "Year",
+          "default": "2012"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Fanzart is born: introducing India’s first luxury ceiling fan brand"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Timeline Image"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 30
+}
+{% endschema %}

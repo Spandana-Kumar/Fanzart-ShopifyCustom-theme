@@ -1,0 +1,43 @@
+<section class="banner__component__wrapper">
+  {% if section.settings.banner_image %}
+    <img src="{{ section.settings.banner_image | img_url: 'master' }}" alt="Terms Banner" />
+  {% endif %}
+</section>
+
+<section class="terms__conditions__policy__wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-md-12 col-lg-10 col-xl-8 mx-auto">
+        <h1 class="title42 txtDark">{{ section.settings.title }}</h1>
+        <div class="rte">
+         {{ shop.terms_of_service }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Terms-Conditions",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner Image"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Page Heading",
+      "default": "Terms & Conditions"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Terms & Conditions",
+    }
+  ]
+}
+{% endschema %}

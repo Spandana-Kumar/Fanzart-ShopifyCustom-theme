@@ -1,0 +1,520 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
+<script>
+$(document).ready(function () {
+
+    // --- HIDE AUTO-GENERATED PRICE FACET ---
+    $(".filter_outer .filter-sidebar .filter-group.accordion").each(function(){
+        const headerText = $(this).find(".accordion-header").text().trim().toLowerCase();
+        if(headerText === "price"){
+            $(this).hide(); // hide only the auto-generated Price facet
+        }
+    });
+
+    const priceSlider = document.getElementById('price-slider');
+    const minInput = $('#price-min');
+    const maxInput = $('#price-max');
+    const $filterContainer = $(".wishlist_product_list_middle");
+
+    $filterContainer.hide(); // Hide filter tags initially
+
+    // --- PRICE SLIDER INIT ---
+    if (priceSlider) {
+        noUiSlider.create(priceSlider, {
+            start: [0, 200000],
+            connect: true,
+            range: { min: 0, max: 200000 },
+            step: 1000,
+            format: {
+                to: v => '₹' + Math.round(v).toLocaleString('en-IN'),
+                from: v => Number(v.replace(/[₹,]/g, ''))
+            }
+        });
+
+        // Update inputs while sliding
+        priceSlider.noUiSlider.on('update', function(values) {
+            const cleanValues = values.map(v => Number(v.replace(/[₹,]/g,'')));
+            minInput.val('₹' + cleanValues[0].toLocaleString('en-IN'));
+            maxInput.val('₹' + cleanValues[1].toLocaleString('en-IN'));
+        });
+
+        // On slider change
+        priceSlider.noUiSlider.on('change', function() {
+            updateSelectedFilters();
+            updateApplyButton();
+        });
+
+    // Set initial slider and inputs from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const minPrice = urlParams.get("filter.v.price.gte") || 0;
+    const maxPrice = urlParams.get("filter.v.price.lte") || 200000;
+    priceSlider.noUiSlider.set([minPrice, maxPrice]);
+    }
+
+    // --- ACCORDION TOGGLE ---
+    $(".accordion-header").on("click", function() {
+        const $group = $(this).closest(".filter-group");
+        const $body = $group.find(".accordion-body");
+        if ($group.hasClass("open")) {
+            $group.removeClass("open");
+            $body.slideUp();
+        } else {
+            $group.addClass("open");
+            $body.slideDown();
+        }
+    });
+
+    // --- CHECKBOX / RADIO CHANGES ---
+    $(".accordion-body input[type='checkbox'], .accordion-body input[type='radio']").on("change", function() {
+        updateSelectedFilters();
+        updateApplyButton();
+    });
+
+    // --- SET INPUTS FROM URL (on page load) ---
+    function setInputsFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+
+        // For each input with data-filter, check if URL has values for that facet
+        $('.accordion-body input[data-filter]').each(function() {
+            const facet = $(this).data('filter');
+            const val = $(this).val();
+            if (!facet) return;
+
+            const values = params.getAll(facet);
+            if (values && values.length) {
+                // For checkboxes: may be multiple values
+                if ($(this).is(':checkbox')) {
+                    $(this).prop('checked', values.includes(val));
+                } else if ($(this).is(':radio')) {
+                    $(this).prop('checked', values.includes(val));
+                }
+            } else {
+                // If no param for this facet, ensure unchecked
+                $(this).prop('checked', false);
+            }
+        });
+    }
+
+    // --- UPDATE APPLY BUTTON ---
+    function updateApplyButton() {
+        let hasFilters = $(".accordion-body input:checked").length > 0;
+        if (priceSlider) {
+            const [min, max] = priceSlider.noUiSlider.get().map(v => Number(v.replace(/[₹,]/g,'')));
+            if ((min > 0) || (max < 200000)) hasFilters = true;
+        }
+        $(".filter-action").toggleClass("show", hasFilters);
+    }
+
+    // --- UPDATE SELECTED FILTER TAGS ---
+    function updateSelectedFilters() {
+        const $filterAdded = $filterContainer.find(".filterAdded");
+        $filterAdded.empty();
+
+        let hasAnyFilter = false; // track if any filter is selected
+    let inputUidCounter = 0;
+
+        // Checked filters
+        $('.accordion-body input[type="checkbox"]:checked, .accordion-body input[type="radio"]:checked').each(function() {
+            hasAnyFilter = true;
+            // give this input a stable uid so tags can reference it reliably
+            const inputUid = 'filter-uid-' + (inputUidCounter++);
+            $(this).attr('data-input-uid', inputUid);
+            const filterTitle = $(this).closest('.filter-group').find('.accordion-header').clone().children().remove().end().text().trim();
+            const filterValue = $(this).parent().clone().children('input').remove().end().text().trim();
+            const filterId = $(this).attr('id');
+            const facetName = $(this).data('filter');
+            const facetValue = $(this).val();
+
+            // Include data attributes so remove handler can target inputs even if id is missing or contains special chars
+            const filterTag = $(`
+                <span data-filter-id="${filterId || ''}" data-facet="${facetName || ''}" data-value="${facetValue || ''}" data-input-uid="${inputUid}">
+                    <a href="javascript:;" class="removeIcon">
+                        <img src="{{ 'img_icons_x.svg' | asset_url }}" alt="Remove">
+                    </a>
+                    <em class="filterTitle">${filterTitle}: <strong>${filterValue}</strong></em>
+                </span>
+            `);
+            $filterAdded.append(filterTag);
+        });
+
+        // Price tag
+        if (priceSlider) {
+            const [priceMin, priceMax] = priceSlider.noUiSlider.get().map(v => Number(v.replace(/[₹,]/g,'')));
+            if (priceMin > 0 || priceMax < 200000) {
+                hasAnyFilter = true;
+                const priceTag = $(`
+                    <span data-filter-id="price-range" data-filter-type="price">
+                        <a href="javascript:;" class="removeIcon">
+                            <img src="{{ 'img_icons_x.svg' | asset_url }}" alt="Remove">
+                        </a>
+                        <em class="filterTitle">Price: <strong>₹${priceMin.toLocaleString('en-IN')} – ₹${priceMax.toLocaleString('en-IN')}</strong></em>
+                    </span>
+                `);
+                $filterAdded.append(priceTag);
+            }
+        }
+
+        // Show or hide the wishlist_product_list_middle container
+        if (hasAnyFilter) {
+            $filterContainer.addClass("show").show();
+        } else {
+            $filterContainer.removeClass("show").hide();
+        }
+
+        updateAccordionCounts();
+        updateApplyButton();
+    }
+
+    // --- UPDATE COUNTS IN HEADERS ---
+    function updateAccordionCounts() {
+        $(".filter-group").each(function() {
+            const count = $(this).find('input:checked').length;
+            const $countEl = $(this).find(".selected-count");
+            $countEl.text(count > 0 ? count : "");
+            $countEl.toggleClass("show", count > 0);
+        });
+    }
+
+    // --- REMOVE TAG ---
+    $(document).on("click", ".removeIcon", function(e) {
+        e.preventDefault();
+        const $span = $(this).closest("span");
+        const filterId = $span.data("filter-id");
+
+        // Prefer lookup by stable uid set on updateSelectedFilters
+        let removed = false;
+        const inputUid = $span.data('input-uid');
+        if (inputUid) {
+            const $byUid = $(`.accordion-body input[data-input-uid="${inputUid}"]`);
+            if ($byUid.length) {
+                $byUid.prop('checked', false).trigger('change');
+                removed = true;
+            }
+        }
+
+        // Fallback: try by id
+        if (!removed && filterId && filterId !== "price-range") {
+            const inputEl = document.getElementById(filterId);
+            if (inputEl) {
+                $(inputEl).prop('checked', false).trigger('change');
+                removed = true;
+            }
+        }
+
+        // Final fallback: facet+value selector
+        if (!removed) {
+            const facet = $span.data('facet');
+            const value = $span.data('value');
+            if (facet && typeof value !== 'undefined') {
+                const $candidates = $('.accordion-body input[data-filter]');
+                const $target = $candidates.filter(function() {
+                    return $(this).data('filter') == facet && String($(this).val()) == String(value);
+                });
+                if ($target.length) {
+                    $target.prop('checked', false).trigger('change');
+                    removed = true;
+                }
+            }
+        }
+
+        // If tag represents the price range, reset slider
+        if ($span.data('filter-id') === "price-range" || $span.data('filter-type') === 'price') {
+            if (priceSlider) priceSlider.noUiSlider.set([0, 200000]);
+        }
+
+        // Rebuild URL from current checked inputs and price and navigate
+        applyFiltersToUrl();
+    });
+
+    // --- CLEAR ALL ---
+    $(document).on("click", ".clearAllBtn", function() {
+    // Clear UI selections
+    $(".accordion-body input").prop("checked", false);
+    if (priceSlider) priceSlider.noUiSlider.set([0, 200000]);
+    updateSelectedFilters();
+
+    // Navigate to collection base URL (clear all filters)
+    const collectionUrl = window.location.pathname.split("?")[0];
+    window.location.href = collectionUrl;
+    });
+
+    // --- OPEN/CLOSE FILTER PANEL ---
+    $(".filterLink").on("click", () => $(".filter_outer").addClass("show"));
+    $(".close-filter").on("click", () => $(".filter_outer").removeClass("show"));
+
+    // --- APPLY BUTTON ---
+    $(".filter-apply-btn").on("click", function() {
+        applyFiltersToUrl();
+    });
+
+    // --- APPLY / BUILD URL FROM CURRENT SELECTIONS ---
+    function applyFiltersToUrl() {
+        const params = new URLSearchParams();
+
+        // Checked filters
+        $('.accordion-body input[type="checkbox"]:checked, .accordion-body input[type="radio"]:checked').each(function() {
+            const facet = $(this).data("filter");
+            const value = $(this).val();
+            if (facet && value) params.append(facet, value);
+        });
+
+        // Price
+        if (priceSlider) {
+            const [min, max] = priceSlider.noUiSlider.get().map(v => Number(v.replace(/[₹,]/g,'')));
+            if (!isNaN(min) && min > 0) params.set("filter.v.price.gte", min);
+            if (!isNaN(max) && max < 200000) params.set("filter.v.price.lte", max);
+        }
+
+        const collectionUrl = window.location.pathname.split("?")[0];
+        const queryString = params.toString();
+        const finalUrl = queryString ? `${collectionUrl}?${queryString}` : collectionUrl;
+
+        // Navigate to the new URL to update products
+        window.location.href = finalUrl;
+    }
+
+    // --- INITIAL SETUP ---
+    // Read URL and set inputs first so UI reflects any pre-applied filters
+    setInputsFromUrl();
+    updateAccordionCounts();
+    updateApplyButton();
+    updateSelectedFilters();
+
+});
+</script>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  let tooltipTimeout;
+
+  //Check login status
+  function isLoggedIn() {
+    try {
+      const ts = localStorage.getItem('sml_login_time');
+      if (!ts) return false;
+      return (Date.now() - Number(ts) < 24 * 60 * 60 * 1000); // 24h validity
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Toggle wishlist dropdowns
+  function toggleWishlistDropdowns() {
+    document.querySelectorAll('.wishlist-dropdown').forEach(function(dropdown) {
+      dropdown.style.display = isLoggedIn() ? '' : 'none';
+    });
+  }
+  toggleWishlistDropdowns();
+
+  // Save product to localStorage
+  function addProductToFolder(name, product) {
+    let folders = JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+    let folder = folders.find(f => f.name === name);
+    if (!folder) {
+      folder = { id: Date.now(), name: name, products: [] };
+      folders.push(folder);
+    }
+    folder.products.push(product);
+    localStorage.setItem('wishlist_folders', JSON.stringify(folders));
+    localStorage.removeItem('wishlist_pending_product');
+  }
+
+  // Toast message
+  function showToast(msg) {
+    const tooltip = document.querySelector('.tooltip-msg');
+    if (tooltip) {
+      tooltip.querySelector('.tooltip-text').textContent = msg;
+      tooltip.style.display = 'block';
+      tooltip.classList.add('show');
+      clearTimeout(tooltipTimeout);
+      tooltipTimeout = setTimeout(() => {
+        tooltip.classList.remove('show');
+        tooltip.style.display = 'none';
+      }, 2000);
+    }
+  }
+
+  // Render folders inside dropdown
+  function renderProjects(dropdown) {
+    let folders = JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+    const list = dropdown.querySelector('.list');
+    if (!list) return;
+
+    list.innerHTML = '';
+    if (folders.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'empty-projects';
+      empty.textContent = 'No projects found.';
+      list.appendChild(empty);
+    } else {
+      folders.forEach(folder => {
+        const option = document.createElement('div');
+        option.className = 'option';
+        option.textContent = folder.name;
+        option.style.cursor = 'pointer';
+        list.appendChild(option);
+      });
+    }
+  }
+
+  // Handle wishlist button click
+  document.querySelectorAll('.listing_card').forEach(card => {
+    const likeBtn = card.querySelector('.likes.actionBtn');
+    if (!likeBtn) return;
+
+    likeBtn.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+        const pending = {
+  id: card.dataset.productId || null,
+  handle: card.dataset.productHandle || null,
+  title: card.dataset.productTitle || (card.querySelector('.defaultDetails h4') ? card.querySelector('.defaultDetails h4').textContent.trim() : 'Product'),
+  image: card.querySelector('.mainImg img') ? card.querySelector('.mainImg img').src : '',
+  price: card.querySelector('.priceValue') ? card.querySelector('.priceValue').textContent.trim() : '',
+  outOfStock: card.classList.contains('outOfStock'),
+  variantId: likeBtn.getAttribute('data-variant-id') || null,
+  options: {
+    color: likeBtn.getAttribute('data-option-color') || '',
+    sweep: likeBtn.getAttribute('data-option-sweep') || '',
+    watt: likeBtn.getAttribute('data-option-watt') || '',
+    material: likeBtn.getAttribute('data-option-material') || '',
+    light: likeBtn.getAttribute('data-option-light') || '',
+    mount: likeBtn.getAttribute('data-option-mount') || '',
+    addon: likeBtn.getAttribute('data-option-addon') || ''
+  }
+};
+
+localStorage.setItem('wishlist_pending_product', JSON.stringify(pending));
+
+
+
+      if (!isLoggedIn()) {
+        window.location.href = '/pages/wishlist';
+        return;
+      }
+
+      // Show dropdown
+      const dropdown = card.querySelector('.wishlist-dropdown');
+      if (dropdown) {
+        renderProjects(dropdown);
+        dropdown.classList.toggle('show');
+        document.querySelectorAll('.wishlist-dropdown').forEach(dd => {
+          if (dd !== dropdown) dd.classList.remove('show');
+        });
+      }
+    });
+  });
+
+  // Select existing project
+  document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('option')) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const projectName = e.target.textContent.trim();
+      const pending = JSON.parse(localStorage.getItem('wishlist_pending_product') || 'null');
+      if (!pending) return;
+
+      addProductToFolder(projectName, pending);
+      showToast(`Product successfully added to '${projectName}'`);
+
+      const dropdown = e.target.closest('.wishlist-dropdown');
+      if (dropdown) dropdown.classList.remove('show');
+    }
+
+    // Open create project popup
+    if (e.target.classList.contains('create-btn')) {
+      e.stopPropagation();
+      document.querySelector('.popup-overlay')?.classList.add('showPopup');
+      document.body.classList.add('overflow-hidden');
+      const input = document.getElementById('new-wishlist-name');
+      if (input) {
+        input.value = '';
+        input.classList.remove('error');
+      }
+      document.querySelector('.wishlist-error-msg')?.classList.add('hidden');
+
+      // disable create button initially
+      document.getElementById('add-wishlist')?.setAttribute('disabled', 'true');
+    }
+  });
+
+  // Outside click closes dropdowns
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.wishlist-dropdown') && !e.target.classList.contains('actionBtn')) {
+      document.querySelectorAll('.wishlist-dropdown').forEach(dd => dd.classList.remove('show'));
+    }
+  });
+
+  // Close popup
+  document.getElementById('closePopup-wishlist')?.addEventListener('click', function () {
+    document.querySelector('.popup-overlay')?.classList.remove('showPopup');
+    document.body.classList.remove('overflow-hidden');
+  });
+
+  // Create new project
+  document.getElementById('add-wishlist')?.addEventListener('click', function () {
+    const input = document.getElementById('new-wishlist-name');
+    if (!input || !input.value.trim()) {
+      input?.classList.add('error');
+      document.querySelector('.wishlist-error-msg')?.classList.remove('hidden');
+      return;
+    }
+
+    const newName = input.value.trim();
+    let pendingProduct = JSON.parse(localStorage.getItem('wishlist_pending_product') || 'null');
+
+    let folders = JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+    let exists = folders.find(f => f.name.toLowerCase() === newName.toLowerCase());
+
+    if (exists) {
+      input.classList.add('error');
+      const errorMsg = document.querySelector('.wishlist-error-msg');
+      if (errorMsg) {
+        errorMsg.textContent = 'Project name already exists!';
+        errorMsg.classList.remove('hidden');
+      }
+      return; // stop creating duplicate
+    }
+
+    const newFolder = { id: Date.now(), name: newName, products: pendingProduct ? [pendingProduct] : [] };
+    folders.push(newFolder);
+    localStorage.setItem('wishlist_folders', JSON.stringify(folders));
+    localStorage.removeItem('wishlist_pending_product');
+
+    // Close popup
+    input.value = '';
+    document.querySelector('.popup-overlay')?.classList.remove('showPopup');
+    document.body.classList.remove('overflow-hidden');
+
+    showToast(`Product successfully added to '${newName}'`);
+  });
+
+  // Validate input while typing
+  document.getElementById('new-wishlist-name')?.addEventListener('input', function () {
+    const createBtn = document.getElementById('add-wishlist');
+    const errorMsg = document.querySelector('.wishlist-error-msg');
+    let folders = JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+    let exists = folders.some(f => f.name.toLowerCase() === this.value.trim().toLowerCase());
+
+    if (this.value.trim() === '') {
+      this.classList.add('error');
+      errorMsg.textContent = 'Please enter a project name.';
+      errorMsg.classList.remove('hidden');
+      createBtn?.setAttribute('disabled', 'true');
+    } else if (exists) {
+      this.classList.add('error');
+      errorMsg.textContent = 'Project name already exists!';
+      errorMsg.classList.remove('hidden');
+      createBtn?.setAttribute('disabled', 'true');
+    } else {
+      this.classList.remove('error');
+      errorMsg.classList.add('hidden');
+      createBtn?.removeAttribute('disabled');
+    }
+  });
+});
+</script>
+

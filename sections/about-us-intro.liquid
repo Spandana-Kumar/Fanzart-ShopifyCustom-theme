@@ -1,0 +1,65 @@
+<section class="about__section" id="aboutUs">
+  <div class="img">
+    <img src="{{ 'img_about_flower.png' | asset_url }}" id="img" alt="Fan" />
+  </div>
+  <div class="reveal_contents">
+    <p class="revealText">{{ section.settings.paragraph_1 }}</p>
+    <p class="revealText">{{ section.settings.paragraph_2 }}</p>
+    <p class="revealText">{{ section.settings.paragraph_3 }}</p>
+    <p class="revealText">{{ section.settings.paragraph_4 }}</p>
+    <p class="revealText">{{ section.settings.paragraph_5 }}</p>
+    <p class="revealText">{{ section.settings.paragraph_6 }}</p>
+    <p class="revealText">{{ section.settings.paragraph_7 }}</p>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "About Us Story",
+  "settings": [
+    {
+      "type": "text",
+      "id": "paragraph_1",
+      "label": "Paragraph 1",
+      "default": "We didn’t come from the fan industry. We came from the design world and couldn’t ignore what sat at the center of every room."
+    },
+    {
+      "type": "text",
+      "id": "paragraph_2",
+      "label": "Paragraph 2",
+      "default": "Everything else had evolved: furniture, lighting, layout. But fan design? No one had rethought them."
+    },
+    {
+      "type": "text",
+      "id": "paragraph_3",
+      "label": "Paragraph 3",
+      "default": "That’s when Fanzart began."
+    },
+    {
+      "type": "text",
+      "id": "paragraph_4",
+      "label": "Paragraph 4",
+      "default": "An era of new fan design."
+    },
+    {
+      "type": "text",
+      "id": "paragraph_5",
+      "label": "Paragraph 5",
+      "default": "Fan designed like sculpture."
+    },
+    {
+      "type": "text",
+      "id": "paragraph_6",
+      "label": "Paragraph 6",
+      "default": "Engineered for silence. Sculpted to belong."
+    },
+    {
+      "type": "text",
+      "id": "paragraph_7",
+      "label": "Paragraph 7",
+      "default": "Built for homes that care how they feel not just how they function."
+    }
+  ],
+  
+}
+{% endschema %}

@@ -1,0 +1,9 @@
+{
+  "name": "Product Listing Page",
+  "sections": {
+    "main": {
+      "type": "product-listing-main"
+    }
+  },
+  "order": ["main"]
+}

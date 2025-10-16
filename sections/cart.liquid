@@ -1,37 +1,1119 @@
-{% comment %}
-  This section is used in the cart template to render /cart page with an
-  overview of the items in customer's cart.
+{% if cart.item_count == 0 %}
+   <section class="cart__empty__wrapper">
+    <div class="container">
+      <div class="empty_flex">
+        {% if section.settings.empty_image != blank %}
+          <img
+            src="{{ section.settings.empty_image | image_url }}"
+            class="img"
+            alt="Empty cart"
+          />
+        {% else %}
+          <img
+            src="{{ 'cart-empty.png' | asset_url }}"
+            class="img"
+            alt="Empty cart"
+          />
+        {% endif %}
 
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/cart
-{% endcomment %}
+        <div class="empty_text">
+          <h4>{{ section.settings.heading }}</h4>
+          <p>{{ section.settings.description }}</p>
+        </div>
 
-<h1>{{ 'cart.title' | t }}</h1>
+        <a
+          href="{{ section.settings.button_link }}"
+          class="btns btnDark"
+          data-aos="fade-up"
+          data-aos-duration="2000"
+        >
+          <div class="bg"></div>
+          <div class="btnText">
+            <span>{{ section.settings.button_text }}</span>
+            <span>{{ section.settings.button_text }}</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
 
-<form action="{{ routes.cart_url }}" method="post">
-  <table>
-    {% for item in cart.items %}
-      <tr>
-        <td>
-          {% render 'image', image: item.image, url: item.url %}
-        </td>
-        <td>
-          <p>{{ item.product.title }}</p>
-          {{ 'cart.remove' | t | link_to: item.url_to_remove }}
-        </td>
-        <td>
-          <input type="text" name="updates[]" value="{{ item.quantity }}">
-          <input type="submit" value="{{ 'cart.update' | t }}">
-        </td>
-      </tr>
-    {% endfor %}
-  </table>
 
-  <input type="submit" name="checkout" value="{{ 'cart.checkout' | t }}">
-</form>
+
+{% else %}
+  <section class="cart__wrapper">
+          <div class="container">
+              <div class="row">
+                     <div class="col-12 col-md-7 col-lg-8 col-xl-7">
+          <div class="cart_title">
+            <h2>Your cart</h2>
+            <div class="count"><span>{{ cart.item_count }}</span> Products</div>
+          </div>
+
+          <!-- Product Card -->
+          {% for item in cart.items %}
+
+            {%- assign housing = item.variant.metafields.custom.housing -%}
+            {%- assign blade = item.variant.metafields.custom.blade -%}
+            {%- assign color = item.variant.option1 -%}
+            {% assign sweep = item.properties['Sweep'] | strip %}
+            {% assign watt = item.properties['Watt'] | strip %}
+
+            {%- comment -%}
+              Build custom tracking key (Colour + Sweep + Watt only)
+            {%- endcomment -%}
+            {% assign tracking_key = color | append: '-' | append: sweep | append: '-' | append: watt %}
+
+            <div class="product_card" <div class="product_card" 
+              data-tracking-key="{{ tracking_key }}"
+              data-line="{{ forloop.index }}"
+              data-variant-id="{{ item.variant_id }}">
+              <div class="product_img">
+                <img src="{{ item.image | img_url: 'medium' }}" alt="{{ item.product.title }}" />
+              </div>
+              <div class="contents_flex">
+                <div class="deatails">
+                  <h3>{{ item.product.title }}</h3>
+                  <div class="inner_flex">
+                    <ul class="product_detail_list">
+
+                      <!-- COLOUR -->
+                      {% if housing or blade %}
+                        <li>
+                          <h5>COLOUR</h5>
+                          <h6>
+                            {% if housing %}Housing: {{ housing }}<br>{% endif %}
+                            {% if blade %}Blades: {{ blade }}{% endif %}
+                          </h6>
+                        </li>
+                      {% elsif color %}
+                        <li>
+                          <h5>COLOUR</h5>
+                          <h6>{{ color }}</h6>
+                        </li>
+                      {% endif %}
+
+                      <!-- SWEEP -->
+                      {% if sweep != blank %}
+                        <li>
+                          <h5>SWEEP</h5>
+                          <h6>{{ sweep }}</h6>
+                        </li>
+                      {% endif %}
+
+                      <!-- WATT -->
+                      {% if watt != blank %}
+                        <li>
+                          <h5>WATT</h5>
+                          <h6>{{ watt }}</h6>
+                        </li>
+                      {% endif %}
+                      
+
+                      <!-- Other properties -->
+                      {% for property in item.properties %}
+                        {% assign label = property.first %}
+                        {% assign value = property.last %}
+                        {% assign label_down = label | downcase %}
+
+                        {% unless label_down contains 'sweep' or
+                                  label_down == 'watt' or
+                                  label_down == 'custom image' or
+                                  label_down == 'custom price' or
+                                  label_down == 'custom label' or
+                                  label_down == 'colour' or
+                                  label_down == 'color' or
+                                  label_down == 'add on price' or
+                                  value == blank %}
+
+                          {% assign label_final = label | replace: 'color', 'colour' | replace: 'Color', 'Colour' | upcase %}
+
+                          <li>
+                            <h5>{{ label_final }}</h5>
+                            <h6>{{ value }}</h6>
+                          </li>
+                        {% endunless %}
+                      {% endfor %}
+                    </ul>
+
+                    <div class="actionBtn_flex">
+                      <button class="actionBtn" onclick="toggleLike(this)">
+                        <span class="img"></span>
+                        <span>Wishlist</span>
+                      </button>
+
+                      <button
+                        class="actionBtn remove-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#removeProduct"
+                        data-product-id="{{ item.key }}"
+                        data-tracking-key="{{ tracking_key }}"
+                        data-product-title="{{ item.product.title }}"
+                        data-product-image="{{ item.image | img_url: 'medium' }}"
+                        data-product-price="{{ item.final_line_price | money_without_trailing_zeros }}"
+                      >
+                        <img src="{{ 'img_cart_trash.svg' | asset_url }}" alt="Remove" />
+                        <span>Remove</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="count_prices_flex">
+                  <div class="counter">
+                    <form method="post" action="/cart/change">
+                      <input type="hidden" name="id" value="{{ item.key }}">
+
+                      <!-- Decrease -->
+                      <button class="decrease" 
+                        {% if item.quantity == 1 %}disabled{% endif %}
+                        onclick="this.parentNode.querySelector('[name=quantity]').value={{ item.quantity | minus: 1 }}">
+                        <img src="{{ 'img_cart_minus.svg' | asset_url }}" class="icon" alt="-" />
+                      </button>
+
+                      <span class="count">{{ item.quantity }}</span>
+
+                      <!-- Increase -->
+                    <button class="increase"
+                      data-tracking-key="{{ tracking_key }}"
+                      data-available="{{ item.variant.inventory_quantity }}"
+                      {% if item.variant.inventory_management and item.variant.inventory_policy == 'deny' and item.quantity >= item.variant.inventory_quantity %}
+                        disabled
+                      {% endif %}>
+                      <img src="{{ 'img_cart_plus.svg' | asset_url }}" class="icon" alt="+" />
+                    </button>
+                      <input type="hidden" name="quantity" value="{{ item.quantity }}" />
+                    </form>
+                  </div>
+
+                  <div class="prices">
+                    <div class="mrpItem">
+                      <div class="mrp">
+                        <h6>MRP:</h6>
+                        <div>
+                          {% assign addon_price = item.properties["Add On Price"] %}
+                          {% if addon_price %}
+                            {% assign addon_price_paise = addon_price | times: 100 %}
+                            {% assign addon_total = item.final_line_price | plus: addon_price_paise %}
+                            <span>&#8377;</span><span>{{ addon_total | money_without_currency | split: '.' | first }}</span>
+                          {% else %}
+                            <span>&#8377;</span><span>{{ item.final_line_price | money_without_currency | split: '.' | first }}</span>
+                          {% endif %}
+                        </div>
+                      </div>
+                      <p>(Inclusive all of taxes)</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+                  <div class="col-12 col-md-5 col-lg-4 col-xl-4 offset-xl-1">
+                      <div class="order__summary__wrapper">
+                       {% assign total_mrp = 0 %}
+                          {% for item in cart.items %}
+                            {% assign addon_price = item.properties["Add On Price"] %}
+                            {% if addon_price %}
+                              {% assign addon_price_paise = addon_price | times: 100 %}
+                              {% assign addon_total = item.final_line_price | plus: addon_price_paise %}
+                              {% assign total_mrp = total_mrp | plus: addon_total %}
+                            {% else %}
+                              {% assign total_mrp = total_mrp | plus: item.final_line_price %}
+                            {% endif %}
+                          {% endfor %}
+
+                          <h3>Order Summary</h3>
+                          <div class="product_mrp_flex">
+                             <div class="inner_flex">
+                                <div class="item">MRP ({{ cart.item_count }} Products)</div>
+                                <div class="rate">
+                                  <span>&#8377;</span><span id="orderMrp">{{ total_mrp | money_without_currency | split: '.' | first }}</span>
+                                </div>
+                              </div>
+
+                              <div class="inner_flex">
+                                  <div class="item">Shipping</div>
+                                  <div class="rate">Free</div>
+                              </div>
+                          </div>
+
+                          <div class="availability_wrap">
+                              <h4>Check availability for installation</h4>
+                              
+                              <div class="pinCode">
+                                <input type="text" id="pincodeInput" class="controls" placeholder="Pin code" maxlength="6" inputmode="numeric">
+                                <div class="successText" style="display:none;">Installation service is available.</div>
+                                <div class="errorText" style="display:none;">Installation service is unavailable.</div>
+                              </div>
+
+                              <div class="installation">
+                                <div class="checkbox_wrap">
+                                  <div class="checkbox">
+                                    <input type="checkbox" name="checkboxs" id="checkboxs" class="cstm-chk">
+                                    <label for="checkboxs">Add Installation Fee</label>
+                                  </div>
+                                  <div class="tooltip_wrap">
+                                    <img src="{{ 'img_cart_Info.svg' | asset_url }}" class="info" alt="" />
+                                   
+                                    <div class="tooltipText">
+                                            {{ shop.metafields.custom.installation_tooltip }}
+                                            <a href="javascript:void();" data-bs-toggle="modal"
+                                                data-bs-target="#modalTooltip">Read More.</a>
+                                        </div>
+                                  </div>
+                                </div>
+                                <div class="installationFee">
+                                  <span>&#8377;</span><span id="installationFeeValue">0</span>
+                                </div>
+                              </div>
+                            </div>
+
+
+
+                          <div class="total_price_flex">
+                              <div class="total">
+                                  <h4>Total</h4>
+                                  <div>
+                                      <span>&#8377;</span><span id="totalValue">{{ initial_total_cents | money_without_currency | split: '.' | first }}</span>
+                                  </div>
+                              </div>
+
+                           
+                          </div>
+
+
+                          <div class="floation_button">
+                              <!-- Only for Mobile (Desktop screen not required only its show in mobile) -->
+                              <div class="mrpMobile">
+                                  <h4>
+                                      <span class="mrp">MRP</span>
+                                      <span>&#8377;</span><span id="mrpMobileValue">{{ initial_total_cents | money_without_currency | split: '.' | first }}</span>
+                                  </h4>
+                              </div>
+                              <!-- Only for Mobile -->
+                              <a href="javascript:" class="btns btnDark btnProceed" data-bs-toggle="modal"
+                                  data-bs-target="#loginModal">
+                                  <div class="bg"></div>
+                                  <div class="btnText">
+                                      <span>Proceed</span>
+                                      <span>Proceed</span>
+                                  </div>
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+  </section>
+  <style>
+{% render 'sml-client-css' %}
+</style>
+{% render 'sml-main' %}
+<script>
+{% render 'sml-client-js' %}
+</script>
+
+<form id="customer_login" style="display:none !important;"></form>
+
+
+
+<!-- Login Modal -->
+ <div class="modal logIn_modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <img src="{{ 'img_cart_close.svg' | asset_url }}" alt="close" />
+                    
+                </button>
+                <div class="modal-body">
+                    <div class="logIn_bg">
+                        <img src="{{ 'img_cart_logIn.png' | asset_url }}" alt="logIn" />
+                    </div>
+
+                    <div class="logIn_form">
+                        <div class="inner_wrap" id="logInBlock">
+                            <div class="title">
+                                <h3>Log In</h3>
+                                <p>Get access to your orders</p>
+                            </div>
+
+                            <form action="" class="form" >
+                                <div class="logIn_field">
+                                    <label for="phone">Enter 10 digit Mobile Number</label>
+                                    <input type="text" class="controls" name="phone" id="phone" />
+                                    <div class="waring" id="warningMsg">Please enter a valid 10-digit mobile number.
+                                    </div>
+                                </div>
+                                <button type="button" id="logInNum" class="btns btnDark">
+                                    <div class="bg"></div>
+                                    <div class="btnText">
+                                        <span>Get Verification Code</span>
+                                        <span>Get Verification Code</span>
+                                    </div>
+                                </button>
+
+                                <div class="deviderLine">
+                                    <div class="line"></div>
+                                    <div class="text">or</div>
+                                    <div class="line"></div>
+                                </div>
+
+                                <button type="button" class="btns btnWhite" id="guestCheckoutBtn">
+                                    <div class="bg"></div>
+                                    <div class="btnText">
+                                        <span>Checkout as a Guest</span>
+                                        <span>Checkout as a Guest</span>
+                                    </div>
+                                </button>
+                            </form>
+
+                            <div class="contents">
+                                <p>By logging in, you agree to our</p>
+                                <ul class="linksList">
+                                    <li><a href="{{ pages['terms-and-conditions'].url }}">Terms and Conditions</a></li>
+                                    <li><span>&</span></li>
+                                    <li><a href="{{ pages['privacy-policy'].url }}">Privacy Policy</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="otp_wrapper" id="otpBlock" style="display:none;">
+                            <div class="title">
+                                <h3>Verify OTP</h3>
+                               <p>Provide OTP sent to <strong id="displayNumber"></strong> <a href="#" id="editNumber">Edit</a></p>
+                            </div>
+                            <form action="" id="otpForm">
+                                <div class="logIn_field">
+                                    <label for="otpInputs">Enter the verification code here</label>
+                                    <div class="otp_inputs" id="otpInputs">
+                                        <input type="text" class="otpControls" maxlength="1" />
+                                        <input type="text" class="otpControls" maxlength="1" />
+                                        <input type="text" class="otpControls" maxlength="1" />
+                                        <input type="text" class="otpControls" maxlength="1" />
+                                    </div>
+                                    
+                                      <div id="otpErrorMsg" style="color:red; display:none; font-size:12px; margin-top:5px;">
+                                        Invalid OTP. Please try again.
+                                      </div>
+                                </div>
+
+                                <p class="resendCounter">
+                                  Didn't get the code? Resend in <span id="resendTimer">00:30</span>
+                                </p>
+                                <p class="resend_text" style="display:none;">Didn't get the code? <br>
+                                    <a href="#" id="resendSMS">Resend code on SMS</a>
+                                </p>
+                            </form>
+                            <div class="contents">
+                                <p>By logging in, you agree to our</p>
+                                <ul class="linksList">
+                                    <li><a href="{{ pages['terms-and-conditions'].url }}">Terms and Conditions</a></li>
+                                    <li><span>&</span></li>
+                                    <li><a href="{{ pages['privacy-policy'].url }}">Privacy Policy</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="email_wrapper inner_wrap" id="emailBlock" style="display:none;">
+                          <div class="title">
+                              <h3>Enter Your Email</h3>
+                              <p>We need your email to complete your login</p>
+                          </div>
+                          <form id="emailForm">
+                              <div class="logIn_field">
+                                  <label for="userEmail">Email Address</label>
+                                  <input type="email" class="controls" name="userEmail" id="userEmail" placeholder="Enter your email" required>
+                              </div>
+                              <button type="submit" id="submitEmail" class="btns btnDark">
+                                  <div class="bg"></div>
+                                  <div class="btnText">
+                                      <span>Done</span>
+                                      <span>Done</span>
+                                  </div>
+                              </button>
+                          </form>
+                      </div>
+
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+<div class="modal modal_remove fade" id="removeProduct" data-bs-backdrop="static" data-bs-keyboard="false"
+  tabindex="-1" aria-labelledby="removeProductLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h1 class="modal-title" id="removeProductLabel">
+          Are you sure you want to remove this product from cart?
+        </h1>
+      </div>
+
+      <div class="modal-body">
+        <div class="product_remove">
+          <img src="" id="modal-product-image" class="img" alt="Product image" />
+          <div class="contents">
+            <h5 id="modal-product-title">Product Name</h5>
+            <p>Carved in wood. Composed in silence.</p>
+            <div class="mrp">
+              <h6>MRP: <span>&#8377;</span><span id="modal-product-price">0</span></h6>
+              <p>(Inclusive all of taxes)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden input to store product ID -->
+        <input type="hidden" id="remove-product-id" />
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btns btnWhite" data-bs-dismiss="modal">
+          <div class="bg"></div>
+          <div class="btnText">
+            <span>Cancel</span>
+            <span>Cancel</span>
+          </div>
+        </button>
+
+        <button type="button" class="btns btnDark" data-bs-dismiss="modal" onclick="handleRemoveClick()" id="confirm-remove-btn">
+          <div class="bg"></div>
+          <div class="btnText">
+            <span>Remove</span>
+            <span>Remove</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+   <div id="toast" class="toastUndo">
+        <div class="flex_wrap">
+            <p>Product is removed from cart</p>
+            <button class="btnUndo" onclick="undoAction()">UNDO</button>
+        </div>
+
+        <button class="close" onclick="hideToast()">
+            <img src="{{ 'img_cart_undo.svg' | asset_url }}" alt="" />
+        </button>
+    </div>
+    
+ <!-- ToolTip Modal -->
+    <div class="modal modalTooltip fade" id="modalTooltip" tabindex="-1" aria-labelledby="modalTooltipLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body">
+                    {{ shop.metafields.custom.installation_terms | raw }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  let resendTimerInterval;
+  let otpStartTime = null;
+  const otpValidDuration = 30; // seconds
+
+  function clearOTPInputs() {
+    document.querySelectorAll("#otpInputs .otpControls").forEach(i => i.value = "");
+  }
+
+  function isOtpExpired() {
+    if (!otpStartTime) return true;
+    const elapsed = (Date.now() - otpStartTime) / 1000;
+    return elapsed > otpValidDuration;
+  }
+
+  function startResendCountdown(seconds = 30) {
+    otpStartTime = Date.now(); // Reset OTP timer start
+    clearInterval(resendTimerInterval);
+
+    const counter = document.querySelector(".resendCounter");
+    const timerSpan = document.getElementById("resendTimer");
+    const resendText = document.querySelector(".resend_text");
+
+    if (!counter || !timerSpan || !resendText) return;
+
+    counter.style.display = "block";
+    resendText.style.display = "none";
+
+    let remaining = seconds;
+
+    function updateTimer() {
+      const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
+      const ss = String(remaining % 60).padStart(2, "0");
+      timerSpan.textContent = `${mm}:${ss}`;
+
+      if (remaining <= 0) {
+        clearInterval(resendTimerInterval);
+        counter.style.display = "none";
+        resendText.style.display = "block";
+      }
+      remaining--;
+    }
+
+    updateTimer();
+    resendTimerInterval = setInterval(updateTimer, 1000);
+  }
+
+  // STEP 1: Send OTP
+  document.getElementById("logInNum").addEventListener("click", function () {
+    const phone = document.getElementById("phone").value.trim();
+
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      document.getElementById("warningMsg").style.display = "block";
+      return;
+    }
+    document.getElementById("warningMsg").style.display = "none";
+
+    document.getElementById("smlPhoneNumberInput").value = phone;
+    document.getElementById("getOTPButton").click();
+
+    document.getElementById("displayNumber").innerText = phone;
+    document.getElementById("logInBlock").style.display = "none";
+    document.getElementById("otpBlock").style.display = "block";
+
+    clearOTPInputs();
+    startResendCountdown(30);
+     
+    document.querySelector('#otpInputs .otpControls')?.focus();
+
+    const otpError = document.getElementById("otpErrorMsg");
+    if (otpError) otpError.style.display = "none";
+  });
+
+  // STEP 2: Capture OTP and validate
+  document.querySelectorAll("#otpInputs .otpControls").forEach((input, idx, arr) => {
+    input.addEventListener("input", function () {
+      if (this.value.length === 1 && idx < arr.length - 1) arr[idx + 1].focus();
+
+      const otp = Array.from(arr).map(i => i.value).join("");
+
+      if (otp.length === 4) {
+        const otpError = document.getElementById("otpErrorMsg");
+
+        if (isOtpExpired()) {
+          otpError.style.display = "block";
+          otpError.textContent = "OTP expired. Please request a new one.";
+          clearOTPInputs();
+          return;
+        }
+
+        otpError.style.display = "none";
+        document.getElementById("otpInput").value = otp;
+        document.getElementById("submitOTPButton").click();
+      }
+    });
+  });
+
+  // STEP 3: Email for new users
+  document.getElementById("emailForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const email = document.getElementById("userEmail").value.trim();
+    if (!email) return;
+    localStorage.setItem("sml_user_email", email);
+    document.getElementById("userEmailInput").value = email;
+    document.getElementById("registerUserButton").click();
+  });
+
+  // STEP 4: Edit number
+  document.getElementById("editNumber").addEventListener("click", function (e) {
+    e.preventDefault();
+    document.getElementById("otpBlock").style.display = "none";
+    document.getElementById("logInBlock").style.display = "block";
+    clearOTPInputs();
+    clearInterval(resendTimerInterval);
+  });
+
+  // STEP 5: Resend OTP
+  document.getElementById("resendSMS").addEventListener("click", function (e) {
+    e.preventDefault();
+    clearOTPInputs();
+    document.getElementById("resendOTPButton").click();
+
+    otpStartTime = Date.now();
+    startResendCountdown(30);
+
+    const otpError = document.getElementById("otpErrorMsg");
+    if (otpError) otpError.style.display = "none";
+  });
+
+  // STEP 6: Hook into SML events
+  window.runOnSMLEvent = function (event, data) {
+    console.log("SML Event:", event, data);
+
+    if (event === "PHONE_OTP_SCREEN_TYPE_CHANGE") {
+      if (data.screen_type === "ENTER_OTP") {
+        document.getElementById("logInBlock").style.display = "none";
+        document.getElementById("otpBlock").style.display = "block";
+        clearOTPInputs();
+        startResendCountdown(30);
+        const otpError = document.getElementById("otpErrorMsg");
+        if (otpError) otpError.style.display = "none";
+      }
+      if (data.screen_type === "ENTER_EMAIL") {
+        document.getElementById("otpBlock").style.display = "none";
+        document.getElementById("emailBlock").style.display = "block";
+        clearInterval(resendTimerInterval);
+      }
+    }
+
+    if (event === "LOGIN_SUCCESSFUL" || event === "USER_REGISTERED_SUCCESSFULLY") {
+      if (data && data.email) {
+        localStorage.setItem("sml_user_email", data.email);
+      }
+      localStorage.setItem("sml_login_time", Date.now());
+      try {
+        window.dispatchEvent(new CustomEvent('sml_user_logged_in', { detail: data || {} }));
+      } catch (e) { }
+      if (window.jQuery && jQuery('#loginModal').modal) {
+        try { jQuery('#loginModal').modal('hide'); } catch (e) { }
+      }
+      try {
+        if (!window.location.pathname.toLowerCase().includes('checkout')) {
+      window.location.href = '/checkout';
+        }
+      } catch (e) { }
+    }
+  };
+
+  // STEP 7: AJAX OTP failure
+  if (window.jQuery) {
+    jQuery(document).ajaxError(function (event, jqxhr, settings, thrownError) {
+      if (settings && settings.url && settings.url.includes("validateOTP")) {
+        console.error("OTP API error caught:", jqxhr);
+        const otpError = document.getElementById("otpErrorMsg");
+        if (otpError) {
+          otpError.style.display = "block";
+          otpError.textContent = "Invalid or expired OTP. Please try again.";
+        }
+        clearOTPInputs();
+      }
+    });
+  }
+
+  // STEP 8: Timeout fallback
+  document.getElementById("submitOTPButton").addEventListener("click", function () {
+    
+    setTimeout(() => {
+      const otpBlock = document.getElementById("otpBlock");
+      if (otpBlock && otpBlock.style.display !== "none") {
+        const otpError = document.getElementById("otpErrorMsg");
+        if (otpError) {
+          otpError.style.display = "block";
+          otpError.textContent = "Invalid or expired OTP. Please try again.";
+        }
+      }
+    }, 4000);
+  });
+
+  // STEP 9: Guest checkout
+  document.getElementById("guestCheckoutBtn").addEventListener("click", function (e) {
+    e.preventDefault();
+    window.location.href = "/checkout";
+  });
+});
+</script>
+
+
+<!-- Autofill email at checkout -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const storedEmail = localStorage.getItem("sml_user_email");
+  if (!storedEmail) return;
+
+  function fillEmail() {
+    const emailInput = document.querySelector(
+      'input#checkout_email, input#email, input[name="checkout[email]"]'
+    );
+    if (emailInput && !emailInput.value) {
+      emailInput.value = storedEmail;
+      emailInput.dispatchEvent(new Event("input", { bubbles: true }));
+      console.log("Email autofilled:", storedEmail);
+      return true;
+    }
+    return false;
+  }
+
+  // Try immediately
+  if (fillEmail()) return;
+
+  // Fallback: observe DOM changes until email field is available
+  const observer = new MutationObserver(() => {
+    if (fillEmail()) {
+      observer.disconnect();
+    }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+});
+</script>
+
+
+
+
+
+
+<script>
+  let toastTimeout;
+  let recentlyRemovedProduct = null;
+  let removeTimeout;
+
+  function handleRemoveClick() {
+    const productId = document.getElementById("remove-product-id").value;
+
+    // Get current item directly from the DOM instead of window.cart
+    const itemEl = document.querySelector(`[data-product-id="${productId}"]`);
+    const productCard = itemEl.closest('.product_card');
+
+    // Store for undo
+    recentlyRemovedProduct = {
+      key: productId,
+      element: productCard.cloneNode(true),
+      quantity: productCard.querySelector("input[name=quantity]").value
+    };
+
+    // Hide item from DOM (visually removed)
+    productCard.style.display = 'none';
+
+    // Show toast
+    undoToast();
+
+    // After 5s, actually remove it from Shopify cart
+    removeTimeout = setTimeout(() => {
+      removeFromCart();
+    }, 5000);
+  }
+
+  function removeFromCart() {
+    if (!recentlyRemovedProduct) return;
+
+    const form = document.createElement("form");
+    form.method = "post";
+    form.action = "/cart/change";
+
+    form.innerHTML = `
+      <input type="hidden" name="id" value="${recentlyRemovedProduct.key}">
+      <input type="hidden" name="quantity" value="0">
+    `;
+
+    document.body.appendChild(form);
+    form.submit(); // reloads cart
+  }
+
+  function undoToast() {
+    const toast = document.getElementById("toast");
+    toast.style.display = "block";
+
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      toast.style.display = "none";
+    }, 5000);
+  }
+
+  function hideToast() {
+    const toast = document.getElementById("toast");
+    toast.style.display = "none";
+    clearTimeout(toastTimeout);
+  }
+
+  function undoAction() {
+    hideToast();
+    clearTimeout(removeTimeout);
+
+    const cartColumn = document.querySelector('.cart__wrapper .container .row .col-12');
+    const cartTitle = cartColumn.querySelector('.cart_title');
+
+    if (recentlyRemovedProduct && recentlyRemovedProduct.element) {
+      recentlyRemovedProduct.element.style.display = '';
+
+      // Insert after cart_title
+      cartTitle.insertAdjacentElement('afterend', recentlyRemovedProduct.element);
+    }
+
+    recentlyRemovedProduct = null;
+  }
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll(".remove-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        const productId = button.getAttribute("data-product-id");
+        const title = button.getAttribute("data-product-title");
+        const image = button.getAttribute("data-product-image");
+        const price = button.getAttribute("data-product-price");
+
+        document.getElementById("modal-product-title").textContent = title;
+        document.getElementById("modal-product-image").src = image;
+        document.getElementById("modal-product-price").textContent = price;
+        document.getElementById("remove-product-id").value = productId;
+      });
+    });
+  });
+document.addEventListener("DOMContentLoaded", function () {
+  function updateStockButtons() {
+    // Group by tracking key
+    const groupedQuantities = {};
+
+    document.querySelectorAll(".product_card").forEach(card => {
+      const key = card.getAttribute("data-tracking-key");
+      const qty = parseInt(card.querySelector("input[name=quantity]").value) || 0;
+
+      groupedQuantities[key] = (groupedQuantities[key] || 0) + qty;
+    });
+
+    // Loop through all increase buttons
+    document.querySelectorAll(".increase").forEach(btn => {
+      const key = btn.getAttribute("data-tracking-key");
+      const available = parseInt(btn.getAttribute("data-available"));
+      const totalInCart = groupedQuantities[key] || 0;
+
+      if (totalInCart >= available) {
+        btn.disabled = true;
+      } else {
+        btn.disabled = false;
+      }
+    });
+  }
+
+  // Function to update Shopify cart
+  function updateCart(line, quantity) {
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ line: line, quantity: quantity })
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log("Cart updated:", data);
+      updateStockButtons();
+
+      // Fetch fresh cart to compute MRP including any add-on properties
+      fetch('/cart.js')
+        .then(r => r.json())
+        .then(cartData => {
+          var mrpCents = 0;
+          (cartData.items || []).forEach(function(it){
+            var itemTotal = parseInt(it.final_line_price || 0, 10) || 0;
+            var addon = 0;
+            if (it.properties && it.properties['Add On Price']) {
+              var parsed = parseFloat(it.properties['Add On Price']);
+              if (!isNaN(parsed)) addon = Math.round(parsed * 100);
+            }
+            mrpCents += itemTotal + addon;
+          });
+
+          computeAndRenderTotals(mrpCents);
+        })
+        .catch(e => console.error('Error fetching cart.js for totals', e));
+    })
+    .catch(err => console.error("Cart update error:", err));
+  }
+
+  // Attach events for + and -
+  document.querySelectorAll(".increase").forEach(btn => {
+    btn.addEventListener("click", function () {
+      const card = this.closest(".product_card");
+      const input = card.querySelector("input[name=quantity]");
+      const line = card.getAttribute("data-line");
+
+      let qty = parseInt(input.value) || 0;
+      qty++;
+
+      input.value = qty;
+      updateCart(line, qty);
+    });
+  });
+
+  document.querySelectorAll(".decrease").forEach(btn => {
+    btn.addEventListener("click", function () {
+      const card = this.closest(".product_card");
+      const input = card.querySelector("input[name=quantity]");
+      const line = card.getAttribute("data-line");
+
+      let qty = parseInt(input.value) || 0;
+      if (qty > 1) qty--;
+
+      input.value = qty;
+      updateCart(line, qty);
+    });
+  });
+
+  // Run initial
+  updateStockButtons();
+});
+ const installationFeesStr = '{{ shop.metafields.custom.installation_pincodes }}';
+  
+  // Parse it safely in JS
+  let windowInstallationFees = {};
+  try {
+    windowInstallationFees = JSON.parse(installationFeesStr);
+  } catch(e) {
+    console.error("Invalid JSON in installation pincodes metafield:", e);
+  }
+
+  window.installationFees = windowInstallationFees;
+const pincodeInput = document.getElementById("pincodeInput");
+const successText = document.querySelector(".successText");
+const errorText = document.querySelector(".errorText");
+const installationFeeEl = document.getElementById("installationFeeValue");
+const installationDiv = document.querySelector('.installation');
+const installationCheckbox = document.getElementById('checkboxs'); // ✅ correct ID
+
+let installationFee = 0;
+
+// Hide initially
+installationDiv.style.display = "none";
+installationCheckbox.disabled = true;
+
+function validatePincode() {
+  const value = pincodeInput.value.replace(/\D/g, '').trim();
+
+  if (/^\d{6}$/.test(value)) {
+    if (window.installationFees && window.installationFees[value]) {
+      // ✅ Installation available
+      successText.style.display = "block";
+      errorText.style.display = "none";
+      installationDiv.style.display = "flex";
+      installationCheckbox.disabled = false;
+
+      installationFee = parseInt(window.installationFees[value]);
+      installationFeeEl.textContent = installationFee.toLocaleString("en-IN");
+    } else {
+      // ❌ Not available
+      successText.style.display = "none";
+      errorText.style.display = "block";
+      installationDiv.style.display = "none";
+      installationCheckbox.checked = false;
+      installationCheckbox.disabled = true;
+      installationFee = 0;
+      installationFeeEl.textContent = "0";
+    }
+  } else {
+    // ⚠️ Invalid pincode
+    successText.style.display = "none";
+    errorText.style.display = "none";
+    installationDiv.style.display = "none";
+    installationCheckbox.checked = false;
+    installationCheckbox.disabled = true;
+    installationFee = 0;
+    installationFeeEl.textContent = "0";
+  }
+
+  window.computeAndRenderTotals?.(currentOrderMrpCents);
+}
+
+pincodeInput.addEventListener("input", validatePincode);
+
+// Add dynamic totals calculation: include installation in displayed total
+(function(){
+  // initial order MRP in cents from Liquid
+  var currentOrderMrpCents = {{ total_mrp | default: 0 }};
+
+  function formatRupees(num) {
+    try { return Number(num).toLocaleString('en-IN'); } catch (e) { return num; }
+  }
+
+  // orderMrpCents expected in cents
+  window.computeAndRenderTotals = function(orderMrpCents) {
+    if (typeof orderMrpCents !== 'number') orderMrpCents = Number(orderMrpCents) || 0;
+    currentOrderMrpCents = orderMrpCents;
+
+    var orderMrpRupees = Math.round(orderMrpCents / 100);
+    var installCheckbox = document.getElementById('checkboxs');
+    var installation = (installCheckbox && installCheckbox.checked && typeof installationFee === 'number') ? installationFee : 0;
+
+    // Displayed order MRP = products only
+    var displayedOrderMrp = orderMrpRupees;
+
+    // Total = products + installation (shipping always free, no "you save")
+    var total = Math.round(orderMrpRupees + installation);
+    if (total < 0) total = 0;
+
+    var orderEl = document.getElementById('orderMrp');
+    if (orderEl) orderEl.textContent = formatRupees(displayedOrderMrp);
+
+    var totalEl = document.getElementById('totalValue');
+    if (totalEl) totalEl.textContent = formatRupees(total);
+
+    var mobileEl = document.getElementById('mrpMobileValue');
+    if (mobileEl) mobileEl.textContent = formatRupees(total);
+  };
+
+  // recompute shortly after pincode validation updates installationFee
+  var pincodeEl = document.getElementById('pincodeInput');
+  if (pincodeEl) {
+    pincodeEl.addEventListener('input', function(){
+      setTimeout(function(){ window.computeAndRenderTotals(currentOrderMrpCents); }, 50);
+    });
+  }
+
+  // recompute when installation checkbox toggles
+  var installationCheckbox = document.getElementById('checkboxs');
+  if (installationCheckbox) {
+    installationCheckbox.addEventListener('change', function(){
+      window.computeAndRenderTotals(currentOrderMrpCents);
+    });
+  }
+
+  // compute on initial load
+  document.addEventListener('DOMContentLoaded', function(){
+    window.computeAndRenderTotals(currentOrderMrpCents);
+  });
+})();
+
+
+</script>
+
 
 {% schema %}
 {
-  "name": "t:general.cart",
-  "settings": []
+  "name": "Cart Empty",
+  "tag": "section",
+  "class": "cart-empty-section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "empty_image",
+      "label": "Empty cart image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Your cart is empty"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "You haven’t yet added anything to your cart. Add a product before checking out."
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link",
+      "default": "/"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Continue Shopping"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cart Empty"
+    }
+  ]
 }
 {% endschema %}

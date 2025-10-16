@@ -1,0 +1,70 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/MotionPathPlugin.min.js"
+        integrity="sha512-vuNgw6lF+p97XmL9lFpbQZWBXxIFnwUVt7J/uknE4NJru5GJjjhIAauXdDtNdezqOJFnit+M3AeaM+gZ93hlmg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/Draggable.min.js"
+        integrity="sha512-dgqdovLK5r/NMiV5YfWA0xC94DKGrm+6q1OZpuWHm+uBGLTck6wu58WAX9lmy8wec6cVnsgxbPJ60DtmNFnfgg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+   <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            $(window).load(function () {
+                if (window.innerWidth >= 767) {
+                    gsap.registerPlugin(MotionPathPlugin);
+
+                    const boxFour = gsap.utils.toArray(".box_four .box");
+                    const spacingFactor = 0.03;
+                    gsap.set(boxFour, {
+                        motionPath: (i) => ({
+                            path: "#myPath",
+                            align: "#myPath",
+                            alignOrigin: [0.5, 0.5],
+                            start: (i - (boxFour.length - 1) / 2) * spacingFactor - 0.25,
+                            end: (i - (boxFour.length - 1) / 2) * spacingFactor - 0.25,
+                            autoRotate: true,
+                        })
+                    });
+                }
+
+                if (window.innerWidth <= 767) {
+                    const cardsFour = gsap.utils.toArray(".box_four .box");;
+                    const spacingFactorMobile = 0.026;
+                    gsap.set(cardsFour, {
+                        motionPath: (i) => ({
+                            path: "#myPath",
+                            align: "#myPath",
+                            alignOrigin: [0.5, 0.5],
+                            start: (i - (cardsFour.length - 1) / 2) * spacingFactorMobile - 0.225,
+                            end: (i - (cardsFour.length - 1) / 2) * spacingFactorMobile - 0.225,
+                            autoRotate: true,
+                        })
+                    });
+                    const fourFan = document.querySelector(".inner_wrap");
+
+                    Draggable.create(fourFan, {
+                        type: "rotation",
+                        inertia: true,
+
+                        onDrag: function () {
+                            const clamped = gsap.utils.clamp(-18, 0, this.rotation);
+                            gsap.set(fourFan, { rotation: clamped });
+                            this.rotation = clamped;
+                            this.endRotation = clamped;
+                        },
+                        onThrowUpdate: function () {
+                            const clamped = gsap.utils.clamp(-18, 0, this.rotation);
+                            gsap.set(fourFan, { rotation: clamped });
+                            this.rotation = clamped;
+                            this.endRotation = clamped;
+                        },
+                        snap: (endVal) => gsap.utils.clamp(-18, 0, endVal)
+                    });
+                }
+            });
+        });
+    </script>
+
+    <script>
+        AOS.init({
+            once: true,
+        });
+    </script>

@@ -1,0 +1,28 @@
+{
+  "name": "About Us",
+  "sections": {
+    "hero": {
+      "type": "about-us-hero"
+    },
+    "intro": {
+      "type": "about-us-intro"
+    },
+    "timeline":{
+      "type": "about-us-timeline"
+    },
+    "innovations":{
+      "type": "about-us-innovations"
+    },
+     "fancompanies":{
+      "type": "about-us-fancompanies"
+    },
+     "testimonials":{
+      "type": "about-us-testimonials"
+    },
+     "visuals":{
+      "type": "about-us-visuals"
+    }
+     
+  },
+  "order": ["hero", "intro" ,"timeline" , "innovations" , "fancompanies" , "testimonials" , "visuals"]
+}

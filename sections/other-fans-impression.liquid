@@ -1,0 +1,54 @@
+<section class="impression__wrapper other__impression">
+  <div class="container">
+    <div class="wrapper">
+      {% if section.settings.image %}
+        <img src="{{ section.settings.image | img_url: 'master' }}" class="img" alt="Impression Image" />
+      {% endif %}
+      <div class="contents">
+        {% if section.settings.title != blank %}
+          <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
+            {{ section.settings.title }}
+          </h2>
+        {% endif %}
+
+        {% if section.settings.description != blank %}
+          <p class="font_18 txtDarkLight" data-aos="fade-up" data-aos-duration="2000">
+            {{ section.settings.description }}
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Impression Section",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Performance with Poise. Wherever You Place It."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "From luxury hotels to industrial floors, our fans are engineered for demanding spaces.\n\nWhether it’s a luxury wall fan in a narrow corridor, a designer pedestal fan for movable comfort, or commercial fans that handle long hours and large spaces, this collection is designed for performance without pause.\n\nThese are undoubtedly the best fans in India for when airflow isn’t optional, it’s essential."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Other fans impression",
+     
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,136 @@
+<section class="innovations__wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-md-5 col-lg-5">
+        <div class="title_sticky">
+          <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
+            {{ section.settings.heading }}
+          </h2>
+          <p class="font_18 txtDarkLight" data-aos="fade-up" data-aos-duration="1500">
+            {{ section.settings.subtext }}
+          </p>
+        </div>
+      </div>
+      <div class="col-12 col-md-7 col-lg-6 offset-lg-1">
+        <div class="innovations_detail">
+          <h3>{{ section.settings.innovation_title }}</h3>
+
+         {% assign innovation_blocks = section.blocks | where: "type", "innovation" %}
+          <ul class="circle_list">
+            {% for block in innovation_blocks %}
+              {% assign index_multiplier = forloop.index0 | times: 200 %}
+              {% assign aos_delay = 1000 | plus: index_multiplier %}
+              <li>
+                <div class="circle_card_flex" data-aos="fade-up" data-aos-duration="{{ aos_delay }}">
+                  {% if block.settings.image %}
+                    <img src="{{ block.settings.image | img_url: 'medium' }}" alt="{{ block.settings.title | escape }}" />
+                  {% endif %}
+                  <div class="contents">
+                    <h4>{{ block.settings.title }}</h4>
+                    <p>{{ block.settings.description }}</p>
+                  </div>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+
+
+          <h4>{{ section.settings.timeless_title }}</h4>
+
+          {% assign timeless_blocks = section.blocks | where: "type", "timeless" %}
+          <ul class="timeless_list">
+            {% for block in timeless_blocks %}
+              
+              {% assign index_multiplier = forloop.index0 | times: 200 %}
+              {% assign aos_delay = 2200 | plus: index_multiplier %}
+              <li>
+                <div class="timeless_card_flex" data-aos="fade-up" data-aos-duration="{{ aos_delay }}">
+                  {% if block.settings.icon %}
+                    <img src="{{ block.settings.icon | img_url: 'small' }}" alt="{{ block.settings.text | escape }}" />
+                  {% endif %}
+                  <h6>{{ block.settings.text }}</h6>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+{% schema %}
+{
+  "name": "About Innovations",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Main Heading",
+      "default": "Solutions You Can Feel. Craft You Can See."
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Subtext",
+      "default": "From finish to function, each of our fan blends design thinking with engineering depth; solving real spatial challenges, quietly."
+    },
+    {
+      "type": "text",
+      "id": "innovation_title",
+      "label": "Innovations Title",
+      "default": "Our Innovations"
+    },
+    {
+      "type": "text",
+      "id": "timeless_title",
+      "label": "Timeless Commitment Title",
+      "default": "The Timeless Commitment"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "innovation",
+      "name": "Innovation Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Innovation Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Form-Led Blade Design"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Smooth, balanced air delivery shaped to match each fan’s aesthetic."
+        }
+      ]
+    },
+    {
+      "type": "timeless",
+      "name": "Timeless Commitment Item",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon Image"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Up to 2 years of R&D, Engineering & Design"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 20
+}
+{% endschema %}
