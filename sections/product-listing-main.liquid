@@ -183,12 +183,14 @@
                           </a>
 
                           <div class="floatingItem_flex">
-                            {% if product.tags contains 'new' %}
-                              <div class="tagNew">New</div>
-                            {% endif %}
-                            {% unless product.available %}
+                           {% unless product.available %}
                               <div class="outOfStockTag">Out of stock</div>
+                            {% else %}
+                              {% if product.tags contains 'new' %}
+                                <div class="tagNew">New</div>
+                              {% endif %}
                             {% endunless %}
+
                            <div class="wishList_wrap">
        <button class="likes actionBtn add-to-wishlist"
     data-id="{{ product.id }}"

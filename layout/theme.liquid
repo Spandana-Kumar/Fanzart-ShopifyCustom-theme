@@ -8,9 +8,8 @@
   <meta name="description" content="{{ page_description | escape }}">
   <title>{{ page_title }}</title>
 
-  {% if settings.favicon %}
-    <link rel="shortcut icon" href="{{ settings.favicon | img_url: '32x32' }}" />
-  {% endif %}
+ {% render 'favicon' %}
+
 
   <link rel="stylesheet" href="{{ 'css-bootstrap.min.css' | asset_url }}" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
