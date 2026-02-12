@@ -1,21 +1,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"
         integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 
-    <script>
-        // Banner Title
-        let splitTitle = SplitText.create(".animated", {
-            type: "words"
-        });
-        gsap.from(splitTitle.words, {
-            x: -40,
-            opacity: 0,
-            autoAlpha: 0,
-            stagger: 0.05
-        })
-    </script>
+<script>
+  // Banner Title
+  let splitTitle = SplitText.create(".animated", {
+    type: "words"
+  });
+  gsap.from(splitTitle.words, {
+    x: -40,
+    opacity: 0,
+    autoAlpha: 0,
+    stagger: 0.05
+  })
+</script>
+
 <script>
   const map = L.map("map", {
     center: [22.9734, 78.6569],
@@ -36,194 +37,207 @@
     popupAnchor: [0, -30],
   });
 
-  // Add markers from dynamic locationData
+  // Add markers from dynamic locationData (AFTER merge)
   Object.entries(window.locationData).forEach(([stateName, stateData]) => {
     Object.entries(stateData.cities).forEach(([cityName, cityData]) => {
       cityData.locations.forEach(loc => {
-        const marker = L.marker(loc.latlng, { icon: customIcon }).addTo(map);
-        const popupContent = `
-          <div class="address-wrap address_tooltip">
-            <h4>${loc.title}</h4>
-            <div class="full-address">${loc.address}</div>
-            <div class="icon-flex"><img src="{{ 'img_showroomlocator_mail-icon.svg' | asset_url }}" alt="mail"><a href="mailto:${loc.email}" class="mail-link">${loc.email}</a></div>
-            <div class="icon-flex"><img src="{{ 'img_showroomlocator_smartphone-icon.svg' | asset_url }}" alt="phone"><ul class="mobile_list">${loc.phone.split(',').map(num => `<li><a href="tel:${num.trim()}">${num.trim()}</a></li>`).join('')}</ul></div>
-            <div class="icon-flex last"><img src="{{ 'img_showroomlocator_clock-icon.svg' | asset_url }}" alt="clock">${loc.weekday}</div>
-            <div class="icon-flex last"><img src="{{ 'img_showroomlocator_calendar.svg' | asset_url }}" alt="calendar">${loc.sunday}</div>
-            <div class="full-link"><a href="${loc.direction}" target="_blank"><span>Get Direction</span><img src="{{ 'img_showroomlocator_navigation-icon.svg' | asset_url }}" alt="Navigation"></a></div>
-          </div>`;
-        marker.bindPopup(popupContent);
+        if (loc.latlng && loc.latlng[0] !== 0) { // Skip empty locations
+          const marker = L.marker(loc.latlng, { icon: customIcon }).addTo(map);
+          const popupContent = `
+            <div class="address-wrap address_tooltip">
+              <h4>${loc.title}</h4>
+              <div class="full-address">${loc.address}</div>
+              <div class="icon-flex"><img src="{{ 'img_showroomlocator_mail-icon.svg' | asset_url }}" alt="mail"><a href="mailto:${loc.email}" class="mail-link">${loc.email}</a></div>
+              <div class="icon-flex"><img src="{{ 'img_showroomlocator_smartphone-icon.svg' | asset_url }}" alt="phone"><ul class="mobile_list">${loc.phone.split(',').map(num => `<li><a href="tel:${num.trim()}">${num.trim()}</a></li>`).join('')}</ul></div>
+              <div class="icon-flex last"><img src="{{ 'img_showroomlocator_clock-icon.svg' | asset_url }}" alt="clock">${loc.weekday}</div>
+              <div class="icon-flex last"><img src="{{ 'img_showroomlocator_calendar.svg' | asset_url }}" alt="calendar">${loc.sunday}</div>
+              <div class="full-link"><a href="${loc.direction}" target="_blank"><span>Get Direction</span><img src="{{ 'img_showroomlocator_navigation-icon.svg' | asset_url }}" alt="Navigation"></a></div>
+            </div>`;
+          marker.bindPopup(popupContent);
+        }
       });
     });
   });
 
-   // State dropdown
-        $.each(locationData, function (state, stateData) {
-            const cityCount = Object.keys(stateData.cities).length;
-            const optionText = `${state} (${cityCount})`;
-            $('#stateSelect').append(new Option(optionText, state));
-        });
+  // State dropdown - POPULATE AFTER MERGE
+ function populateStateDropdown() {
+  const sortedStates = Object.keys(window.locationData).sort((a, b) =>
+    a.localeCompare(b)
+  );
 
-        $('#stateSelect').on('change', function () {
-            const selectedState = $(this).val();
+  sortedStates.forEach(state => {
+    const cityCount = Object.keys(window.locationData[state].cities).length;
+    const optionText = `${state} (${cityCount})`;
+    $('#stateSelect').append(new Option(optionText, state));
+  });
+}
 
-            $('#citySelect').empty().append('<option value="">Choose City (India)</option>').prop("disabled", !selectedState);
+  // Initialize Select2 for state
+  $('#stateSelect').select2({
+    placeholder: "Choose State (India)",
+    allowClear: false,
+    minimumResultsForSearch: -1,
+    templateResult: formatWithHTML,
+    templateSelection: formatWithHTML,
+  });
 
-            function formatOptionWithCount(data) {
-                if (!data.id) return data.text;
-                const [name, count] = data.text.split('||');
-                return $('<span>').html(`${name} <em>(${count})</em>`);
-            }
+  $('#stateSelect').on('change', function () {
+    const selectedState = $(this).val();
 
-            if (selectedState) {
-                const stateData = locationData[selectedState];
+    $('#citySelect').empty().append('<option value="">Choose City (India)</option>').prop("disabled", !selectedState);
 
-                // Smooth transition to state
-                map.flyTo(stateData.center, 7, { animate: true, duration: 1.5 });
+    if (selectedState) {
+      const stateData = window.locationData[selectedState];
 
-                $.each(stateData.cities, function (city, cityInfo) {
-                    const showroomCount = cityInfo.locations.length;
-                    const optionText = `${city} (${showroomCount})`;
-                    $('#citySelect').append(new Option(optionText, city));
-                });
+      // Smooth transition to state
+      map.flyTo(stateData.center, 7, { animate: true, duration: 1.5 });
 
-                $('#citySelect').select2({
-                    placeholder: "Choose City (India)",
-                    allowClear: false,
-                    minimumResultsForSearch: -1,
-                    templateResult: formatWithHTML,
-                    templateSelection: formatWithHTML
-                });
+      const sortedCities = Object.keys(stateData.cities).sort((a, b) =>
+        a.localeCompare(b)
+      );
 
-                $('#citySelect').on('select2:select', function (e) {
-                    $('#addressOuter').addClass('show');
-                });
-            }
-        });
+      sortedCities.forEach(city => {
+        const showroomCount = stateData.cities[city].locations.length;
+        const optionText = `${city} (${showroomCount})`;
+        $('#citySelect').append(new Option(optionText, city));
+      });
 
-        $('#citySelect').on('change', function () {
-            const selectedState = $('#stateSelect').val();
-            const selectedCity = $(this).val();
 
-            if (selectedState && selectedCity) {
-                const cityData = locationData[selectedState].cities[selectedCity];
+      $('#citySelect').select2({
+        placeholder: "Choose City (India)",
+        allowClear: false,
+        minimumResultsForSearch: -1,
+        templateResult: formatWithHTML,
+        templateSelection: formatWithHTML
+      });
 
-                // Smooth transition to city
-                map.flyTo(cityData.center, 12, { animate: true, duration: 1.5 });
-            }
-        });
+      $('#citySelect').on('select2:select', function (e) {
+        $('#addressOuter').addClass('show');
+      });
+    }
+  });
 
-        // Global Select2
-        $('#stateSelect').select2({
-            placeholder: "Choose State (India)",
-            allowClear: false,
-            minimumResultsForSearch: -1,
-            templateResult: formatWithHTML,
-            templateSelection: formatWithHTML,
-        });
+  $('#citySelect').on('change', function () {
+    const selectedState = $('#stateSelect').val();
+    const selectedCity = $(this).val();
 
-        $('#citySelect').select2({
-            placeholder: "Choose City (India)",
-            allowClear: false,
-            minimumResultsForSearch: -1,
-            templateResult: formatWithHTML,
-            templateSelection: formatWithHTML
-        });
+    if (selectedState && selectedCity) {
+      const cityData = window.locationData[selectedState].cities[selectedCity];
 
-        function formatWithHTML(data) {
-            if (!data.id) return data.text;
-            const $container = $('<span>').html(data.text);
-            return $container;
-        }
-    </script>
-    <script>
-        $('.mobile-clicker').click(function () {
-            $(this).parent('.addresses-sec').toggleClass('show')
-        })
-    </script>
+      // Smooth transition to city
+      map.flyTo(cityData.center, 12, { animate: true, duration: 1.5 });
+    }
+  });
 
-    <script>
-        AOS.init({
-            once: true,
-        });
-    </script>
-    <script>
-        $(document).ready(function () {
+  $('#citySelect').select2({
+    placeholder: "Choose City (India)",
+    allowClear: false,
+    minimumResultsForSearch: -1,
+    templateResult: formatWithHTML,
+    templateSelection: formatWithHTML
+  });
+
+  function formatWithHTML(data) {
+    if (!data.id) return data.text;
+    const $container = $('<span>').html(data.text);
+    return $container;
+  }
+
+  // Populate dropdown after all setup
+  populateStateDropdown();
+</script>
+
+<script>
+  $('.mobile-clicker').click(function () {
+    $(this).parent('.addresses-sec').toggleClass('show')
+  })
+</script>
+
+<script>
+  AOS.init({
+    once: true,
+  });
+</script>
+
+<script>
+  
+  $(document).ready(function () {
     // Initially disable patches
     $('.countTag').hide();
 
     // State dropdown change event
     $('#stateSelect').on('change', function () {
-        const selectedState = $(this).val();
+      const selectedState = $(this).val();
 
-        // Hide all patches initially
-        $('.countTag').hide();
-        $('#addressOuter').empty();
+      // Hide all patches initially
+      $('.countTag').hide();
+      $('#addressOuter').empty();
 
-        if (selectedState) {
-            const stateData = locationData[selectedState];
+      if (selectedState) {
+        const stateData = window.locationData[selectedState];
 
-            // Display the number of cities for the selected state
-            const cityCount = Object.keys(stateData.cities).length;
-            $('.countTag').first().show().find('div:first').text(cityCount);
+        // Display the number of cities for the selected state
+        const cityCount = Object.keys(stateData.cities).length;
+        $('.countTag').first().show().find('div:first').text(cityCount);
 
-            // Populate city dropdown
-            $('#citySelect').empty().append('<option value="">Choose City (India)</option>').prop("disabled", false);
-            $.each(stateData.cities, function (city, cityInfo) {
-                const showroomCount = cityInfo.locations.length;
-                $('#citySelect').append(new Option(`${city} (${showroomCount})`, city));
-            });
-        } else {
-            $('#citySelect').prop("disabled", true).empty().append('<option value="">Choose City (India)</option>');
-        }
+        // Populate city dropdown
+        $('#citySelect').empty().append('<option value="">Choose City (India)</option>').prop("disabled", false);
+        $.each(stateData.cities, function (city, cityInfo) {
+          const showroomCount = cityInfo.locations.length;
+          $('#citySelect').append(new Option(`${city} (${showroomCount})`, city));
+        });
+      } else {
+        $('#citySelect').prop("disabled", true).empty().append('<option value="">Choose City (India)</option>');
+      }
     });
 
     // City dropdown change event
     $('#citySelect').on('change', function () {
-        const selectedState = $('#stateSelect').val();
-        const selectedCity = $(this).val();
+      const selectedState = $('#stateSelect').val();
+      const selectedCity = $(this).val();
 
-        if (selectedState && selectedCity) {
-            const cityData = locationData[selectedState].cities[selectedCity];
+      if (selectedState && selectedCity) {
+        const cityData = window.locationData[selectedState].cities[selectedCity];
 
-            // Display the number of showrooms for the selected city
-            const showroomCount = cityData.locations.length;
-            $('.countTag').last().show().find('div:first').text(showroomCount);
+        // Display the number of showrooms for the selected city
+        const showroomCount = cityData.locations.length;
+        $('.countTag').last().show().find('div:first').text(showroomCount);
 
-            // Display only the selected city's showroom addresses
-            $('#addressOuter').empty();
-            cityData.locations.forEach(loc => {
-                const addressHTML = `
-                    <div class="address-wrap" data-state="${selectedState}" data-city="${selectedCity}">
-                        <h4>${loc.title}</h4>
-                        <div class="full-address">${loc.address}</div>
-                        <div class="icon-flex">
-                            <img src="{{ 'img_showroomlocator_mail-icon-black.svg' | asset_url }}" alt="mail-img">
-                            <a href="mailto:${loc.email}" class="mail-link">${loc.email}</a>
-                        </div>
-                        <div class="icon-flex">
-                            <img src="{{ 'img_showroomlocator_smartphone-icon-black.svg' | asset_url }}" alt="smartphone-img">
-                            <ul class="mobile_list">
-                                ${loc.phone.split(',').map(phone => `<li><a href="tel:${phone.trim()}">${phone.trim()}</a></li>`).join('')}
-                            </ul>
-                        </div>
-                        <div class="icon-flex last">
-                            <img src="{{ 'img_showroomlocator_clock-icon-black.svg' | asset_url }}" alt="clock-img">
-                            ${loc.weekday}
-                        </div>
-                        <div class="icon-flex last">
-                            <img src="{{ 'img_showroomlocator_calendar-black.svg' | asset_url }}" alt="calendar-img">
-                            ${loc.sunday}
-                        </div>
-                        <div class="full-link">
-                            <a href="${loc.direction}" target="_blank">
-                                <span>Get Direction</span>
-                                <img src="{{ 'img_showroomlocator_navigation-icon-black.svg' | asset_url }}" alt="Navigation-img">
-                            </a>
-                        </div>
-                    </div>`;
-                $('#addressOuter').append(addressHTML);
-            });
-        }
+        // Display only the selected city's showroom addresses
+        $('#addressOuter').empty();
+        cityData.locations.forEach(loc => {
+          const addressHTML = `
+            <div class="address-wrap" data-state="${selectedState}" data-city="${selectedCity}">
+              <h4>${loc.title}</h4>
+              <div class="full-address">${loc.address}</div>
+              <div class="icon-flex">
+                <img src="{{ 'img_showroomlocator_mail-icon-black.svg' | asset_url }}" alt="mail-img">
+                <a href="mailto:${loc.email}" class="mail-link">${loc.email}</a>
+              </div>
+              <div class="icon-flex">
+                <img src="{{ 'img_showroomlocator_smartphone-icon-black.svg' | asset_url }}" alt="smartphone-img">
+                <ul class="mobile_list">
+                  ${loc.phone.split(',').map(phone => `<li><a href="tel:${phone.trim()}">${phone.trim()}</a></li>`).join('')}
+                </ul>
+              </div>
+              <div class="icon-flex last">
+                <img src="{{ 'img_showroomlocator_clock-icon-black.svg' | asset_url }}" alt="clock-img">
+                ${loc.weekday}
+              </div>
+              <div class="icon-flex last">
+                <img src="{{ 'img_showroomlocator_calendar-black.svg' | asset_url }}" alt="calendar-img">
+                ${loc.sunday}
+              </div>
+              <div class="full-link">
+                <a href="${loc.direction}" target="_blank">
+                  <span>Get Direction</span>
+                  <img src="{{ 'img_showroomlocator_navigation-icon-black.svg' | asset_url }}" alt="Navigation-img">
+                </a>
+              </div>
+            </div>`;
+          $('#addressOuter').append(addressHTML);
+        });
+      }
     });
-});
-    </script>
+  });
+</script>

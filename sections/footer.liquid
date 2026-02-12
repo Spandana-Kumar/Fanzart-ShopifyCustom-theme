@@ -1,29 +1,27 @@
 {% assign footer_data = shop.metaobjects.footer_info.footer %}
 <footer class="footer__wrapper">
   <div class="container">
-    <a href="{{ routes.root_url }}" class="brand">
-      {% if section.settings.footer_logo != blank %}
-        <img src="{{ section.settings.footer_logo | image_url }}" alt="{{ shop.name }}">
-      {% else %}
-        <img src="{{ 'img_logo_white.svg' | asset_url }}" alt="{{ shop.name }}">
-      {% endif %}
-    </a>
-
-
     <div class="footer_contents">
       <div class="row">
         <!-- Contact Info Column -->
-        <div class="col-12 col-md-4 col-lg-3 order-md-1 order-2">
+        <div class="col-12 col-md-4 col-lg-3 ">
           <div class="contact_flex">
-            
+            <a href="{{ routes.root_url }}" class="brand">
+              {% if section.settings.footer_logo != blank %}
+                <img src="{{ section.settings.footer_logo | image_url }}" alt="{{ shop.name }}">
+              {% else %}
+                <img src="{{ 'img_logo_white.svg' | asset_url }}" alt="{{ shop.name }}">
+              {% endif %}
+            </a>
+
             <h6>{{ footer_data.address.value | newline_to_br }}</h6>
             <ul class="contact_list">
               <li>
-                <img src="{{ 'img_mail.svg' | asset_url }}" alt="Mail" />
+                <img src="{{ 'img_mail.svg' | asset_url }}" alt="Mail">
                 <a href="mailto:{{ footer_data.email.value }}">{{ footer_data.email.value }}</a>
               </li>
               <li>
-                <img src="{{ 'img_phone.svg' | asset_url }}" alt="Phone" />
+                <img src="{{ 'img_phone.svg' | asset_url }}" alt="Phone">
                 <a href="tel:{{ footer_data.mobile_phone.value }}">{{ footer_data.mobile_phone.value }}</a>
               </li>
             </ul>
@@ -31,7 +29,7 @@
         </div>
 
         <!-- Footer Links -->
-        <div class="col-12 col-md-8 col-lg-8 offset-lg-1 order-1 order-md-2">
+        <div class="col-12 col-md-8 col-lg-8 offset-lg-1 ">
           <div class="links_flex">
             {% assign footer_links = linklists.footer.links %}
 
@@ -39,29 +37,57 @@
             <ul class="links_list">
               {% for link in footer_links %}
                 {% unless link.links.size > 0 %}
-                  <li><a href="{{ link.url }}"><span>{{ link.title }}</span></a></li>
+                  <li>
+                    <a href="{{ link.url }}"
+                      ><span>{{ link.title }}</span></a
+                    >
+                  </li>
                 {% endunless %}
               {% endfor %}
+              {% if shop.metafields.custom.product_catalogue != blank %}
+                <li>
+                  <a href="{{ shop.metafields.custom.product_catalogue | file_url }}" download>
+                    <span>Download Product Catalogue</span>
+                  </a>
+                </li>
+              {% endif %}
+              <li>
+                <a href="mailto:sadhvik@fanzartfans.com">
+                  <span>Franchise Opportunity</span>
+                </a>
+              </li>
             </ul>
 
             <!-- Ceiling Fans Submenu -->
-            {% assign ceiling_fans = footer_links | where: "title", "Ceiling Fans" | first %}
+            {% assign ceiling_fans = footer_links | where: 'title', 'Ceiling Fans' | first %}
             {% if ceiling_fans.links.size > 0 %}
               <ul class="links_list">
-                <li><h6>{{ ceiling_fans.title }}</h6></li>
+                <li>
+                  <h6>{{ ceiling_fans.title }}</h6>
+                </li>
                 {% for sublink in ceiling_fans.links %}
-                  <li><a href="{{ sublink.url }}"><span>{{ sublink.title }}</span></a></li>
+                  <li>
+                    <a href="{{ sublink.url }}"
+                      ><span>{{ sublink.title }}</span></a
+                    >
+                  </li>
                 {% endfor %}
               </ul>
             {% endif %}
 
             <!-- Other Fans Submenu -->
-            {% assign other_fans = footer_links | where: "title", "Other Fans" | first %}
+            {% assign other_fans = footer_links | where: 'title', 'Other Fans' | first %}
             {% if other_fans.links.size > 0 %}
               <ul class="links_list">
-                <li><h6>{{ other_fans.title }}</h6></li>
+                <li>
+                  <h6>{{ other_fans.title }}</h6>
+                </li>
                 {% for sublink in other_fans.links %}
-                  <li><a href="{{ sublink.url }}"><span>{{ sublink.title }}</span></a></li>
+                  <li>
+                    <a href="{{ sublink.url }}"
+                      ><span>{{ sublink.title }}</span></a
+                    >
+                  </li>
                 {% endfor %}
               </ul>
             {% endif %}
@@ -70,58 +96,729 @@
       </div>
     </div>
 
-     <div class="bottom_contents">
-            <div class="logos_wrap">
-                <img src="{{ 'img_footer_icon1.svg' | asset_url }}" class="dmca" alt="Logo" />
-                 <ul class="icons_list">
-                    <li>
-                      <img src="{{ 'img_footer_icon2.svg' | asset_url }}" alt="Logo" />
-                    </li>
-                    <li>
-                       <img src="{{ 'img_footer_icon3.svg' | asset_url }}" alt="Logo" />
-                    </li>
-                    <li>
-                       <img src="{{ 'img_footer_icon4.svg' | asset_url }}" alt="Logo" />
-                    </li>
-                    <li>
-                     <img src="{{ 'img_footer_icon5.svg' | asset_url }}" alt="Logo" />
-                    </li>
-                </ul>
-            </div>
+    <div class="bottom_contents">
+      <div class="logos_wrap">
+  {% if section.settings.dmca_logo != blank %}
+    <img src="{{ section.settings.dmca_logo | image_url }}" class="dmca" alt="DMCA Logo" />
+  {% endif %}
 
-            <div class="bottom_links_flex">
-                <div class="bottom_inner_flex">
-                    <h6>Fanzart 2024. All Right Reserved</h6>
-                    {% assign bottom_links = linklists['customer-account-main-menu'].links %}
-                    <ul class="bottom_links_list">
-                        {% for link in bottom_links %}
-                        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
-                        {% endfor %}
-                    </ul>
+  <ul class="icons_list">
+    {% for i in (1..5) %}
+      {% assign icon_id = "footer_icon_" | append: i %}
+      {% assign icon = section.settings[icon_id] %}
+      {% if icon != blank %}
+        <li>
+          <img src="{{ icon | image_url }}" alt="Footer Icon {{ i }}" />
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</div>
+
+      <div class="bottom_links_flex">
+        <div class="bottom_inner_flex">
+          <h6>Fanzart 2026. All Right Reserved</h6>
+          {% assign bottom_links = linklists['customer-account-main-menu'].links %}
+          <ul class="bottom_links_list">
+            {% for link in bottom_links %}
+              <li>
+                <a href="{{ link.url }}">{{ link.title }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% assign social_media_links = footer_data.social_links.value %}
+        <ul class="bottom_links_list">
+          {% for social in social_media_links %}
+            <li>
+              <a href="{{ social.link }}" target="_blank" rel="noopener">
+                <img
+                  src="{{ social.icon | img_url: 'master' }}"
+                  alt="{{ social.text | escape }}"
+                >
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
+<script>
+  let modalTimeout;
+  let idleTimeout;
+  const IDLE_TIME = 5000; // 5 seconds
+
+  function resetIdleTimer() {
+    clearTimeout(idleTimeout);
+    
+    idleTimeout = setTimeout(function() {
+      // Check if modal was already dismissed in this session
+      if (!sessionStorage.getItem('modalDismissed')) {
+        var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+        modal.show();
+      }
+    }, IDLE_TIME);
+  }
+
+  // Track user interactions
+  document.addEventListener('click', function() {
+    resetIdleTimer();
+  });
+
+  document.addEventListener('scroll', function() {
+    resetIdleTimer();
+  });
+
+  document.addEventListener('keydown', function() {
+    resetIdleTimer();
+  });
+
+  document.addEventListener('touchstart', function() {
+    resetIdleTimer();
+  });
+
+  document.addEventListener('mousemove', function() {
+    resetIdleTimer();
+  });
+
+  // Handle modal close button
+document.addEventListener('click', function (e) {
+  if (
+    e.target.classList.contains('btn-close') ||
+    e.target.classList.contains('zcwf_button')
+  ) {
+    sessionStorage.setItem('modalDismissed', 'true');
+
+    const modalEl = document.getElementById('exampleModal');
+    if (modalEl) {
+      const modalInstance = bootstrap.Modal.getInstance(modalEl);
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+    }
+
+    // extra safety for Zoho submit delay
+    setTimeout(forceCleanupModal, 300);
+  }
+});
+
+
+  // Start idle timer on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    resetIdleTimer();
+  });
+</script>
+<script>
+  function forceCleanupModal() {
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('padding-right');
+
+    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const exampleModal = document.getElementById('exampleModal');
+    if (exampleModal) {
+      // Cleanup when modal is hidden (both manual close and auto-close)
+      exampleModal.addEventListener('hidden.bs.modal', function () {
+        sessionStorage.setItem('modalDismissed', 'true');
+        forceCleanupModal();
+      });
+    }
+  });
+</script>
+
+<!-- Modal -->
+<div class="modal modal__form__common fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog-centered modal-dialog">
+        <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body">
+               <img src="{{ 'img_modal-bg.png' | asset_url }}" class="img" alt="Modal Background" />
+                <div id='crmWebToEntityForm' class='zcwf_lblLeft crmWebToEntityForm'>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                    <META HTTP- EQUIV='content-type' CONTENT='text/html;charset=UTF-8'>
+                    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js'> </script>
+                    <style>
+                        .wf_customMessageBox {
+                            /* font-family: Arial, Helvetica, sans-serif;
+                            color:
+                                #132C14;
+                            background: #F5FAF5;
+                            box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
+                            max-width: 90%;
+                            width: max-content;
+                            word-break: break-word;
+                            z-index: 11000;
+                            border-radius: 6px;
+                            border: 1px solid #A9D3AB;
+                            min-width: 100px;
+                            padding:
+                                10px 15px;
+                            display: flex;
+                            align-items: center;
+                            position: fixed;
+                            top: 20px;
+                            left:
+                                50%;
+                            transform: translate(-50%, 0); */
+
+                            color: #121212;
+                            font-size: 16px;
+                            font-style: normal;
+                            font-weight: 400;
+                            line-height: 150%;
+                            background: #0ECC00;
+                            border-radius: 4px;
+                            box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
+                            max-width: 420px;
+                            /* width: max-content; */
+                            word-break: break-word;
+                            z-index: 11000;
+                            /* min-width: 100px; */
+                            padding: 10px 16px;
+                            display: flex;
+                            align-items: center;
+                            position: fixed;
+                            top: 20px;
+                            left: 50%;
+                            transform: translate(-50%, 0);
+                        }
+
+                        .wf_customCircle {
+                            /* position: relative;
+                            background-color: #12AA67;
+                            border-radius: 100%;
+                            width: 20px;
+                            height: 20px;
+                            flex: none;
+                            margin-right: 7px; */
+                        }
+
+                        .wf_customCheckMark {
+                            /* box-sizing: unset ! important;
+                            position: absolute;
+                            transform: rotate(45deg)translate(-50%, -50%);
+                            left: 6px;
+                            top: 9px;
+                            height: 8px;
+                            width: 3px;
+                            border-bottom: 2px solid #fff;
+                            border-right: 2px solid #fff; */
+                        }
+
+                        .wf_customClose {
+                            box-sizing: border-box;
+                            position: relative;
+                            width: 18px;
+                            height:
+                                18px;
+                        }
+
+                        .wf_customClose::after,
+                        .wf_customClose::before {
+                            content: '';
+                            display:
+                                block;
+                            box-sizing: border-box;
+                            position: absolute;
+                            width: 12px;
+                            height: 1.5px;
+                            background: #616E88;
+                            transform: rotate(45deg);
+                            border-radius: 5px;
+                            top: 8px;
+                            /* left */
+                        }
+
+                        .wf_customClose::after {
+                            transform: rotate(-45deg)
+                        }
+                    </style>
+
+                    <form id='webform1111638000000834052' name=WebToLeads1111638000000834052 accept-charset='UTF-8'>
+                        <input type='text' style='display:none;' name='xnQsjsdp'
+                            value='a5c27f7eb6f57c4a2931946a18aeb2f00e7c65becdf3070353f3f117b4d1ec44'>
+                       <input type='hidden' name='zc_gad' id='zc_gad' value=''>
+                        <input type='text' style='display:none;' name='xmIwtLD'
+                            value='6178186fc1d7fbdae11b1f572cfd19fc80fbbb944268f648886cd2b9c161d00caf6eba665cf1ac8adbbe2cf30a8e2ccb'>
+                        <input type='text' style='display:none;' name='actionType' value='TGVhZHM='>
+                      <input type='text' style='display:none;' name='returnURL' value='null'>
+                        <style>
+                            
+                           
+
+                            .formsubmit.zcwf_button {
+                                color: white !important;
+                                background:
+                                    transparent linear-gradient(0deg, #0279FF 0%, #00A3F3 100%);
+                            }
+
+                            #crmWebToEntityForm.zcwf_lblLeft {
+                                width: 100%;
+                                /* padding: 25px; */
+                                margin: 0 auto;
+                                box-sizing: border-box;
+                            }
+
+                            #crmWebToEntityForm.zcwf_lblLeft * {
+                                box-sizing: border-box;
+                            }
+
+                            #crmWebToEntityForm {
+                                text-align: left;
+                            }
+
+                            #crmWebToEntityForm * {
+                                direction: ltr;
+                            }
+
+                            .zcwf_lblLeft .zcwf_title {
+                                word-wrap:
+                                    break-word;
+                                padding: 0px 6px 10px;
+                                font-weight:
+                                    bold
+                            }
+
+                            .zcwf_lblLeft.cpT_primaryBtn:hover {
+                                background: linear-gradient(#02acff 0, #006be4 100%)no-repeat padding-box !important;
+                                box-shadow: 0 -2px 0 0 #0159b9 inset !important;
+                                border: 0 !important;
+                                color: #fff ! important;
+                                outline: 0 !important;
+                            }
+
+                            .zcwf_lblLeft .zcwf_col_fld input[ type=text],
+                            input[ type=password],
+                            .zcwf_lblLeft .zcwf_col_fld textarea {
+                                width: 100%;
+                                border-bottom: 1px solid #A1A1AA !important;
+                                border: none;
+                                resize: vertical;
+                                border-radius: 0;
+                                float: left;
+                                background-color: transparent;
+                            }
+
+                            .zcwf_lblLeft .zcwf_col_lab {
+                                width: 100%;
+                                word-break: break-word;
+                                padding: 0px 6px 0px;
+                                margin-right: 10px;
+                                margin-top: 5px;
+                                float: left;
+                                min-height: 1px;
+                            }
+
+                            .zcwf_lblLeft .zcwf_col_fld {
+                                float: left;
+                                width: 100%;
+                                padding: 0px 6px 0px;
+                                position: relative;
+                                margin-top: 5px;
+                            }
+
+                            .zcwf_lblLeft .zcwf_privacy {
+                                padding: 6px;
+                            }
+
+                            .zcwf_lblLeft .wfrm_fld_dpNn {
+                                display: none;
+                            }
+
+                            .dIB {
+                                display:
+                                    inline-block;
+                            }
+
+                            .zcwf_lblLeft .zcwf_col_fld_slt {
+                                width: 100%;
+                                border-bottom: 1px solid #A1A1AA !important;
+                                background: transparent;
+                                border-radius: 0;
+                                font-size: 16px;
+                                color: #121212;
+                                font-weight: 400;
+                                float: left;
+                                resize: vertical;
+                                padding: 12px 0 12px 0;
+                                border: none;
+                            }
+
+                            .zcwf_lblLeft .zcwf_row:after,
+                            .zcwf_lblLeft .zcwf_col_fld:after {
+                                content:
+                                    '';
+                                display: table;
+                                clear: both;
+                            }
+
+                            .zcwf_lblLeft .zcwf_col_help {
+                                float: left;
+                                margin-left: 7px;
+                                font-size: 12px;
+                                max-width: 35%;
+                                word-break: break-word;
+                            }
+
+                            .zcwf_lblLeft .zcwf_help_icon {
+                                cursor: pointer;
+                                width: 16px;
+                                height:
+                                    16px;
+                                display: inline-block;
+                                background: #fff;
+                                border: 1px solid #c0c6cc;
+                                color:
+                                    #c1c1c1;
+                                text-align: center;
+                                font-size: 11px;
+                                line-height: 16px;
+                                font-weight: bold;
+                                border-radius: 50%;
+                            }
+
+                            .zcwf_lblLeft .zcwf_row {
+                                margin: 15px 0px;
+                            }
+
+                            .zcwf_lblLeft .formsubmit {
+                                margin-bottom: 12px;
+                                cursor: pointer;
+                                color: #313949;
+                            }
+
+                            .zcwf_lblLeft .zcwf_privacy_txt {
+                                width: 90%;
+                                color:
+                                    rgb(0, 0, 0);
+                                font-size: 12px;
+                                font-family: Arial;
+                                display: inline-block;
+                                vertical-align: top;
+                                color: #313949;
+                                padding-top: 2px;
+                                margin-left:
+                                    6px;
+                            }
+
+                            .zcwf_lblLeft .zcwf_button {
+                                cursor: pointer;
+                                border-radius: 24px;
+                                border: 1px solid #121212;
+                                background: #121212;
+                                padding: 12px 16px;
+                                color: #FFF;
+                                text-align: center;
+                                font-size: 16px;
+                                font-style: normal;
+                                font-weight: 400;
+                                line-height: 130%;
+                                width: 100%;
+                            }
+
+                            .zcwf_lblLeft .zcwf_tooltip_over {
+                                position:
+                                    relative;
+                            }
+
+                            .zcwf_lblLeft .zcwf_tooltip_ctn {
+                                position: absolute;
+                                background:
+                                    #dedede;
+                                padding: 3px 6px;
+                                top: 3px;
+                                border-radius: 4px;
+                                word-break: break- word;
+                                min-width: 100px;
+                                max-width: 150px;
+                                color: #313949;
+                                z-index:
+                                    100;
+                            }
+
+                            .zcwf_lblLeft .zcwf_ckbox {
+                                float: left;
+                            }
+
+                            .zcwf_lblLeft .zcwf_file {
+                                width:
+                                    55%;
+                                box-sizing: border-box;
+                                float: left;
+                            }
+
+                            .cBoth:after {
+                                content: '';
+                                display: block;
+                                clear: both;
+                            }
+
+                            @media all and (max-width: 600px) {
+
+                                .zcwf_lblLeft .zcwf_col_lab,
+                                .zcwf_lblLeft .zcwf_col_fld {
+                                    width: auto;
+                                    float:
+                                        none !important;
+                                }
+
+                                .zcwf_lblLeft .zcwf_col_help {
+                                    width: 40%;
+                                }
+                            }
+                        </style>
+                        <!-- <div class='zcwf_title' style='max-width: 600px;color: black; font-family:Arial;'>Contact_US
+                        </div> -->
+                        <div class='zcwf_row'>
+                            <div class='zcwf_col_lab'
+                                style='font-size: 16px;font-weight: 500;color: #121212;line-height: 130%;margin-bottom: 8px;'>
+                                <label for='Last_Name'>Name <span style='color:red;'>*</span> </label>
+                            </div>
+                            <div class='zcwf_col_fld'>
+                                <input type='text' id='Last_Name' placeholder="Enter the name" aria-required='true'
+                                    aria-label='Last Name' name='Last Name' aria-valuemax='80' maxlength='80'></input>
+                                <div class='zcwf_col_help'></div>
+                            </div>
+                        </div>
+                        <div class='zcwf_row'>
+                            <div class='zcwf_col_lab'
+                                style='font-size: 16px;font-weight: 500;color: #121212;line-height: 130%;margin-bottom: 8px;'>
+                                <label for='Mobile'>Phone Number <span style='color:red;'>*</span> </label>
+                            </div>
+                            <div class='zcwf_col_fld'>
+                                <input type='text' id='Mobile' placeholder="Enter the phone number" aria-required='true'
+                                    aria-label='Mobile' name='Mobile' aria-valuemax='30' maxlength='30'> </input>
+                                <div class='zcwf_col_help'></div>
+                            </div>
+                        </div>
+                        <div class='zcwf_row'>
+                            <div class='zcwf_col_lab'
+                                style='font-size: 16px;font-weight: 500;color: #121212;line-height: 130%;margin-bottom: 8px;'>
+                                <label for='LEADCF18'>City <span style='color:red;'>*</span>
+                                </label>
+                            </div>
+                            <div class='zcwf_col_fld'>
+                                <input type='text' id='LEADCF18' placeholder="Enter the city" aria-required='true'
+                                    aria-label='LEADCF18' name='LEADCF18' aria-valuemax='255' maxlength='255'> </input>
+                                <div class='zcwf_col_help'></div>
+                            </div>
+                        </div>
+                        <div class='zcwf_row'>
+                            <div class='zcwf_col_lab'
+                                style='font-size: 16px;font-weight: 500;color: #121212;line-height: 130%;margin-bottom: 8px;'>
+                                <label for='LEADCF19'>I AM <span style='color:red;'>*</span></label>
+                            </div>
+                            <div class='zcwf_col_fld'> <select class='zcwf_col_fld_slt' role='combobox'
+                                    aria-expanded='false' aria-haspopup='listbox' id='LEADCF19'
+                                    onChange='addAriaSelected1111638000000834052()' aria-required='false'
+                                    aria-label='LEADCF19' name='LEADCF19'>
+                                    <option value='-None-'>-None-
+                                    </option>
+                                    <option value='Customer'>Customer</option>
+                                    <option value='Dealer'>Dealer</option>
+                                    <option value='Interior&#x20;Designer'>Interior
+                                        Designer</option>
+                                    <option value='Architect'>Architect</option>
+                                    <option value='Others'>Others</option>
+                                </select>
+                                <div class='zcwf_col_help'> </div>
+                            </div>
+                        </div> <input type='text' type='hidden' style='display: none;' name='aG9uZXlwb3Q' value='' />
+                        <div class='zcwf_row'>
+                            <div class='zcwf_col_lab'>
+                            </div>
+                            <div class='zcwf_col_fld'>
+                                <input type='submit' id='formsubmit' role='button' class='formsubmit zcwf_button'
+                                    value='Submit' aria-label='Submit' title='Submit'>
+                                <input type='reset' class='zcwf_button d-none' role='button' name='reset' value='Reset'
+                                    aria-label='Reset' title='Reset'>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-{% assign social_media_links = footer_data.social_links.value %}
-<ul class="bottom_links_list">
-  {% for social in social_media_links %}
-    <li>
-      <a href="{{ social.link }}" target="_blank" rel="noopener">
-        <img 
-          src="{{ social.icon | img_url: 'master' }}" 
-          alt="{{ social.text | escape }}" 
-        />
-      </a>
-    </li>
-  {% endfor %}
-</ul>
-
-
-
             </div>
         </div>
     </div>
-</footer>
+</div>
+<div class='wf_customMessageBox' id='wf_splash' style='display:none'>
+    <!-- <div class='wf_customCircle'>
+                            <div class='wf_customCheckMark'> </div>
+                        </div> -->
+    <span id='wf_splash_info'> </span> </p>
+</div>
 
 
+<script id='wf_anal' src='https://crm.zohopublic.in/crm/WebFormAnalyticsServeServlet?
+rid=9bd50725baf6a5e29a0e1c727095d4974105dcfe7853978b4303d4c5569ede9b
+94d8fcfc9072bde6b073e188e3338e69gid5b29b08f3b171e1b645312be9061da405
+a4c3d854ced15472d6a8569de3a3e5fgid0db4409c43898ae892f4d04005edcf454f
+73e43f439a678ddb0469a560e31f7bgid39d79c0f34fc8a874feb54e4ee00e0681969
+0ed7f152ffb23d2d41bd870aaafa&tw=9ad40ecea216cf888620d14377bca9c4cdbf
+2452a7c776bbe876098d1b9f5917'> </script>
 
+<script>
+    function addAriaSelected1111638000000834052() {
+        var optionElem =
+            event.target; var previousSelectedOption = optionElem.querySelector('[aria-selected = true]'); if (previousSelectedOption) { previousSelectedOption.removeAttribute('aria-selected'); }
+        optionElem.querySelectorAll('option')[optionElem.selectedIndex].ariaSelected
+            = 'true';
+    }
+    function checkMandatory1111638000000834052() {
+        var mndFileds =
+            new Array('Last Name', 'Mobile', 'LEADCF18'); var fldLangVal = new
+                Array('Name', 'Mobile', 'City'); for (i = 0; i < mndFileds.length; i++) {
+                    var fieldObj
+                        = document.forms['WebToLeads1111638000000834052'][mndFileds[i]];
+                    if (fieldObj) {
+                        if (((fieldObj.value).replace(/^\s+|\s+$/g, '')).length == 0) {
+                            if (fieldObj.type == 'file') {
+                                alert('Please select a file to upload.');
+                                fieldObj.focus(); return false;
+                            } alert(fldLangVal[i] + ' cannot be empty.');
+                            fieldObj.focus(); return false;
+                        } else if (fieldObj.nodeName == 'SELECT') {
+                            if (fieldObj.options[fieldObj.selectedIndex].value == '-None-') { alert(fldLangVal[i] + ' cannot be none.'); fieldObj.focus(); return false; }
+                        } else
+                            if (fieldObj.type == 'checkbox') {
+                                if (fieldObj.checked == false) {
+                                    alert('Please accept ' + fldLangVal[i]); fieldObj.focus(); return false;
+                                }
+                            } try {
+                                if (fieldObj.name
+                                    == 'Last Name') { name = fieldObj.value; }
+                            } catch (e) { }
+                    }
+                } var urlparams = new
+                    URLSearchParams(window.location.search); if (urlparams.has('service') &&
+                        (urlparams.get('service') === 'smarturl')) {
+            var webform =
+                document.getElementById('webform1111638000000834052'); var service =
+                    urlparams.get('service'); var smarturlfield = document.createElement('input');
+            smarturlfield.setAttribute('type', 'hidden'); smarturlfield.setAttribute('value',
+                service); smarturlfield.setAttribute('name', 'service');
+            webform.appendChild(smarturlfield);
+        }
+        document.querySelector('.crmWebToEntityForm .formsubmit').setAttribute('disabled', true); return true;
+    }
+
+    $(document).ready(function () {
+        $('#webform1111638000000834052').submit(function (e) {
+            e.preventDefault();
+
+            var ismandatory = checkMandatory1111638000000834052();
+            if (!ismandatory) return;
+
+            if (typeof _wfa_track != 'undefined' && _wfa_track.wfa_submit) {
+                _wfa_track.wfa_submit(e);
+            }
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: 'https://crm.zoho.in/crm/WebToLeadForm',
+                type: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+
+                success: function (data) {
+
+                    // splash message
+                    var splashinfodom = document.getElementById('wf_splash_info');
+                    splashinfodom.innerText = data.actionvalue;
+
+                    var splashdom = document.getElementById('wf_splash');
+                    splashdom.style.display = '';
+
+                    setTimeout(function () {
+                        splashdom.style.display = 'none';
+                        // Force cleanup after splash disappears
+                        forceCleanupModal();
+                    }, 5000);
+
+                    // enable submit button
+                    document
+                        .querySelector('.crmWebToEntityForm .formsubmit')
+                        .removeAttribute('disabled');
+
+                    //  Hide Bootstrap modal immediately
+                    const modalEl = document.querySelector('#exampleModal');
+                    if (modalEl) {
+                        const modalInstance =
+                            bootstrap.Modal.getInstance(modalEl) ||
+                            new bootstrap.Modal(modalEl);
+
+                        modalInstance.hide();
+                    }
+
+                    // Immediate cleanup
+                    setTimeout(forceCleanupModal, 100);
+
+                    //  Keep tooltip visible, hide after 5 seconds
+                    const tooltips = document.querySelectorAll('.zcwf_tooltip_over');
+                    tooltips.forEach(function (tooltip) {
+                        tooltip.style.display = 'block';
+
+                        setTimeout(function () {
+                            tooltip.style.display = 'none';
+                        }, 5000);
+                    });
+
+                },
+
+                error: function () {
+                    alert('an error occurred');
+                }
+            });
+        });
+    });
+
+    // $(document).ready(function () {
+    //     $
+    //         ('#webform1111638000000834052').submit(function (e) {
+    //             var ismandatory =
+    //                 checkMandatory1111638000000834052(); e.preventDefault(); if (ismandatory) {
+    //                     if (typeof _wfa_track != 'undefined' && _wfa_track.wfa_submit) { _wfa_track.wfa_submit(e); } var formData = new FormData(this);
+    //                     $.ajax({
+    //                         url: 'https://crm.zoho.in/crm/WebToLeadForm', type: 'POST',
+    //                         data: formData, cache: false, contentType: false, processData: false, success:
+    //                             function (data) {
+    //                                 var splashinfodom =
+    //                                     document.getElementById('wf_splash_info'); splashinfodom.innerText =
+    //                                         data.actionvalue; var splashdom = document.getElementById('wf_splash');
+    //                                 document.getElementById('webform1111638000000834052').reset.click();
+    //                                 splashdom.style.display = ''; setTimeout(function () {
+    //                                     splashdom.style.display =
+    //                                         'none';
+    //                                 }, 5000);
+    //                                 document.querySelector('.crmWebToEntityForm .formsubmit').removeAttribute('disabled');
+
+    //                             }, error: function (data) { alert('an error occurred'); }
+    //                     });
+    //                 }
+    //         });
+    // });
+    function tooltipShow1111638000000834052(el) {
+        var tooltip = el.nextElementSibling;
+        var tooltipDisplay = tooltip.style.display;
+
+        if (tooltipDisplay == 'none') {
+            var allTooltip = document.getElementsByClassName('zcwf_tooltip_over');
+            for (i = 0; i < allTooltip.length; i++) {
+                allTooltip[i].style.display = 'none';
+            }
+            tooltip.style.display = 'block';
+
+        } else {
+            tooltip.style.display = 'none';
+        }
+    } 
+</script>
 {% schema %}
 {
   "name": "Footer",
@@ -130,7 +827,37 @@
       "type": "image_picker",
       "id": "footer_logo",
       "label": "Footer Logo"
-    }
+    },
+    {
+      "type": "header",
+      "content": "Footer Logos Section"
+    },
+    {
+      "type": "image_picker",
+      "id": "dmca_logo",
+      "label": "DMCA Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "footer_icon_1",
+      "label": "Footer Icon 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "footer_icon_2",
+      "label": "Footer Icon 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "footer_icon_3",
+      "label": "Footer Icon 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "footer_icon_4",
+      "label": "Footer Icon 4"
+    },
+  
   ]
 }
 {% endschema %}

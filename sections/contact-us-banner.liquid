@@ -26,117 +26,527 @@
     </div>
   </div>
 </section>
-   <section class="contact__form__wrapper">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-12 col-md-12 col-lg-10">
+ 
+       <section class="contact__form__wrapper">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-12 col-lg-8">
+                    <div id='crmWebToEntityForm' class='zcwf_lblLeft crmWebToEntityForm'>
+                        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                        <META HTTP- EQUIV='content-type' CONTENT='text/html;charset=UTF-8'>
+                        <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js'> </script>
+                        <style>
+                            .wf_customMessageBox {
+                                color: #121212;
+                                font-size: 16px;
+                                font-style: normal;
+                                font-weight: 400;
+                                line-height: 150%;
+                                background: #0ECC00;
+                                border-radius: 4px;
+                                box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.25);
+                                max-width: 420px;
+                                /* width: max-content; */
+                                word-break: break-word;
+                                z-index: 11000;
+                                /* min-width: 100px; */
+                                padding:10px 16px;
+                                display: flex;
+                                align-items: center;
+                                position: fixed;
+                                top: 20px;
+                                left: 50%;
+                                transform: translate(-50%, 0);
+                            }
 
-        {% form 'contact', id: 'contactForm' %}
-          <div class="form_group">
-            <label for="">I am a <sup>*</sup></label>
-            <div class="radio_flex">
-              <div class="radio_wrap">
-                <input type="radio" id="radio1" name="contact[role]" value="Customer" checked>
-                <label for="radio1">Customer </label>
-              </div>
-              <div class="radio_wrap">
-                <input type="radio" id="radio2" name="contact[role]" value="Architect">
-                <label for="radio2">Architect</label>
-              </div>
-              <div class="radio_wrap">
-                <input type="radio" id="radio3" name="contact[role]" value="Interior Designer">
-                <label for="radio3">Interior Designer </label>
-              </div>
-              <div class="radio_wrap">
-                <input type="radio" id="radio4" name="contact[role]" value="Dealer">
-                <label for="radio4">Dealer</label>
-              </div>
-              <div class="radio_wrap">
-                <input type="radio" id="radio5" name="contact[role]" value="Other">
-                <label for="radio5">Other</label>
-              </div>
-            </div>
-            <div class="errorMsg">Please select the type of user</div>
-          </div>
+                            .wf_customCircle {
+                                /* position: relative;
+                                background-color: #12AA67;
+                                border-radius: 100%;
+                                width: 20px;
+                                height: 20px;
+                                flex: none;
+                                margin-right: 7px; */
+                            }
 
-          <div class="flex_input_wrap">
-            <div class="form_group">
-              <label for="name">Name<sup>*</sup></label>
-              <input type="text" id="name" class="formControl" name="contact[name]" placeholder="Enter name">
-              <div class="errorMsg"></div>
-            </div>
-            <div class="form_group">
-              <label for="email">Email<sup>*</sup></label>
-              <input type="text" class="formControl" id="email" name="contact[email]" placeholder="Enter email">
-              <div class="errorMsg"></div>
-            </div>
-            <div class="form_group">
-              <label for="phone">Phone Number<sup>*</sup></label>
-              <input type="text" class="formControl" id="phone" name="contact[phone]" placeholder="Enter phone">
-              <div class="errorMsg"></div>
-            </div>
-            <div class="form_group">
-              <label for="city">City / Pin Code<sup>*</sup></label>
-              <input type="text" class="formControl" id="city" name="contact[city]" placeholder="Enter city / pin code">
-              <div class="errorMsg"></div>
-            </div>
-            <div class="form_group">
-              <label for="preferredMode">Preferred Contact Mode</label>
-              <input type="text" id="preferredMode" class="formControl" name="contact[preferredMode]" placeholder="Select the mode of contact">
-              <div class="errorMsg"></div>
-            </div>
-            <div class="form_group">
-              <label for="reason">Reason for Contact</label>
-              <input type="text" id="reason" class="formControl" name="contact[reason]" placeholder="Select the reason">
-              <div class="errorMsg"></div>
-            </div>
-            <div class="form_group full-grid">
-              <label for="msg">Message</label>
-              <textarea name="contact[body]" placeholder="Write a message"></textarea>
-              <div class="errorMsg"></div>
-            </div>
-            <div class="form_group full-grid">
-              <input type="checkbox" name="chkbox" id="chkbox" class="cstm-chk">
-              <label for="chkbox">I agree to be contacted by Fanzart.</label>
-              <div class="errorMsg"></div>
-            </div>
-            <div class="btn-group full-grid">
-              <button type="submit" class="btns btnDark">
-                <div class="bg"></div>
-                <div class="btnText">
-                  <span>Submit</span>
-                  <span>Submit</span>
+                            .wf_customCheckMark {
+                                /* box-sizing: unset ! important;
+                                position: absolute;
+                                transform: rotate(45deg)translate(-50%, -50%);
+                                left: 6px;
+                                top: 9px;
+                                height: 8px;
+                                width: 3px;
+                                border-bottom: 2px solid #fff;
+                                border-right: 2px solid #fff; */
+                            }
+
+                            .wf_customClose {
+                                box-sizing: border-box;
+                                position: relative;
+                                width: 18px;
+                                height:
+                                    18px;
+                            }
+
+                            .wf_customClose::after,
+                            .wf_customClose::before {
+                                content: '';
+                                display:
+                                    block;
+                                box-sizing: border-box;
+                                position: absolute;
+                                width: 12px;
+                                height: 1.5px;
+                                background: #616E88;
+                                transform: rotate(45deg);
+                                border-radius: 5px;
+                                top: 8px;
+                            }
+
+                            .wf_customClose::after {
+                                transform: rotate(-45deg)
+                            }
+                        </style>
+                        <div class='wf_customMessageBox' id='wf_splash' style='display:none'>
+                            <!-- <div class='wf_customCircle'>
+                                <div class='wf_customCheckMark'> </div>
+                            </div> -->
+                             <span id='wf_splash_info'> </span> </p>
+                        </div>
+                        <form id='webform1111638000001421074' name=WebToLeads1111638000001421074 accept-charset='UTF-8'>
+                            <input type='text' style='display:none;' name='xnQsjsdp'
+                                value='ad1b865adfc6a1963f239298e3a98f97af3392d4f5f8695f24dfde5b567fed1a'>
+                           <input type='hidden' name='zc_gad' id='zc_gad' value=''> 
+                            <input type='text' style='display:none;' name='xmIwtLD'
+                                value='4d252980c073664547ae55d5a9729d8e11f7a7bbf44b8ee1fc7be307d90451d4ab9575dc36af43232338b8c4c38c5a4e'>
+                            <input type='text' style='display:none;' name='actionType' value='TGVhZHM='>
+                            <input type='text' style='display:none;' name='returnURL' value='null'> 
+                            <style>
+                              
+
+                                .formsubmit.zcwf_button {
+                                    color: white !important;
+                                    background:
+                                        transparent linear-gradient(0deg, #0279FF 0%, #00A3F3 100%);
+                                }
+
+                                #crmWebToEntityForm.zcwf_lblLeft {
+                                    width: 100%;
+                                    /* padding: 25px; */
+                                    margin: 0 auto;
+                                    box-sizing: border-box;
+                                }
+
+                                #crmWebToEntityForm.zcwf_lblLeft * {
+                                    box-sizing: border-box;
+                                }
+
+                                #crmWebToEntityForm {
+                                    text-align: left;
+                                }
+
+                                #crmWebToEntityForm * {
+                                    direction: ltr;
+                                }
+
+                                .zcwf_lblLeft .zcwf_title {
+                                    word-wrap:
+                                        break-word;
+                                    padding: 0px 6px 10px;
+                                    font-weight:
+                                        bold
+                                }
+
+                                .zcwf_lblLeft.cpT_primaryBtn:hover {
+                                    background: linear-gradient(#02acff 0, #006be4 100%)no-repeat padding-box !important;
+                                    box-shadow: 0 -2px 0 0 #0159b9 inset !important;
+                                    border: 0 !important;
+                                    color: #fff ! important;
+                                    outline: 0 !important;
+                                }
+
+                                .zcwf_lblLeft .zcwf_col_fld input[ type=text],
+                                input[ type=password],
+                                .zcwf_lblLeft .zcwf_col_fld textarea {
+                                    width: 100%;
+                                    border-bottom: 1px solid #A1A1AA !important;
+                                    border: none;
+                                    resize: vertical;
+                                    border-radius: 2px;
+                                    float: left;
+                                    padding: 0 12px 12px 0;
+                                    background-color: transparent;
+                                }
+
+                                .zcwf_lblLeft .zcwf_col_lab {
+                                    width: 100%;
+                                    word-break: break-word;
+                                    padding: 0px 6px 0px;
+                                    margin-right: 10px;
+                                    margin-top: 5px;
+                                    float: left;
+                                    min-height: 1px;
+                                }
+
+                                .zcwf_lblLeft .zcwf_col_fld {
+                                    float: left;
+                                    width: 100%;
+                                    padding: 0px 6px 0px;
+                                    position: relative;
+                                    margin-top: 5px;
+                                }
+
+                                .zcwf_lblLeft .zcwf_privacy {
+                                    padding: 6px;
+                                }
+
+                                .zcwf_lblLeft .wfrm_fld_dpNn {
+                                    display: none;
+                                }
+
+                                .dIB {
+                                    display:
+                                        inline-block;
+                                }
+
+                                .zcwf_lblLeft .zcwf_col_fld_slt {
+                                    width: 100%;
+                                    border: 1px solid #ccc;
+                                    background: transparent;
+                                    border-radius: 4px;
+                                    font-size: 16px;
+                                    font-weight: 400;
+                                    line-height: 130%;
+                                    color: #121212;
+                                    float: left;
+                                    resize: vertical;
+                                    padding: 12px;
+                                }
+
+                                .zcwf_lblLeft .zcwf_row:after,
+                                .zcwf_lblLeft .zcwf_col_fld:after {
+                                    content:
+                                        '';
+                                    display: table;
+                                    clear: both;
+                                }
+
+                                .zcwf_lblLeft .zcwf_col_help {
+                                    float: left;
+                                    margin-left: 7px;
+                                    font-size: 12px;
+                                    max-width: 35%;
+                                    word-break: break-word;
+                                }
+
+                                .zcwf_lblLeft .zcwf_help_icon {
+                                    cursor: pointer;
+                                    width: 16px;
+                                    height:
+                                        16px;
+                                    display: inline-block;
+                                    background: #fff;
+                                    border: 1px solid #c0c6cc;
+                                    color:
+                                        #c1c1c1;
+                                    text-align: center;
+                                    font-size: 11px;
+                                    line-height: 16px;
+                                    font-weight: bold;
+                                    border-radius: 50%;
+                                }
+
+                                .zcwf_lblLeft .zcwf_row {
+                                    margin: 15px 0px;
+                                }
+
+                                .zcwf_lblLeft .formsubmit {
+                                    margin-right: 5px;
+                                    cursor: pointer;
+                                    color:
+                                        #313949;
+                                    font-size: 12px;
+                                }
+
+                                .zcwf_lblLeft .zcwf_privacy_txt {
+                                    width: 90%;
+                                    color:
+                                        rgb(0, 0, 0);
+                                    font-size: 12px;
+                                    font-family: Arial;
+                                    display: inline-block;
+                                    vertical-align: top;
+                                    color: #313949;
+                                    padding-top: 2px;
+                                    margin-left: 6px;
+                                }
+
+                                .zcwf_lblLeft .zcwf_button {
+                                    font-size: 12px;
+                                    color: #313949;
+                                    border: 1px solid #c0c6cc;
+                                    padding: 3px 9px;
+                                    border-radius: 4px;
+                                    cursor: pointer;
+                                    max-width: 120px;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                    white-space:
+                                        nowrap;
+                                }
+
+                                .zcwf_lblLeft .zcwf_tooltip_over {
+                                    position:
+                                        relative;
+                                }
+
+                                .zcwf_lblLeft .zcwf_tooltip_ctn {
+                                    position: absolute;
+                                    background:
+                                        #dedede;
+                                    padding: 3px 6px;
+                                    top: 3px;
+                                    border-radius: 4px;
+                                    word-break: break- word;
+                                    min-width: 100px;
+                                    max-width: 150px;
+                                    color: #313949;
+                                    z-index:
+                                        100;
+                                }
+
+                                .zcwf_lblLeft .zcwf_ckbox {
+                                    float: left;
+                                }
+
+                                .zcwf_lblLeft .zcwf_file {
+                                    width:
+                                        55%;
+                                    box-sizing: border-box;
+                                    float: left;
+                                }
+
+                                .cBoth:after {
+                                    content: '';
+                                    display: block;
+                                    clear: both;
+                                }
+
+                                @media all and (max-width: 600px) {
+
+                                    .zcwf_lblLeft .zcwf_col_lab,
+                                    .zcwf_lblLeft .zcwf_col_fld {
+                                        width: auto;
+                                        float:
+                                            none !important;
+                                    }
+
+                                    .zcwf_lblLeft .zcwf_col_help {
+                                        width: 40%;
+                                    }
+                                }
+                            </style>
+                            <!-- <div class='zcwf_title' style='max-width: 600px;color: black; font-family:Arial;'>
+                                Lead_Information</div> -->
+                            <div class='zcwf_row'>
+                                <div class='zcwf_col_lab'
+                                    style='font-size: 16px;font-weight: 500;color: #121212;line-height: 130%;margin:0 0 8px 0;'>
+                                    <label for='LEADCF19'>I am a <span style='color:red;'>*</span></label>
+                                </div>
+                                <div class='zcwf_col_fld'> <select class='zcwf_col_fld_slt' role='combobox'
+                                        aria-expanded='false' aria-haspopup='listbox' id='LEADCF19'
+                                        onChange='addAriaSelected1111638000001421074()' aria-required='false'
+                                        aria-label='LEADCF19' name='LEADCF19'>
+                                        <option value='-None-'>-None-</option>
+                                        <option value='Customer'>Customer</option>
+                                        <option value='Dealer'>Dealer</option>
+                                        <option value='Interior&#x20;Designer'>Interior Designer</option>
+                                        <option value='Architect'>Architect</option>
+                                        <option value='Others'>Others</option>
+                                    </select>
+                                    <div class='zcwf_col_help'> </div>
+                                </div>
+                            </div>
+                            <div class='zcwf_row'>
+                                <div class='zcwf_col_lab'
+                                    style='font-size: 16px;font-weight: 500;color: #121212;line-height: 130%;margin:0 0 8px 0;'>
+                                    <label for='Last_Name'>Name <span style='color:red;'>*</span>
+                                    </label>
+                                </div>
+                                <div class='zcwf_col_fld'> <input type='text' id='Last_Name' aria-required='true'
+                                        aria-label='Last Name' name='Last Name' aria- valuemax='80' maxlength='80'>
+                                    </input>
+                                    <div class='zcwf_col_help'> </div>
+                                </div>
+                            </div>
+                            <div class='zcwf_row'>
+                                <div class='zcwf_col_lab'
+                                    style='font-size: 16px;font-weight: 500;color: #121212;line-height: 130%;margin:0 0 8px 0;'>
+                                    <label for='Email'>Email <span style='color:red;'>*</span> </label> </div>
+                                <div class='zcwf_col_fld'> <input type='text' ftype='email' autocomplete='false'
+                                        id='Email' aria-required='true' aria-label='Email' name='Email'
+                                        aria-valuemax='100' crmlabel='' maxlength='100'>
+                                    </input>
+                                    <div class='zcwf_col_help'> </div>
+                                </div>
+                            </div>
+                            <div class='zcwf_row'>
+                                <div class='zcwf_col_lab'
+                                    style='font-size: 16px;font-weight: 500;color: #121212;line-height: 130%;margin:0 0 8px 0;'>
+                                    <label for='Phone'>Phone Number <span style='color:red;'>*</span> </label> </div>
+                                <div class='zcwf_col_fld'> <input type='text' id='Phone' aria-required='true'
+                                        aria-label='Phone' name='Phone' aria- valuemax='30' maxlength='30'> </input>
+                                    <div class='zcwf_col_help'> </div>
+                                </div>
+                            </div>
+                            <div class='zcwf_row'>
+                                <div class='zcwf_col_lab'
+                                    style='font-size: 16px;font-weight: 500;color: #121212;line-height: 130%;margin:0 0 8px 0;'>
+                                    <label for='LEADCF18'>City &#x2f; Pin
+                                        Code</label> </div>
+                                <div class='zcwf_col_fld'> <input type='text' id='LEADCF18' aria-required='false'
+                                        aria-label='LEADCF18' name='LEADCF18' aria-valuemax='255' maxlength='255'>
+                                    </input>
+                                    <div class='zcwf_col_help'>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='zcwf_row'>
+                                <div class='zcwf_col_lab'
+                                    style='font-size: 16px;font-weight: 500;color: #121212;line-height: 130%;margin:0 0 8px 0;'>
+                                    <label for='LEADCF14'>Message <span style='color:red;'>*</span> </label> </div>
+                                <div class='zcwf_col_fld'>
+                                    <textarea aria-multiline='true' id='LEADCF14' aria-required='true'
+                                        aria-label='LEADCF14' name='LEADCF14'>
+                                    </textarea>
+                                    <div class='zcwf_col_help'> </div>
+                                </div>
+                            </div> <input type='text' type='hidden' style='display: none;' name='aG9uZXlwb3Q'
+                                value='' />
+                            <div class='zcwf_row'>
+                                <div class='zcwf_col_lab'> </div>
+                                <div class='zcwf_col_fld'> <input type='submit' id='formsubmit' role='button'
+                                        class='formsubmit zcwf_button' value='Submit' aria-label='Submit'
+                                        title='Submit'>
+                                    <input type='reset' class='zcwf_button d-none' role='button' name='reset'
+                                        value='Reset' aria-label='Reset' title='Reset'>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+
+
+
+                    <!-- <form action="" id="contactForm">
+                        <div class="form_group">
+                            <label for="">I am a <sup>*</sup></label>
+                            <div class="radio_flex">
+                                <div class="radio_wrap">
+                                    <input type="radio" id="radio1" name="radio-group" checked>
+                                    <label for="radio1">Customer </label>
+                                </div>
+                                <div class="radio_wrap">
+                                    <input type="radio" id="radio2" name="radio-group">
+                                    <label for="radio2">Architect</label>
+                                </div>
+                                <div class="radio_wrap">
+                                    <input type="radio" id="radio3" name="radio-group">
+                                    <label for="radio3">Interior Designer </label>
+                                </div>
+                                <div class="radio_wrap">
+                                    <input type="radio" id="radio4" name="radio-group">
+                                    <label for="radio4">Dealer</label>
+                                </div>
+                                <div class="radio_wrap">
+                                    <input type="radio" id="radio5" name="radio-group">
+                                    <label for="radio5">Other</label>
+                                </div>
+                            </div>
+
+                            <div class="errorMsg">Please select the type of user</div>
+                        </div>
+
+                        <div class="flex_input_wrap">
+                            <div class="form_group">
+                                <label for="name">Name<sup>*</sup></label>
+                                <input type="text" id="name" class="formControl" name="name" placeholder="Enter name">
+                                <div class="errorMsg">Valid name is required</div>
+                            </div>
+                            <div class="form_group">
+                                <label for="email">Email<sup>*</sup></label>
+                                <input type="text" class="formControl" id="email" name="email"
+                                    placeholder="Enter email">
+                                <div class="errorMsg">Valid email is required</div>
+                            </div>
+                            <div class="form_group">
+                                <label for="phone">Phone Number<sup>*</sup></label>
+                                <input type="text" class="formControl" id="phone" name="phone"
+                                    placeholder="Enter phone number">
+                                <div class="errorMsg">Valid phone number is required</div>
+                            </div>
+                            <div class="form_group">
+                                <label for="city">City / Pin Code<sup>*</sup></label>
+                                <input type="text" class="formControl" id="city" name="city"
+                                    placeholder="Enter city / pin code">
+                                <div class="errorMsg">Valid pin code is required</div>
+                            </div>
+                            <div class="form_group">
+                                <label for="cusSelectbox">Preferred Contact Mode</label>
+                                <select class="select2 formControl" name="cusSelectbox" id="cusSelectbox">
+                                    <option value="4">Select the mode of contact</option>
+                                    <option value="5">First option</option>
+                                    <option value="6">option 3</option>
+                                    <option value="7">Third option</option>
+                                </select>
+                            </div>
+
+                            <div class="form_group">
+                                <label for="cusSelectbox1">Reason for Contact <sup>*</sup></label>
+                                <select class="select2 formControl" name="contact_mode" id="cusSelectbox1">
+                                    <option value="0">Select the reason</option>
+                                    <option value="1">First option</option>
+                                    <option value="2">option 3</option>
+                                    <option value="3">Third option</option>
+                                </select>
+                                <div class="errorMsg">Reason for contact is required</div>
+                            </div>
+                            <div class="form_group full-grid">
+                                <label for="msg">Message</label>
+                                <textarea name="msg" placeholder="Write a message"></textarea>
+                                <div class="errorMsg"></div>
+                            </div>
+                            <div class="form_group full-grid">
+                                <input type="checkbox" name="chkbox" id="chkbox" class="cstm-chk">
+                                <label for="chkbox">I agree to be contacted by Fanzart.</label>
+                                <div class="errorMsg">Check is required</div>
+                            </div>
+                            <div class="btn-group full-grid">
+                                <button type="submit" class="btns btnDark disabled">
+                                    <div class="bg"></div>
+                                    <div class="btnText">
+                                        <span>Submit</span>
+                                        <span>Submit</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="thankYouMsg" id="successMsg">
+                        <div class="inner_wrap">
+                            <button class="close-btn">
+                                <img src="../assets/img/icons/x.svg" alt="">
+                            </button>
+                            <h4>Thanks for reaching out! We've received your message and will get back to you soon.</h4>
+                        </div>
+                    </div> -->
                 </div>
-              </button>
             </div>
-          </div>
-        {% endform %}
-
-        {% if form.posted_successfully? %}
-          <div class="thankYouMsg" id="successMsg" style="display:block;">
-            <div class="inner_wrap">
-              <button class="close-btn">
-                <img src="../assets/img/icons/x.svg" alt="">
-              </button>
-              <h4>Thanks for reaching out! We've received your message and will get back to you soon.</h4>
-            </div>
-          </div>
-        {% else %}
-          <div class="thankYouMsg" id="successMsg">
-            <div class="inner_wrap">
-              <button class="close-btn">
-                <img src="../assets/img/icons/x.svg" alt="">
-              </button>
-              <h4>Thanks for reaching out! We've received your message and will get back to you soon.</h4>
-            </div>
-          </div>
-        {% endif %}
-
-      </div>
-    </div>
-  </div>
-</section>
-
+        </div>
+    </section>
 
 
 {% schema %}

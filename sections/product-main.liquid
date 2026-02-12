@@ -8,7 +8,7 @@
             <div class="swiper-wrapper">
               {% for image in product.images %}
                 <div class="swiper-slide">
-                  <img src="{{ image | img_url: '300x' }}" alt="{{ image.alt }}" />
+                  <img src="{{ image | img_url: '300x' }}" alt="{{ image.alt }}">
                 </div>
               {% endfor %}
             </div>
@@ -16,12 +16,31 @@
 
           <!-- Main Swiper with Zoom -->
           <div class="swiperLarge">
-            <div class="likeProduct" onclick="toggleLike(this)">
-              <div class="like"></div>
+            <div class="likeProduct">
+              <div class="wishList_wrap">
+                <button
+                  class="like actionBtn add-to-wishlist"
+                  data-id="{{ product.id }}"
+                  data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                  data-title="{{ product.title | escape }}"
+                  data-product-handle="{{ product.handle }}"
+                  data-image="{{ product.featured_image | img_url: '600x' }}"
+                  data-price="{{ product.selected_or_first_available_variant.price | money }}"
+                  data-handle="{{ product.handle }}"
+                  
+                  aria-label="Add to wishlist"
+                ></button>
+                <div class="wishlist-dropdown product_wishlist_dropdown">
+                  <div class="wishlist-inner">
+                    <div class="list"></div>
+                    <div class="list-create">
+                      <div class="create-btn">Create a New Project</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="hint" id="hint">
-              Hover over image to zoom in
-            </div>
+            <div class="hint" id="hint">Hover over image to zoom in</div>
             <div class="swiper mySwiper2 swiperCartRight">
               <div class="swiper-wrapper">
                 {% for image in product.images %}
@@ -47,6 +66,40 @@
         <div class="product_scroll_wrap">
           <div class="product_deatils_wrap">
             <nav class="breadcrumb_wrap">
+              <ul>
+                <li>
+                  <a href="/" class="breadcrumb_link">Home</a>
+                </li>
+ {% if collection and collection.handle != 'all' %}
+                {% if product.type != blank %}
+                  <li>
+                    <span class="breadcrumb_link">{{ product.type }}</span>
+                  </li>
+                {% endif %}
+
+               
+                  {% if collection.metafields.custom.parent_collection != blank %}
+                    {% assign parent_handle = collection.metafields.custom.parent_collection | handleize %}
+                    <li>
+                      <a href="/collections/{{ parent_handle }}" class="breadcrumb_link">
+                        {{ collection.metafields.custom.parent_collection }}
+                      </a>
+                    </li>
+                  {% endif %}
+
+                  <li>
+                    <a href="{{ collection.url }}" class="breadcrumb_link">
+                      {{ collection.title }}
+                    </a>
+                  </li>
+                {% endif %}
+
+                <li class="active">
+                  <span>{{ product.title }}</span>
+                </li>
+              </ul>
+            </nav>
+            {% comment %} <nav class="breadcrumb_wrap">
               <ul>
                 <li><a href="/" class="breadcrumb_link">Home</a></li>
                 {% if product.type != blank %}
@@ -79,18 +132,17 @@
                 {% endif %}
                 <li class="active"><span>{{ product.title }}</span></li>
               </ul>
-            </nav>
+            </nav> {% endcomment %}
 
             <div class="title">
               <h1>{{ product.title }}</h1>
-              
+
               {% if product.metafields.custom.subtext != blank %}
                 <p>{{ product.metafields.custom.subtext }}</p>
               {% else %}
                 <p>{{ product.description | strip_html | truncatewords: 12 }}</p>
               {% endif %}
             </div>
-
 
             <div class="flex_price">
               {% assign highest_price = 0 %}
@@ -101,30 +153,40 @@
               {% endfor %}
               <div class="price">
                 <span class="label">MRP:</span>
-                 <span class="amount" id="priceDisplay"><span>&#8377;</span>{{ product.selected_or_first_available_variant.price | money_without_currency | split: '.' | first }}</span>
+                <span class="amount" id="priceDisplay"
+                  ><span>&#8377;</span>
+                  {{-
+                    product.selected_or_first_available_variant.price
+                    | money_without_currency
+                    | split: '.'
+                    | first
+                  -}}
+                </span>
                 <span class="note">(Inclusive all of taxes)</span>
               </div>
-              
-                <div class="soldOut" id="variantSoldOut">
-                  <h4>Sold Out</h4>
-                  <p>This item is currently out of stock</p>
-                </div>
-              
+
+              <div class="soldOut" id="variantSoldOut">
+                <h4>Sold Out</h4>
+                <p>This item is currently out of stock</p>
+              </div>
             </div>
 
             <div class="customisation_wrap">
               {% if product.metafields.custom.customisation_available == true %}
-                               <div class="customTag">
-                                <img src="{{ 'img_product-detail_check.svg' | asset_url }}" alt="" />
-                                    <span>Customisation Available</span>
-                                </div>    
-                
+                <div class="customTag">
+                  <img src="{{ 'img_product-detail_check.svg' | asset_url }}" alt="">
+                  <span>Customisation Available</span>
+                </div>
               {% endif %}
 
               {% if product.metafields.custom.size_guide %}
                 <div class="tags">
-                  <a href="{{ product.metafields.custom.size_guide | image_url }}" data-bs-toggle="modal" data-bs-target="#sizeGuide">
-                    <img src="{{ 'img_ruler.svg' | asset_url }}" alt="Ruler" />
+                  <a
+                    href="{{ product.metafields.custom.size_guide | image_url }}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#sizeGuide"
+                  >
+                    <img src="{{ 'img_ruler.svg' | asset_url }}" alt="Ruler">
                     <span>Size Guide</span>
                   </a>
                 </div>
@@ -132,15 +194,17 @@
               {% if product.metafields.custom.threed_link %}
                 <div class="tags">
                   <a href="{{ product.metafields.custom.threed_link }}" target="_blank">
-                    <img src="{{ 'img_download.svg' | asset_url }}" alt="3D" />
+                    <img src="{{ 'img_download.svg' | asset_url }}" alt="3D">
                     <span>3 D</span>
                   </a>
                 </div>
               {% endif %}
               <div class="tags">
-                <a href="https://api.whatsapp.com/send?text={{ shop.url }}{{ product.url | url_encode }}&t={{ product.title | url_encode }}"
-                   onclick="window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600'); return false;">
-                  <img src="{{ 'img_whatsapp.svg' | asset_url }}" alt="Whatsapp" />
+                <a
+                  href="https://api.whatsapp.com/send?text={{ shop.url }}{{ product.url | url_encode }}&t={{ product.title | url_encode }}"
+                  onclick="window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600'); return false;"
+                >
+                  <img src="{{ 'img_whatsapp.svg' | asset_url }}" alt="Whatsapp">
                   <span>Share</span>
                 </a>
               </div>
@@ -153,14 +217,16 @@
               <div class="product_cards_flex" id="colorOptions">
                 {% for variant in product.variants %}
                   {% unless shown_colors contains variant.option1 %}
-                    <div class="card_wrap small js-color-option"
+                    <div
+                      class="card_wrap small js-color-option"
                       data-color="{{ variant.option1 }}"
                       data-image="{{ variant.featured_image | img_url: '800x' }}"
                       data-price="{{ variant.price }}"
                       data-variant-id="{{ variant.id }}"
-                      data-available="{{ variant.available }}">
+                      data-available="{{ variant.available }}"
+                    >
                       <div class="inner">
-                        <img src="{{ variant.featured_image | img_url: '300x' }}" class="img" alt="{{ variant.title }}" />
+                        <img src="{{ variant.featured_image | img_url: '300x' }}" class="img" alt="{{ variant.title }}">
                         <div class="contents">
                           <h4>{{ variant.option1 }}</h4>
                           {% if variant.metafields.custom.housing != blank %}
@@ -170,7 +236,9 @@
                             <p>Blades: {{ variant.metafields.custom.blade }}</p>
                           {% endif %}
                           {% if variant.price != featured_color_price %}
-                            <h5 class="color-price"><span>&#8377;</span>{{ variant.price | money_without_currency | split: '.' | first }}</h5>
+                            <h5 class="color-price">
+                              <span>&#8377;</span>{{ variant.price | money_without_currency | split: '.' | first }}
+                            </h5>
                           {% endif %}
                         </div>
                       </div>
@@ -181,29 +249,27 @@
               </div>
             </div>
 
-             {% if product.metafields.custom.material != blank %}
-            <div class="product_category_wrap">
-              <h2 class="titleInner">MATERIAL</h2>
-              <div class="product_cards_flex">
-               
+            {% if product.metafields.custom.material != blank %}
+              <div class="product_category_wrap">
+                <h2 class="titleInner">MATERIAL</h2>
+                <div class="product_cards_flex">
                   {% for material in product.metafields.custom.material.value %}
-                    <div class="card_wrap small material js-material-option" data-material="{{ material.material_text.value }}">
-                    
+                    <div
+                      class="card_wrap small material js-material-option"
+                      data-material="{{ material.material_text.value }}"
+                    >
                       <div class="inner">
-                      
                         <div class="contents">
-                           <h4>{{ material.material_text.value }}</h4>
+                          <h4>{{ material.material_text.value }}</h4>
                         </div>
                       </div>
                     </div>
-
                   {% endfor %}
-               
+                </div>
               </div>
-            </div>
-             {% endif %}
+            {% endif %}
 
-           {% assign has_any_sweep = false %}
+            {% assign has_any_sweep = false %}
             {% for variant in product.variants %}
               {% if variant.option2 != blank %}
                 {% assign has_any_sweep = true %}
@@ -213,17 +279,19 @@
 
             {% if has_any_sweep %}
               <div class="product_category_wrap">
-                <h2 class="titleInner">SWEEP</h2>
+                <h2 class="titleInner">{{ product.options[1] | default: 'SWEEP' | upcase }}</h2>
                 <div class="product_cards_flex" id="sweepOptions">
                   {% for variant in product.variants %}
                     {% if variant.option2 != blank %}
-                      <div class="card_wrap sweep js-sweep-option"
+                      <div
+                        class="card_wrap sweep js-sweep-option"
                         data-color="{{ variant.option1 }}"
                         data-sweep="{{ variant.option2 }}"
                         data-variant-id="{{ variant.id }}"
                         data-price="{{ variant.price }}"
                         data-available="{{ variant.available }}"
-                        style="display:none;">
+                        style="display:none;"
+                      >
                         <div class="inner">
                           <div class="size">{{ variant.option2 }}</div>
                           <div class="contents">
@@ -235,7 +303,9 @@
                               {% endif %}
                             {% endfor %}
                             {% if variant.price != color_price %}
-                              <h4><span>&#8377;</span>{{ variant.price | money_without_currency | split: '.' | first }}</h4>
+                              <h4>
+                                <span>&#8377;</span>{{ variant.price | money_without_currency | split: '.' | first }}
+                              </h4>
                             {% endif %}
                           </div>
                         </div>
@@ -247,14 +317,13 @@
             {% endif %}
 
             {% if product.metafields.custom.addon != blank %}
-            <div class="product_category_wrap">
-              <h2 class="titleInner">ADD ON</h2>
-              <div class="product_cards_flex">
-                
+              <div class="product_category_wrap">
+                <h2 class="titleInner">ADD ON</h2>
+                <div class="product_cards_flex">
                   {% for addon in product.metafields.custom.addon.value %}
                     <div class="card_wrap addOn js-addon-option">
                       <div class="inner">
-                        <img src="{{ 'img_remote.svg' | asset_url }}" class="addOnImg" alt="Remote Icon" />
+                        <img src="{{ 'img_remote.svg' | asset_url }}" class="addOnImg" alt="Remote Icon">
                         <div class="contents">
                           <h4>
                             {{ addon.addon_text }}
@@ -266,99 +335,109 @@
                       </div>
                     </div>
                   {% endfor %}
-               
+                </div>
               </div>
-            </div>
-             {% endif %}
+            {% endif %}
 
             {% assign has_any_watt = false %}
-              {% for variant in product.variants %}
-                {% if variant.option3 != blank %}
-                  {% assign has_any_watt = true %}
-                  {% break %}
-                {% endif %}
-              {% endfor %}
-
-              {% if has_any_watt %}
-                <div class="product_category_wrap">
-                  <h2 class="titleInner">WATT</h2>
-                  <div class="product_cards_flex" id="wattOptions">
-                    {% for variant in product.variants %}
-                      {% if variant.option3 != blank %}
-                        <div class="card_wrap addOn js-watt-option"
-                          data-color="{{ variant.option1 }}"
-                          data-sweep="{{ variant.option2 }}"
-                          data-watt="{{ variant.option3 }}"
-                          data-variant-id="{{ variant.id }}"
-                          data-price="{{ variant.price }}"
-                          data-available="{{ variant.available }}"
-                          style="display:none;">
-                          <div class="inner">
-                            <div>{{ variant.option3 }}</div>
-                          </div>
-                        </div>
-                      {% endif %}
-                    {% endfor %}
-                  </div>
-                </div>
+            {% for variant in product.variants %}
+              {% if variant.option3 != blank %}
+                {% assign has_any_watt = true %}
+                {% break %}
               {% endif %}
+            {% endfor %}
 
+            {% if has_any_watt %}
+              <div class="product_category_wrap">
+                <h2 class="titleInner">{{ product.options[2] | default: 'WATT' | upcase }}</h2>
+                <div class="product_cards_flex" id="wattOptions">
+                  {% for variant in product.variants %}
+                    {% if variant.option3 != blank %}
+                      <div
+                        class="card_wrap addOn js-watt-option"
+                        data-color="{{ variant.option1 }}"
+                        data-sweep="{{ variant.option2 }}"
+                        data-watt="{{ variant.option3 }}"
+                        data-variant-id="{{ variant.id }}"
+                        data-price="{{ variant.price }}"
+                        data-available="{{ variant.available }}"
+                        style="display:none;"
+                      >
+                        <div class="inner">
+                          <div>{{ variant.option3 }}</div>
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
 
-             {% if product.metafields.custom.light != blank %}
-            <div class="product_category_wrap">
-              <h2 class="titleInner">LIGHT</h2>
-              <div class="product_cards_flex">
-               
+            {% if product.metafields.custom.light != blank %}
+              <div class="product_category_wrap">
+                <h2 class="titleInner">LIGHT</h2>
+                <div class="product_cards_flex">
                   {% for light in product.metafields.custom.light.value %}
                     <div class="card_wrap small js-light-option" data-light="{{ light.light_text }}">
                       <div class="inner">
-                        <img src="{{ light.light_image | file_url }}" class="img" alt="{{ light.light_text }}" />
+                        <img src="{{ light.light_image | file_url }}" class="img" alt="{{ light.light_text }}">
                         <div class="contents">
                           <h4>{{ light.light_text }}</h4>
                           {% if light.light_price.value > 0 %}
-                            <h5><span>&#8377;</span>{{ light.light_price.value | money_without_currency | split: '.' | first }}</h5>
+                            <h5>
+                              <span>&#8377;</span>
+                              {{- light.light_price.value | money_without_currency | split: '.' | first }}
+                            </h5>
                           {% endif %}
                         </div>
                       </div>
                     </div>
                   {% endfor %}
-                
+                </div>
               </div>
-            </div>
             {% endif %}
 
-             {% if product.metafields.custom.mount != blank %}
-            <div class="product_category_wrap">
-              <h2 class="titleInner">MOUNT</h2>
-              <div class="product_cards_flex">
-               
+            {% if product.metafields.custom.mount != blank %}
+              <div class="product_category_wrap">
+                <h2 class="titleInner">MOUNT</h2>
+                <div class="product_cards_flex">
                   {% for mount in product.metafields.custom.mount.value %}
                     <div class="card_wrap small js-mount-option" data-mount="{{ mount.mount_text }}">
                       <div class="inner">
-                        <img src="{{ mount.mount_image | file_url }}" class="img" alt="{{ mount.mount_text }}" />
+                        <img src="{{ mount.mount_image | file_url }}" class="img" alt="{{ mount.mount_text }}">
                         <div class="contents">
                           <h4>{{ mount.mount_text }}</h4>
                           {% if mount.mount_price.value > 0 %}
-                            <h5><span>&#8377;</span>{{ mount.mount_price.value | money_without_currency | split: '.' | first }}</h5>
+                            <h5>
+                              <span>&#8377;</span>
+                              {{- mount.mount_price.value | money_without_currency | split: '.' | first }}
+                            </h5>
                           {% endif %}
                         </div>
                       </div>
                     </div>
                   {% endfor %}
-               
+                </div>
               </div>
-            </div>
-             {% endif %}
-
+            {% endif %}
           </div>
           <div class="actions_btn_wrap">
             <div class="price">
               <span class="label">MRP:</span>
-              <span class="amount"><span>&#8377;</span>{{ product.selected_or_first_available_variant.price | money_without_currency | split: '.' | first }}</span>
+
+              <span class="amount" id="priceDisplayBottom"
+                ><span>&#8377;</span>
+                {{- product.selected_or_first_available_variant.price | money_without_currency | split: '.' | first -}}
+              </span>
               <span class="note">(Inclusive all of taxes)</span>
             </div>
-           <form method="post" action="/cart/add" class="btns btnDark">
-              <input type="hidden" name="id" id="variantIdInput" value="{{ product.selected_or_first_available_variant.id }}">
+            <form method="post" action="/cart/add" id="addToCartForm" class="btns btnDark">
+              <input
+                type="hidden"
+                name="id"
+                id="variantIdInput"
+                value="{{ product.selected_or_first_available_variant.id }}"
+              >
 
               <!-- Custom properties -->
               <input type="hidden" name="properties[Custom Image]" id="customImageInput" value="">
@@ -380,15 +459,54 @@
                 </div>
               </button>
             </form>
-
           </div>
         </div>
       </div>
     </div>
   </div>
+  <!-- whishlist Toast -->
+  <div class="tooltip-msg">
+    <div class="container">
+      <div class="tooltip-msg-inn">
+        <span class="tooltip-text">Product successfully added to 'Project - 2'</span>
+        <a href="javascript:" class="undoBtn">UNDO</a>
+        <span class="tooltip-close">
+          <img src="{{ 'img_icons_x.svg' | asset_url }}" alt="">
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup for New Project -->
+  <div class="popup-overlay">
+    <div class="popup-box">
+      <h4>Create a Wishlist</h4>
+
+      <div class="form-group">
+        <input type="text" id="new-wishlist-name" placeholder="Enter wishlist name">
+        <div class="wishlist-error-msg ">Please enter a wishlist name</div>
+      </div>
+      <div class="btn-wrap">
+        <button id="closePopup-wishlist" class="btns btnWhite">
+          <div class="bg"></div>
+          <div class="btnText">
+            <span>Cancel</span>
+            <span>Cancel</span>
+          </div>
+        </button>
+        <button id="add-wishlist" class="btns btnDark">
+          <div class="bg"></div>
+          <div class="btnText">
+            <span>Create</span>
+            <span>Create</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
   <div id="zoomResult"></div>
 
-  <!-- Modal For Slider Cart mobile screen  -->
+  <!-- Modal For Slider Cart mobile screen -->
   <div class="modal modal_cart fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
       <div class="modal-content">
@@ -398,7 +516,7 @@
             <div class="swiper-wrapper">
               {% for image in product.images %}
                 <div class="swiper-slide">
-                  <img src="{{ image | img_url: '800x' }}" alt="{{ product.title }}" />
+                  <img src="{{ image | img_url: '800x' }}" alt="{{ product.title }}">
                 </div>
               {% endfor %}
             </div>
@@ -419,461 +537,966 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <img src="{{ product.metafields.custom.size_guide | image_url }}" alt="Size Guide" />
+            <img src="{{ product.metafields.custom.size_guide | image_url }}" alt="Size Guide">
           </div>
         </div>
       </div>
     </div>
   {% endif %}
 
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const priceDisplay = document.querySelector("#priceDisplay");
-  const variantIdInput = document.querySelector("#variantIdInput");
-  const customPriceInput = document.querySelector("#customPriceInput");
-  const customImageInput = document.querySelector("#customImageInput");
-  const customLabelInput = document.querySelector("#customLabelInput");
-  const soldOutMessage = document.getElementById("variantSoldOut");
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const priceDisplay = document.querySelector('#priceDisplay');
+      const priceDisplayBottom = document.querySelector('#priceDisplayBottom');
+      const variantIdInput = document.querySelector('#variantIdInput');
+      const customPriceInput = document.querySelector('#customPriceInput');
+      const customImageInput = document.querySelector('#customImageInput');
+      const customLabelInput = document.querySelector('#customLabelInput');
+      const soldOutMessage = document.getElementById('variantSoldOut');
 
-  const customColorInput = document.getElementById("customColorInput");
-  const customBladeInput = document.getElementById("customBladeInput");
-  const customHousingInput = document.getElementById("customHousingInput");
-  const customMaterialInput = document.getElementById("customMaterialInput");
-  const customSweepInput = document.getElementById("customSweepInput");
-  const customAddonInput = document.getElementById("customAddonInput");
-  const customWattInput = document.getElementById("customWattInput");
-  const customLightInput = document.getElementById("customLightInput");
-  const customMountInput = document.getElementById("customMountInput");
+      const customColorInput = document.getElementById('customColorInput');
+      const customBladeInput = document.getElementById('customBladeInput');
+      const customHousingInput = document.getElementById('customHousingInput');
+      const customMaterialInput = document.getElementById('customMaterialInput');
+      const customSweepInput = document.getElementById('customSweepInput');
+      const customAddonInput = document.getElementById('customAddonInput');
+      const customWattInput = document.getElementById('customWattInput');
+      const customLightInput = document.getElementById('customLightInput');
+      const customMountInput = document.getElementById('customMountInput');
 
-  let selectedPrices = {
-    color: 0,
-    blade: 0,
-    housing: 0,
-    material: 0,
-    sweep: 0,
-    addon: 0,
-    light: 0,
-    mount: 0,
-  };
+      let selectedPrices = {
+        color: 0,
+        blade: 0,
+        housing: 0,
+        material: 0,
+        sweep: 0,
+        addon: 0,
+        light: 0,
+        mount: 0,
+      };
 
-  let selectionOrder = [];
+      let selectionOrder = [];
 
-  function parsePrice(priceText) {
-    if (!priceText) return 0;
-    return parseFloat(priceText.replace(/[^\d.]/g, '')) * 100;
-  }
-
-  function formatPrice(priceCents) {
-    return Math.round(priceCents / 100).toLocaleString("en-IN");
-  }
-
-  function updateMRP(optionKey) {
-    const newPrice = selectedPrices[optionKey];
-
-    // Update order tracking
-    const index = selectionOrder.indexOf(optionKey);
-    if (index !== -1) selectionOrder.splice(index, 1);
-    if (newPrice > 0) selectionOrder.push(optionKey);
-
-    // Find the last selected non-zero price excluding addon
-    let lastValidPrice = 0;
-    for (let i = selectionOrder.length - 1; i >= 0; i--) {
-      const key = selectionOrder[i];
-      if (key !== "addon" && selectedPrices[key] > 0) {
-        lastValidPrice = selectedPrices[key];
-        break;
+      function parsePrice(priceText) {
+        if (!priceText) return 0;
+        return parseFloat(priceText.replace(/[^\d.]/g, '')) * 100;
       }
-    }
 
-    // Display price on screen (excluding addon)
-    if (priceDisplay) {
-      priceDisplay.innerHTML = `<span>&#8377;</span>${formatPrice(lastValidPrice)}`;
-    }
+      function formatPrice(priceCents) {
+        return Math.round(priceCents / 100).toLocaleString('en-IN');
+      }
 
-    // Hidden input value (including addon)
-    const totalWithAddon = Object.entries(selectedPrices).reduce((sum, [key, val]) => {
-      return sum + (val || 0);
-    }, 0);
+      function updateMRP(optionKey) {
+        const newPrice = selectedPrices[optionKey];
 
-    if (customPriceInput) {
-      customPriceInput.value = (totalWithAddon / 100).toFixed(2);
-    }
-  }
+        // Update order tracking
+        const index = selectionOrder.indexOf(optionKey);
+        if (index !== -1) selectionOrder.splice(index, 1);
+        if (newPrice > 0) selectionOrder.push(optionKey);
 
-  function activateOption(selector, callback) {
-    document.querySelectorAll(selector).forEach(card => {
-      card.addEventListener("click", function () {
-        document.querySelectorAll(selector).forEach(c => c.classList.remove("active"));
-        this.classList.add("active");
-        callback(this);
+        // Find the last selected non-zero price excluding addon
+        let lastValidPrice = 0;
+        for (let i = selectionOrder.length - 1; i >= 0; i--) {
+          const key = selectionOrder[i];
+          if (key !== 'addon' && selectedPrices[key] > 0) {
+            lastValidPrice = selectedPrices[key];
+            break;
+          }
+        }
+
+        // Display price on screen (excluding addon)
+        if (priceDisplay) {
+          priceDisplay.innerHTML = `<span>&#8377;</span>${formatPrice(lastValidPrice)}`;
+        }
+        if (priceDisplayBottom) {
+          priceDisplayBottom.innerHTML = `<span>&#8377;</span>${formatPrice(lastValidPrice)}`;
+        }
+
+        // Hidden input value (including addon)
+        const totalWithAddon = Object.entries(selectedPrices).reduce((sum, [key, val]) => {
+          return sum + (val || 0);
+        }, 0);
+
+        if (customPriceInput) {
+          customPriceInput.value = (totalWithAddon / 100).toFixed(2);
+        }
+      }
+
+      function activateOption(selector, callback) {
+        document.querySelectorAll(selector).forEach((card) => {
+          card.addEventListener('click', function () {
+            document.querySelectorAll(selector).forEach((c) => c.classList.remove('active'));
+            this.classList.add('active');
+            callback(this);
+          });
+        });
+      }
+
+      // === HANDLERS BELOW ===
+
+      activateOption('.js-variant-option', function (card) {
+        const price = parseInt(card.dataset.price || '0');
+        const image = card.dataset.image?.replace('300x', '800x');
+        const variantId = card.dataset.variantId;
+        const label = card.querySelector('h4')?.innerText || 'Variant';
+        const isAvailable = card.dataset.available === 'true';
+
+        selectedPrices.color = price;
+        updateMRP('color');
+
+        if (customColorInput) customColorInput.value = label;
+        if (customImageInput && image) customImageInput.value = image;
+        if (variantIdInput && variantId) variantIdInput.value = variantId;
+        if (customLabelInput && label) customLabelInput.value = label;
+
+        // Set featured image directly
+        if (image) {
+          const productImg = document.querySelector('#productImg');
+          if (productImg) productImg.src = image;
+        }
+
+        if (soldOutMessage) {
+          soldOutMessage.style.display = isAvailable ? 'none' : 'block';
+        }
+
+        const addToCartButton = document.getElementById('addToCartButton');
+        if (addToCartButton) {
+          addToCartButton.disabled = !isAvailable;
+          addToCartButton.classList.toggle('disabled', !isAvailable);
+        }
       });
-    });
-  }
 
-  // === HANDLERS BELOW ===
+      function handleGenericOption(selector, key, customInputElement, changeImage = true) {
+        activateOption(selector, function (card) {
+          const image = changeImage ? card.querySelector('img')?.src?.replace('300x', '800x') : null;
 
-  activateOption(".js-variant-option", function (card) {
-    const price = parseInt(card.dataset.price || "0");
-    const image = card.dataset.image?.replace("300x", "800x");
-    const variantId = card.dataset.variantId;
-    const label = card.querySelector("h4")?.innerText || "Variant";
-    const isAvailable = card.dataset.available === "true";
+          let label, priceText;
 
-    selectedPrices.color = price;
-    updateMRP("color");
+          if (key === 'sweep') {
+            label = card.querySelector('.size')?.innerText?.trim() || '';
+            priceText = card.querySelector('h4')?.innerText || '';
+          } else {
+            label = card.querySelector('h4')?.innerText?.trim() || card.dataset.material || key;
 
-    if (customColorInput) customColorInput.value = label;
-    if (customImageInput && image) customImageInput.value = image;
-    if (variantIdInput && variantId) variantIdInput.value = variantId;
-    if (customLabelInput && label) customLabelInput.value = label;
+            priceText = card.querySelector('h5')?.innerText || card.querySelector('h4')?.innerText || '';
+          }
 
-    // Set featured image directly
-    if (image) {
-      const productImg = document.querySelector("#productImg");
-      if (productImg) productImg.src = image;
-    }
+          const price = parsePrice(priceText);
 
-    if (soldOutMessage) {
-      soldOutMessage.style.display = isAvailable ? "none" : "block";
-    }
+          selectedPrices[key] = price;
+          updateMRP(key);
 
-    const addToCartButton = document.getElementById("addToCartButton");
-    if (addToCartButton) {
-      addToCartButton.disabled = !isAvailable;
-      addToCartButton.classList.toggle("disabled", !isAvailable);
-    }
-  });
+          if (customInputElement) {
+            customInputElement.value = label;
+          }
 
-  function handleGenericOption(selector, key, customInputElement, changeImage = true) {
-    activateOption(selector, function (card) {
-      const image = changeImage ? card.querySelector("img")?.src?.replace("300x", "800x") : null;
-
-      let label, priceText;
-
-      if (key === "sweep") {
-        label = card.querySelector(".size")?.innerText?.trim() || "";
-        priceText = card.querySelector("h4")?.innerText || "";
-      } else {
-        label = card.querySelector("h4")?.innerText?.trim() || card.dataset.material || key;
-
-        priceText = card.querySelector("h5")?.innerText || card.querySelector("h4")?.innerText || "";
-      }
-
-      const price = parsePrice(priceText);
-
-      selectedPrices[key] = price;
-      updateMRP(key);
-
-      if (customInputElement) {
-        customInputElement.value = label;
-      }
-
-      // Set featured image only when allowed
-      if (changeImage && image) {
-        const productImg = document.querySelector("#productImg");
-        if (productImg) productImg.src = image;
-      }
-    });
-  };
-
-  handleGenericOption(".js-material-option", "material", customMaterialInput, false);
-  handleGenericOption(".js-sweep-option", "sweep", customSweepInput);
-  handleGenericOption(".js-light-option", "light", customLightInput, false);
-  handleGenericOption(".js-mount-option", "mount", customMountInput, false);
-
-  // Add-on is separate since it uses addonPriceCents
- activateOption(".js-addon-option", function (card) {
-  const priceText = card.querySelector("h4")?.innerText || "0";
-  const label = card.querySelector("h4")?.innerText || "Add-on";
-  const price = parsePrice(priceText); // this is the addon price in paise
-
-  // Store addon label
-  if (customAddonInput) customAddonInput.value = label;
-
-  // Store only addon price (not full custom price)
-  const addonPriceInput = document.getElementById("addonPriceInput");
-  if (addonPriceInput) {
-    addonPriceInput.value = (price / 100).toFixed(0); // in rupees
-  }
-});
-
-// WATT selection (variant-based, linked with color + sweep)
-document.querySelectorAll('.js-watt-option').forEach(card => {
-  card.addEventListener('click', function () {
-    document.querySelectorAll('.js-watt-option').forEach(c => c.classList.remove('active'));
-    this.classList.add('active');
-
-    const price = parseInt(this.dataset.price || "0");
-    const variantId = this.dataset.variantId;
-    const isAvailable = this.dataset.available === "true";
-    const wattLabel = this.dataset.watt || '';
-
-    selectedPrices.watt = price;
-    updateMRP("watt");
-
-    if (customWattInput) customWattInput.value = wattLabel;
-    if (variantIdInput && variantId) variantIdInput.value = variantId;
-
-    if (soldOutMessage) {
-      soldOutMessage.style.display = isAvailable ? "none" : "block";
-    }
-    const addToCartButton = document.getElementById("addToCartButton");
-    if (addToCartButton) {
-      addToCartButton.disabled = !isAvailable;
-      addToCartButton.classList.toggle("disabled", !isAvailable);
-    }
-  });
-});
-
-// Show only valid WATTs for selected Color + Sweep
-function showWattsForSelection(color, sweep) {
-  let firstVisible = null;
-
-  document.querySelectorAll('.js-watt-option').forEach(card => {
-    if (card.dataset.color === color && card.dataset.sweep === sweep) {
-      card.style.display = '';
-      if (!firstVisible) firstVisible = card; // capture first match
-    } else {
-      card.style.display = 'none';
-      card.classList.remove('active');
-    }
-  });
-
-  //Auto-select the first available watt
-  if (firstVisible) {
-    firstVisible.click();
-  }
-}
-
-  // Image thumbnails
-  document.querySelectorAll(".swiperCartLeft .swiper-slide img").forEach(img => {
-    img.addEventListener("click", function () {
-      const src = this.src.replace("300x", "800x");
-      const productImg = document.querySelector("#productImg");
-      if (productImg) productImg.src = src;
-    });
-  });
-
-  // === COLOR & SWEEP LOGIC FOR UNIQUE COLOR/SWEEP SELECTION ===
-
-   // Show sweeps for selected color only
-  function showSweepsForColor(color) {
-    document.querySelectorAll('.js-sweep-option').forEach(card => {
-      if (card.dataset.color === color) {
-        card.style.display = '';
-      } else {
-        card.style.display = 'none';
-        card.classList.remove('active');
-      }
-    });
-  }
-
-
-
-  // Cache original images once (use this as the master pool for rebuilding)
-  const ORIGINAL_RIGHT_IMAGES = Array.from(document.querySelectorAll('.swiperCartRight .swiper-slide img')).map(img => {
-    return { src: img.getAttribute('src') || img.src, alt: (img.getAttribute('alt') || img.alt || '').trim() };
-  });
-
-  function rebuildSwipersForColor(color) {
-    const norm = c => (c || '').trim().toLowerCase();
-    const productImg = document.querySelector("#productImg");
-
-    // Use original cached pool so each color rebuild filters from the full set
-    const allRightImgs = ORIGINAL_RIGHT_IMAGES.slice();
-    const matches = allRightImgs.filter(img => norm(img.alt) === norm(color));
-
-    // If no matches, fallback to showing all images
-    const rightImgsToUse = matches.length ? matches : allRightImgs;
-
-    // Helper: build slide HTML for swiper.appendSlide
-    const buildRightSlideHtml = img => {
-      // preserve original classes/ids and lens element so zoom & styles keep working
-      return `<div class="swiper-slide"><div class="zoom_container"><img src="${img.src}" id="productImg" class="productImg" alt="${img.alt}"><div id="lens"></div></div></div>`;
-    };
-    const buildLeftSlideHtml = img => {
-      let thumbSrc = img.src;
-      if (thumbSrc.indexOf('800x') !== -1) thumbSrc = thumbSrc.replace('800x', '300x');
-      // keep thumbnail img class matching original markup
-      return `<div class="swiper-slide"><img src="${thumbSrc}" class="img" alt="${img.alt}"></div>`;
-    };
-
-    // re-attach thumbnail click handlers (avoid duplicates using dataset flag)
-    function attachThumbnailClicks() {
-      document.querySelectorAll(".swiperCartLeft .swiper-slide img").forEach(img => {
-        if (img.dataset.thumbAttached) return;
-        img.addEventListener("click", function () {
-          const src = this.src.replace("300x", "800x");
-          const productImgEl = document.querySelector("#productImg");
-          if (productImgEl) productImgEl.src = src;
+          // Set featured image only when allowed
+          if (changeImage && image) {
+            const productImg = document.querySelector('#productImg');
+            if (productImg) productImg.src = image;
+          }
         });
-        img.dataset.thumbAttached = "1";
+      }
+
+      handleGenericOption('.js-material-option', 'material', customMaterialInput, false);
+      handleGenericOption('.js-sweep-option', 'sweep', customSweepInput);
+      handleGenericOption('.js-light-option', 'light', customLightInput, false);
+      handleGenericOption('.js-mount-option', 'mount', customMountInput, false);
+
+      // Add-on is separate since it uses addonPriceCents
+      activateOption('.js-addon-option', function (card) {
+        const priceText = card.querySelector('h4')?.innerText || '0';
+        const label = card.querySelector('h4')?.innerText || 'Add-on';
+        const price = parsePrice(priceText); // this is the addon price in paise
+
+        // Store addon label
+        if (customAddonInput) customAddonInput.value = label;
+
+        // Store only addon price (not full custom price)
+        const addonPriceInput = document.getElementById('addonPriceInput');
+        if (addonPriceInput) {
+          addonPriceInput.value = (price / 100).toFixed(0); // in rupees
+        }
       });
-    }
 
-    try {
-      // Main (right) swiper
-      if (window.swiperRightCart) {
-        if (typeof window.swiperRightCart.removeAllSlides === 'function') {
-          window.swiperRightCart.removeAllSlides();
-        } else {
-          Array.from(window.swiperRightCart.slides || []).forEach(s => s.remove());
-        }
+      // WATT selection (variant-based, linked with color + sweep)
+      document.querySelectorAll('.js-watt-option').forEach((card) => {
+        card.addEventListener('click', function () {
+          document.querySelectorAll('.js-watt-option').forEach((c) => c.classList.remove('active'));
+          this.classList.add('active');
 
-        const rightHtml = rightImgsToUse.map(buildRightSlideHtml);
-        if (rightHtml.length) window.swiperRightCart.appendSlide(rightHtml);
-        window.swiperRightCart.update();
-        if (window.swiperRightCart.slides && window.swiperRightCart.slides.length) {
-          window.swiperRightCart.slideTo(0);
+          const price = parseInt(this.dataset.price || '0');
+          const variantId = this.dataset.variantId;
+          const isAvailable = this.dataset.available === 'true';
+          const wattLabel = this.dataset.watt || '';
+
+          selectedPrices.watt = price;
+          updateMRP('watt');
+
+          if (customWattInput) customWattInput.value = wattLabel;
+          if (variantIdInput && variantId) variantIdInput.value = variantId;
+
+          if (soldOutMessage) {
+            soldOutMessage.style.display = isAvailable ? 'none' : 'block';
+          }
+          const addToCartButton = document.getElementById('addToCartButton');
+          if (addToCartButton) {
+            addToCartButton.disabled = !isAvailable;
+            addToCartButton.classList.toggle('disabled', !isAvailable);
+          }
+        });
+      });
+
+      // Show only valid WATTs for selected Color + Sweep
+      function showWattsForSelection(color, sweep) {
+        let firstVisible = null;
+
+        document.querySelectorAll('.js-watt-option').forEach((card) => {
+          if (card.dataset.color === color && card.dataset.sweep === sweep) {
+            card.style.display = '';
+            if (!firstVisible) firstVisible = card; // capture first match
+          } else {
+            card.style.display = 'none';
+            card.classList.remove('active');
+          }
+        });
+
+        //Auto-select the first available watt
+        if (firstVisible) {
+          firstVisible.click();
         }
-      } else {
-        // fallback: show/hide DOM slides (if swipers not initialized)
-        document.querySelectorAll('.swiperCartRight .swiper-slide').forEach(slide => {
-          const imgEl = slide.querySelector('img');
-          if (imgEl && norm(imgEl.alt) === norm(color)) slide.style.display = '';
-          else slide.style.display = 'none';
+      }
+
+      // Image thumbnails
+      document.querySelectorAll('.swiperCartLeft .swiper-slide img').forEach((img) => {
+        img.addEventListener('click', function () {
+          const src = this.src.replace('300x', '800x');
+          const productImg = document.querySelector('#productImg');
+          if (productImg) productImg.src = src;
+        });
+      });
+
+      // === COLOR & SWEEP LOGIC FOR UNIQUE COLOR/SWEEP SELECTION ===
+
+      // Show sweeps for selected color only
+      function showSweepsForColor(color) {
+        document.querySelectorAll('.js-sweep-option').forEach((card) => {
+          if (card.dataset.color === color) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+            card.classList.remove('active');
+          }
         });
       }
 
-      // Left (thumbnails) swiper
-      if (window.swiperLeftCart) {
-        if (typeof window.swiperLeftCart.removeAllSlides === 'function') {
-          window.swiperLeftCart.removeAllSlides();
-        } else {
-          Array.from(window.swiperLeftCart.slides || []).forEach(s => s.remove());
+      // Cache original images once (use this as the master pool for rebuilding)
+      const ORIGINAL_RIGHT_IMAGES = Array.from(document.querySelectorAll('.swiperCartRight .swiper-slide img')).map(
+        (img) => {
+          return { src: img.getAttribute('src') || img.src, alt: (img.getAttribute('alt') || img.alt || '').trim() };
+        }
+      );
+
+      function rebuildSwipersForColor(color) {
+        const norm = (c) => (c || '').trim().toLowerCase();
+        const productImg = document.querySelector('#productImg');
+
+        // Use original cached pool so each color rebuild filters from the full set
+        const allRightImgs = ORIGINAL_RIGHT_IMAGES.slice();
+        const matches = allRightImgs.filter((img) => norm(img.alt) === norm(color));
+
+        // If no matches, fallback to showing all images
+        const rightImgsToUse = matches.length ? matches : allRightImgs;
+
+        // Helper: build slide HTML for swiper.appendSlide
+        const buildRightSlideHtml = (img) => {
+          // preserve original classes/ids and lens element so zoom & styles keep working
+          return `<div class="swiper-slide"><div class="zoom_container"><img src="${img.src}" id="productImg" class="productImg" alt="${img.alt}"><div id="lens"></div></div></div>`;
+        };
+        const buildLeftSlideHtml = (img) => {
+          let thumbSrc = img.src;
+          if (thumbSrc.indexOf('800x') !== -1) thumbSrc = thumbSrc.replace('800x', '300x');
+          // keep thumbnail img class matching original markup
+          return `<div class="swiper-slide"><img src="${thumbSrc}" class="img" alt="${img.alt}"></div>`;
+        };
+
+        // re-attach thumbnail click handlers (avoid duplicates using dataset flag)
+        function attachThumbnailClicks() {
+          document.querySelectorAll('.swiperCartLeft .swiper-slide img').forEach((img) => {
+            if (img.dataset.thumbAttached) return;
+            img.addEventListener('click', function () {
+              const src = this.src.replace('300x', '800x');
+              const productImgEl = document.querySelector('#productImg');
+              if (productImgEl) productImgEl.src = src;
+            });
+            img.dataset.thumbAttached = '1';
+          });
         }
 
-        const leftHtml = rightImgsToUse.map(buildLeftSlideHtml);
-        if (leftHtml.length) window.swiperLeftCart.appendSlide(leftHtml);
-        window.swiperLeftCart.update();
-
-        if (window.swiperLeftCart.slides && window.swiperLeftCart.slides.length) {
-          window.swiperLeftCart.slideTo(0);
-          window.swiperLeftCart.slides.forEach(s => s.classList.remove('swiper-slide-thumb-active'));
-          if (window.swiperLeftCart.slides[0]) window.swiperLeftCart.slides[0].classList.add('swiper-slide-thumb-active');
-        }
-      } else {
-        document.querySelectorAll('.swiperCartLeft .swiper-slide').forEach(slide => {
-          const imgEl = slide.querySelector('img');
-          if (imgEl && norm(imgEl.alt) === norm(color)) slide.style.display = '';
-          else slide.style.display = 'none';
-        });
-      }
-
-      // Re-link thumbs if used
-      if (window.swiperRightCart && window.swiperLeftCart) {
         try {
-          window.swiperRightCart.thumbs = window.swiperRightCart.thumbs || {};
-          window.swiperRightCart.thumbs.swiper = window.swiperLeftCart;
-          if (typeof window.swiperRightCart.thumbs.update === 'function') window.swiperRightCart.thumbs.update();
-        } catch (e) { /* non-fatal */ }
+          // Main (right) swiper
+          if (window.swiperRightCart) {
+            if (typeof window.swiperRightCart.removeAllSlides === 'function') {
+              window.swiperRightCart.removeAllSlides();
+            } else {
+              Array.from(window.swiperRightCart.slides || []).forEach((s) => s.remove());
+            }
+
+            const rightHtml = rightImgsToUse.map(buildRightSlideHtml);
+            if (rightHtml.length) window.swiperRightCart.appendSlide(rightHtml);
+            window.swiperRightCart.update();
+            if (window.swiperRightCart.slides && window.swiperRightCart.slides.length) {
+              window.swiperRightCart.slideTo(0);
+            }
+          } else {
+            // fallback: show/hide DOM slides (if swipers not initialized)
+            document.querySelectorAll('.swiperCartRight .swiper-slide').forEach((slide) => {
+              const imgEl = slide.querySelector('img');
+              if (imgEl && norm(imgEl.alt) === norm(color)) slide.style.display = '';
+              else slide.style.display = 'none';
+            });
+          }
+
+          // Left (thumbnails) swiper
+          if (window.swiperLeftCart) {
+            if (typeof window.swiperLeftCart.removeAllSlides === 'function') {
+              window.swiperLeftCart.removeAllSlides();
+            } else {
+              Array.from(window.swiperLeftCart.slides || []).forEach((s) => s.remove());
+            }
+
+            const leftHtml = rightImgsToUse.map(buildLeftSlideHtml);
+            if (leftHtml.length) window.swiperLeftCart.appendSlide(leftHtml);
+            window.swiperLeftCart.update();
+
+            if (window.swiperLeftCart.slides && window.swiperLeftCart.slides.length) {
+              window.swiperLeftCart.slideTo(0);
+              window.swiperLeftCart.slides.forEach((s) => s.classList.remove('swiper-slide-thumb-active'));
+              if (window.swiperLeftCart.slides[0])
+                window.swiperLeftCart.slides[0].classList.add('swiper-slide-thumb-active');
+            }
+          } else {
+            document.querySelectorAll('.swiperCartLeft .swiper-slide').forEach((slide) => {
+              const imgEl = slide.querySelector('img');
+              if (imgEl && norm(imgEl.alt) === norm(color)) slide.style.display = '';
+              else slide.style.display = 'none';
+            });
+          }
+
+          // Re-link thumbs if used
+          if (window.swiperRightCart && window.swiperLeftCart) {
+            try {
+              window.swiperRightCart.thumbs = window.swiperRightCart.thumbs || {};
+              window.swiperRightCart.thumbs.swiper = window.swiperLeftCart;
+              if (typeof window.swiperRightCart.thumbs.update === 'function') window.swiperRightCart.thumbs.update();
+            } catch (e) {
+              /* non-fatal */
+            }
+          }
+
+          // Update featured image to first available slide
+          if (rightImgsToUse.length && productImg) {
+            productImg.src = rightImgsToUse[0].src;
+          }
+
+          // ensure thumbnail click handlers are attached to the newly added DOM nodes
+          attachThumbnailClicks();
+
+          // if you have a zoom init function in product-scripts.liquid, call it to re-bind lens/zoom
+          if (typeof window.initZoom === 'function') {
+            try {
+              window.initZoom();
+            } catch (e) {
+              /* non-fatal */
+            }
+          } else {
+            // dispatch event so other scripts can listen and re-init zoom if needed
+            try {
+              document.dispatchEvent(new CustomEvent('swipers:rebuild'));
+            } catch (e) {
+              /* ignore */
+            }
+          }
+        } catch (err) {
+          console.warn('rebuildSwipersForColor failed', err);
+        }
+      }
+      // Function to format price from cents (Shopify format)
+      function formatPrice(priceCents) {
+        if (!priceCents) return '';
+        const priceInRupees = Math.round(priceCents) / 100;
+        return new Intl.NumberFormat('en-IN', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }).format(priceInRupees);
       }
 
-      // Update featured image to first available slide
-      if (rightImgsToUse.length && productImg) {
-        productImg.src = rightImgsToUse[0].src;
+      // Activate color selection (preserving metafields)
+      document.querySelectorAll('.js-color-option').forEach((card) => {
+        card.addEventListener('click', function () {
+          document.querySelectorAll('.js-color-option').forEach((c) => c.classList.remove('active'));
+          this.classList.add('active');
+          const color = this.dataset.color;
+          showSweepsForColor(color);
+
+          // Filter images by color
+          rebuildSwipersForColor(color);
+
+          // Set featured image directly
+          const image = this.dataset.image;
+          const productImg = document.querySelector('#productImg');
+          if (productImg && image) productImg.src = image;
+
+          // Update wishlist button with selected color variant
+          const likeBtn = document.querySelector('.add-to-wishlist');
+          if (likeBtn) {
+            likeBtn.setAttribute('data-variant-id', this.dataset.variantId);
+            likeBtn.setAttribute('data-image', this.dataset.image);
+            const formattedPrice = formatPrice(this.dataset.price);
+            likeBtn.setAttribute('data-price', formattedPrice);
+            // Reflect current selection in the icon state
+            if (window.updateIconState) window.updateIconState();
+          }
+
+          // Optionally auto-select first sweep for this color
+          const firstSweep = document.querySelector('.js-sweep-option[data-color="' + color + '"]');
+          if (firstSweep) {
+            firstSweep.click();
+          }
+        });
+      });
+
+      // Activate sweep selection
+      document.querySelectorAll('.js-sweep-option').forEach((card) => {
+        card.addEventListener('click', function () {
+          document.querySelectorAll('.js-sweep-option').forEach((c) => c.classList.remove('active'));
+          this.classList.add('active');
+
+          const price = parseInt(this.dataset.price || '0');
+          const variantId = this.dataset.variantId;
+          const isAvailable = this.dataset.available === 'true';
+          const sweepLabel = this.querySelector('.size')?.innerText || '';
+
+          selectedPrices.sweep = price;
+          updateMRP('sweep');
+
+          if (customSweepInput) customSweepInput.value = sweepLabel;
+          if (variantIdInput && variantId) variantIdInput.value = variantId;
+
+          // Update wishlist button with selected sweep variant
+          const likeBtn = document.querySelector('.add-to-wishlist');
+          if (likeBtn && variantId) {
+            likeBtn.setAttribute('data-variant-id', variantId);
+            const formattedPrice = formatPrice(this.dataset.price);
+            likeBtn.setAttribute('data-price', formattedPrice);
+            // Reflect current selection in the icon state
+            if (window.updateIconState) window.updateIconState();
+          }
+
+          if (soldOutMessage) {
+            soldOutMessage.style.display = isAvailable ? 'none' : 'block';
+          }
+          const addToCartButton = document.getElementById('addToCartButton');
+          if (addToCartButton) {
+            addToCartButton.disabled = !isAvailable;
+            addToCartButton.classList.toggle('disabled', !isAvailable);
+          }
+
+          // ✅ NEW: filter WATTS based on selected color + sweep
+          const color = document.querySelector('.js-color-option.active')?.dataset.color || '';
+          showWattsForSelection(color, sweepLabel);
+        });
+      });
+
+      // Auto-select first visible option for each group on load
+      function autoSelectFirstOption(selector) {
+        const first = document.querySelector(selector + ':not([style*="display: none"])');
+        if (first) first.click();
       }
 
-      // ensure thumbnail click handlers are attached to the newly added DOM nodes
-      attachThumbnailClicks();
+      autoSelectFirstOption('.js-color-option');
+      autoSelectFirstOption('.js-sweep-option');
+      autoSelectFirstOption('.js-material-option');
+      autoSelectFirstOption('.js-light-option');
+      autoSelectFirstOption('.js-mount-option');
+      autoSelectFirstOption('.js-watt-option');
+    });
 
-      // if you have a zoom init function in product-scripts.liquid, call it to re-bind lens/zoom
-      if (typeof window.initZoom === 'function') {
-        try { window.initZoom(); } catch (e) { /* non-fatal */ }
-      } else {
-        // dispatch event so other scripts can listen and re-init zoom if needed
-        try { document.dispatchEvent(new CustomEvent('swipers:rebuild')); } catch (e) { /* ignore */ }
-      }
-    } catch (err) {
-      console.warn('rebuildSwipersForColor failed', err);
-    }
-  }
-  // Activate color selection (preserving metafields)
-  document.querySelectorAll('.js-color-option').forEach(card => {
-    card.addEventListener('click', function () {
-      document.querySelectorAll('.js-color-option').forEach(c => c.classList.remove('active'));
-      this.classList.add('active');
-      const color = this.dataset.color;
-      showSweepsForColor(color);
+    //Add 'lastProduct' class to the last visible .product_category_wrap
+    document.addEventListener('DOMContentLoaded', function () {
+      const wraps = Array.from(document.querySelectorAll('.product_category_wrap')).filter(
+        (el) => el.offsetParent !== null
+      ); // only visible ones
 
-      // Filter images by color
-      rebuildSwipersForColor(color);
-
-      // Set featured image directly
-      const image = this.dataset.image;
-      const productImg = document.querySelector("#productImg");
-      if (productImg && image) productImg.src = image;
-
-      // Optionally auto-select first sweep for this color
-      const firstSweep = document.querySelector('.js-sweep-option[data-color="' + color + '"]');
-      if (firstSweep) {
-        firstSweep.click();
+      if (wraps.length > 0) {
+        wraps.forEach((w) => w.classList.remove('lastProduct'));
+        wraps[wraps.length - 1].classList.add('lastProduct');
       }
     });
-  });
+  </script>
 
-  // Activate sweep selection
-document.querySelectorAll('.js-sweep-option').forEach(card => {
-  card.addEventListener('click', function () {
-    document.querySelectorAll('.js-sweep-option').forEach(c => c.classList.remove('active'));
-    this.classList.add('active');
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const likeBtn = document.querySelector('.add-to-wishlist');
+      const dropdown = document.querySelector('.wishlist-dropdown');
+      const tooltip = document.querySelector('.tooltip-msg');
+      const popup = document.querySelector('.popup-overlay');
+      const newWishlistInput = document.getElementById('new-wishlist-name');
+      const addWishlistBtn = document.getElementById('add-wishlist');
+      const closePopupBtn = document.getElementById('closePopup-wishlist');
 
-    const price = parseInt(this.dataset.price || "0");
-    const variantId = this.dataset.variantId;
-    const isAvailable = this.dataset.available === "true";
-    const sweepLabel = this.querySelector('.size')?.innerText || '';
+      if (!likeBtn) return;
 
-    selectedPrices.sweep = price;
-    updateMRP("sweep");
+      let tooltipTimeout = null;
 
-    if (customSweepInput) customSweepInput.value = sweepLabel;
-    if (variantIdInput && variantId) variantIdInput.value = variantId;
+      function isLoggedIn() {
+        try {
+          const ts = localStorage.getItem('sml_login_time');
+          if (!ts) return false;
+          return Date.now() - Number(ts) < 24 * 60 * 60 * 1000;
+        } catch (e) {
+          return false;
+        }
+      }
 
-    if (soldOutMessage) {
-      soldOutMessage.style.display = isAvailable ? "none" : "block";
+      function showToast(msg, undoCallback = null) {
+        if (!tooltip) return;
+        tooltip.querySelector('.tooltip-text').textContent = msg;
+        const undoBtn = tooltip.querySelector('.undoBtn');
+        if (undoCallback) {
+          undoBtn.style.display = 'inline-block';
+          undoBtn.onclick = function () {
+            undoCallback();
+            tooltip.classList.remove('show');
+            tooltip.style.display = 'none';
+          };
+        } else {
+          undoBtn.style.display = 'none';
+        }
+        tooltip.style.display = 'block';
+        tooltip.classList.add('show');
+        clearTimeout(tooltipTimeout);
+        tooltipTimeout = setTimeout(() => {
+          tooltip.classList.remove('show');
+          tooltip.style.display = 'none';
+        }, 2500);
+      }
+
+      function getFolders() {
+        return JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+      }
+
+      function saveFolders(folders) {
+        localStorage.setItem('wishlist_folders', JSON.stringify(folders));
+        // notify other parts of the page (or other components) that wishlist changed
+        try {
+          window.dispatchEvent(new CustomEvent('wishlist:changed', { detail: { folders: folders } }));
+        } catch (e) {}
+      }
+
+      // Update all like icons across the page. Accepts either a product object {id, variantId}
+      // or a product id string/number. When a variantId is present on buttons, the icon will
+      // reflect variant-level wishlist state (only dark if that variant is saved).
+      function updateAllIcons(productRef) {
+        let pid = '';
+        let vid = null;
+        if (productRef && typeof productRef === 'object') {
+          pid = String(productRef.id || '');
+          vid = productRef.variantId ? String(productRef.variantId) : null;
+        } else {
+          pid = String(productRef || '');
+        }
+
+        const folders = getFolders();
+
+        // Helper to determine if a given product id/variant exists in any folder
+        function isSaved(productId, variantId) {
+          for (let f of folders) {
+            for (let p of f.products) {
+              if (String(p.id) === String(productId)) {
+                if (variantId) {
+                  if (String(p.variantId) === String(variantId)) return true;
+                } else {
+                  return true; // product present (any variant)
+                }
+              }
+            }
+          }
+          return false;
+        }
+
+        // Update every like button on the page
+        document.querySelectorAll('.likes.actionBtn').forEach((btn) => {
+          const bpid = String(btn.getAttribute('data-id') || btn.dataset.id || '');
+          const bvid = btn.getAttribute('data-variant-id') || btn.dataset.variantId || '';
+          const active = isSaved(bpid, bvid || null);
+          btn.classList.toggle('active', active);
+        });
+
+        // Update listing_card buttons (if any)
+        document.querySelectorAll('.listing_card').forEach((card) => {
+          const cardPid = String(card.dataset.productId || '');
+          card.querySelectorAll('.likes.actionBtn').forEach((b) => {
+            const bvid = b.getAttribute('data-variant-id') || b.dataset.variantId || '';
+            const active = isSaved(cardPid, bvid || null);
+            b.classList.toggle('active', active);
+          });
+        });
+      }
+
+      function addProductToFolder(name, product) {
+        let folders = getFolders();
+        let folder = folders.find((f) => f.name === name);
+        if (!folder) {
+          folder = { id: Date.now(), name: name, products: [] };
+          folders.push(folder);
+        }
+        folder.products.push(product);
+        saveFolders(folders);
+        localStorage.removeItem('wishlist_pending_product');
+        // update icons globally for this product (pass full object to preserve variant)
+        updateAllIcons(product);
+      }
+
+      // Remove a product from a folder. If variantId is provided, remove only that variant;
+      // otherwise remove all entries with matching productId.
+      function removeProductFromFolder(productId, folderName, variantId) {
+        let folders = getFolders();
+        let folder = folders.find((f) => f.name === folderName);
+        if (folder) {
+          if (variantId) {
+            folder.products = folder.products.filter((p) => !(String(p.id) === String(productId) && String(p.variantId) === String(variantId)));
+          } else {
+            folder.products = folder.products.filter((p) => String(p.id) !== String(productId));
+          }
+          saveFolders(folders);
+          // update icons globally for this product
+          updateAllIcons({ id: productId, variantId: variantId });
+        }
+      }
+
+      // Returns the folder name if a given productId/variantId is saved. If variantId is
+      // provided it searches for an exact match; otherwise it checks for any saved variant.
+      function getProductFolder(productId, variantId) {
+        let folders = getFolders();
+        for (let folder of folders) {
+          if (variantId) {
+            if (folder.products.some((p) => String(p.id) === String(productId) && String(p.variantId) === String(variantId))) return folder.name;
+          } else {
+            if (folder.products.some((p) => String(p.id) === String(productId))) return folder.name;
+          }
+        }
+        return null;
+      }
+
+      // Expose helper functions globally so other DOMContentLoaded handlers can query/update state
+      try {
+        window.getFolders = getFolders;
+        window.getProductFolder = getProductFolder;
+        window.updateAllIcons = updateAllIcons;
+        window.updateIconState = updateIconState;
+        window.addProductToFolder = addProductToFolder;
+        window.removeProductFromFolder = removeProductFromFolder;
+      } catch (e) {}
+
+      function renderProjects(dropdownEl) {
+        const folders = getFolders();
+        const inner = dropdownEl.querySelector('.wishlist-inner') || dropdownEl;
+        let list = inner.querySelector('.list');
+        if (!folders || folders.length === 0) {
+          if (list) list.remove();
+          return;
+        }
+        if (!list) {
+          list = document.createElement('div');
+          list.className = 'list';
+          const createBlock = inner.querySelector('.list-create');
+          if (createBlock) inner.insertBefore(list, createBlock);
+          else inner.appendChild(list);
+        }
+        list.innerHTML = '';
+        folders.forEach((folder) => {
+          const option = document.createElement('div');
+          option.className = 'option';
+          option.textContent = folder.name;
+          option.style.cursor = 'pointer';
+          list.appendChild(option);
+        });
+      }
+
+      function updateIconState() {
+        const productId = likeBtn.getAttribute('data-id');
+        const variantId = likeBtn.getAttribute('data-variant-id') || null;
+        const folderName = getProductFolder(productId, variantId);
+        likeBtn.classList.toggle('active', !!folderName);
+      }
+
+      // Listen for wishlist changes from other components (e.g. related items)
+      window.addEventListener('storage', function (e) {
+        if (e.key === 'wishlist_folders') {
+          // storage event only fires in other tabs; still update icons if possible
+          updateIconState();
+          // also update related listing icons
+          const pending = JSON.parse(localStorage.getItem('wishlist_pending_product') || 'null');
+          if (pending && pending.id) updateAllIcons(pending);
+        }
+      });
+
+      // also react to our custom event (dispatched when saveFolders is called)
+      window.addEventListener('wishlist:changed', function (ev) {
+        // update product page icon and related icons
+        updateIconState();
+        try {
+          const folders = ev.detail && ev.detail.folders;
+          if (folders && folders.length) {
+            // iterate products and update icons for all products present
+            folders.forEach((f) => {
+              f.products.forEach((p) => updateAllIcons(p));
+            });
+          }
+        } catch (err) {}
+      });
+
+      // Init state
+      updateIconState();
+      // hide dropdown if not logged in
+      if (!isLoggedIn()) {
+        if (dropdown) dropdown.style.display = 'none';
+      }
+
+      likeBtn.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        const productId = likeBtn.getAttribute('data-id');
+        const variantId = likeBtn.getAttribute('data-variant-id') || null;
+        const existingFolder = getProductFolder(productId, variantId);
+        if (existingFolder) {
+          // remove from folder (variant-specific)
+          removeProductFromFolder(productId, existingFolder, variantId);
+          likeBtn.classList.remove('active');
+          showToast(`Product successfully removed from '${existingFolder}' in your Wishlist`, function undoAction() {
+            // re-add on undo
+            const pending = {
+              id: productId,
+              handle: likeBtn.getAttribute('data-handle') || null,
+              title: likeBtn.getAttribute('data-title') || '',
+              image: likeBtn.getAttribute('data-image') || '',
+              price: likeBtn.getAttribute('data-price') || '',
+              variantId: variantId,
+              options: {},
+            };
+            addProductToFolder(existingFolder, pending);
+            updateIconState();
+            updateAllIcons(pending);
+          });
+          return;
+        }
+
+        // prepare pending product
+        const pending = {
+          id: productId || null,
+          handle: likeBtn.getAttribute('data-handle') || null,
+          title: likeBtn.getAttribute('data-title') || '',
+          image: likeBtn.getAttribute('data-image') || '',
+          price: likeBtn.getAttribute('data-price') || '',
+          variantId: variantId,
+          options: {},
+        };
+        localStorage.setItem('wishlist_pending_product', JSON.stringify(pending));
+
+        if (!isLoggedIn()) {
+          window.location.href = '/pages/wishlist';
+          return;
+        }
+
+        if (dropdown) {
+          renderProjects(dropdown);
+          dropdown.classList.toggle('show');
+          document.querySelectorAll('.wishlist-dropdown').forEach((dd) => {
+            if (dd !== dropdown) dd.classList.remove('show');
+          });
+        }
+      });
+
+      // Click handlers for folder selection / create
+      document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('option')) {
+          e.preventDefault();
+          e.stopPropagation();
+          const projectName = e.target.textContent.trim();
+          const pending = JSON.parse(localStorage.getItem('wishlist_pending_product') || 'null');
+          if (!pending) return;
+          addProductToFolder(projectName, pending);
+          updateIconState();
+          updateAllIcons(pending);
+          showToast(`Product successfully added to '${projectName}'`, function undoAction() {
+            removeProductFromFolder(pending.id, projectName, pending.variantId);
+            updateIconState();
+            updateAllIcons(pending);
+          });
+          const dd = e.target.closest('.wishlist-dropdown');
+          if (dd) dd.classList.remove('show');
+        }
+
+        if (e.target.classList.contains('create-btn')) {
+          e.stopPropagation();
+          popup?.classList.add('showPopup');
+          document.body.classList.add('overflow-hidden');
+          if (newWishlistInput) {
+            newWishlistInput.value = '';
+            newWishlistInput.classList.remove('error');
+          }
+          document.querySelector('.wishlist-error-msg')?.classList.add('hidden');
+          addWishlistBtn?.setAttribute('disabled', 'true');
+        }
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.wishlist-dropdown') && !e.target.classList.contains('actionBtn')) {
+          document.querySelectorAll('.wishlist-dropdown').forEach((dd) => dd.classList.remove('show'));
+        }
+      });
+
+      // Close popup
+      closePopupBtn?.addEventListener('click', function () {
+        popup?.classList.remove('showPopup');
+        document.body.classList.remove('overflow-hidden');
+      });
+    });
+  </script>
+
+  <script>
+    // Function to update cart counter in header
+    function updateHeaderCartCounter() {
+      fetch('/cart.js')
+        .then(response => response.json())
+        .then(cartData => {
+          // Calculate total quantity (excluding Installation Fee)
+          let productCount = 0;
+          (cartData.items || []).forEach(item => {
+            if (item.product_title !== 'Installation Fee') {
+              productCount += item.quantity;
+            }
+          });
+
+          // Update header cart counter
+          const cartLink = document.querySelector('a[href="/cart"]');
+          if (cartLink) {
+            // Remove existing counter
+            const existingCounter = cartLink.querySelector('.count');
+            if (existingCounter) {
+              existingCounter.remove();
+            }
+
+            // Add new counter if count > 0
+            if (productCount > 0) {
+              const counterDiv = document.createElement('div');
+              counterDiv.className = 'count';
+              counterDiv.textContent = productCount;
+              cartLink.appendChild(counterDiv);
+            }
+          }
+        })
+        .catch(error => console.error('Error updating cart counter:', error));
     }
-    const addToCartButton = document.getElementById("addToCartButton");
-    if (addToCartButton) {
-      addToCartButton.disabled = !isAvailable;
-      addToCartButton.classList.toggle("disabled", !isAvailable);
-    }
 
-    // ✅ NEW: filter WATTS based on selected color + sweep
-    const color = document.querySelector('.js-color-option.active')?.dataset.color || '';
-    showWattsForSelection(color, sweepLabel);
+    document.addEventListener('DOMContentLoaded', function () {
+      const addToCartForm = document.getElementById('addToCartForm');
+      const addToCartButton = document.getElementById('addToCartButton');
+      const tooltip = document.querySelector('.tooltip-msg');
 
-  });
-});
+      if (addToCartForm) {
+        addToCartForm.addEventListener('submit', function (e) {
+          e.preventDefault();
 
-  // Auto-select first visible option for each group on load
-  function autoSelectFirstOption(selector) {
-    const first = document.querySelector(selector + ':not([style*="display: none"])');
-    if (first) first.click();
-  }
+          // Disable button to prevent multiple submissions
+          addToCartButton.disabled = true;
+          addToCartButton.classList.add('loading');
 
-  autoSelectFirstOption('.js-color-option');
-  autoSelectFirstOption('.js-sweep-option');
-  autoSelectFirstOption('.js-material-option');
-  autoSelectFirstOption('.js-light-option');
-  autoSelectFirstOption('.js-mount-option');
-  autoSelectFirstOption('.js-watt-option');
+          // Collect form data
+          const formData = new FormData(addToCartForm);
+          const data = {
+            id: formData.get('id'),
+            quantity: 1,
+            properties: {}
+          };
 
-});
+          // Collect custom properties
+          for (let [key, value] of formData.entries()) {
+            if (key.startsWith('properties[') && value) {
+              const propName = key.replace('properties[', '').replace(']', '');
+              data.properties[propName] = value;
+            }
+          }
 
-//Add 'lastProduct' class to the last visible .product_category_wrap
-document.addEventListener("DOMContentLoaded", function () {
-  const wraps = Array.from(document.querySelectorAll(".product_category_wrap"))
-    .filter(el => el.offsetParent !== null); // only visible ones
-  
-  if (wraps.length > 0) {
-    wraps.forEach(w => w.classList.remove("lastProduct"));
-    wraps[wraps.length - 1].classList.add("lastProduct");
-  }
-});
+          // Make the cart add request using Shopify's cart API
+          fetch('/cart/add.js', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to add to cart');
+              }
+              return response.json();
+            })
+            .then(data => {
+              // Update cart counter in header
+              updateHeaderCartCounter();
+              
+              // Show success message using existing tooltip
+              if (tooltip) {
+                tooltip.querySelector('.tooltip-text').textContent = 'Product successfully added to cart!';
+                // Hide undo and close buttons for add to cart message
+                const undoBtn = tooltip.querySelector('.undoBtn');
+                const closeBtn = tooltip.querySelector('.tooltip-close');
+                if (undoBtn) undoBtn.style.display = 'none';
+                if (closeBtn) closeBtn.style.display = 'none';
+                
+                tooltip.classList.add('show');
+                tooltip.style.display = 'block';
+                
+                // Remove the message after 3 seconds
+                setTimeout(() => {
+                  tooltip.classList.remove('show');
+                  tooltip.style.display = 'none';
+                  // Show undo and close buttons again for wishlist use
+                  if (undoBtn) undoBtn.style.display = '';
+                  if (closeBtn) closeBtn.style.display = '';
+                }, 3000);
+              }
 
-</script>
+              // Re-enable button
+              addToCartButton.disabled = false;
+              addToCartButton.classList.remove('loading');
+            })
+            .catch(error => {
+              console.error('Error adding to cart:', error);
+              
+              // Show error message using existing tooltip
+              if (tooltip) {
+                tooltip.querySelector('.tooltip-text').textContent = 'Failed to add product to cart. Please try again.';
+                tooltip.classList.add('show');
+                tooltip.style.display = 'block';
+                
+                // Remove the message after 3 seconds
+                setTimeout(() => {
+                  tooltip.classList.remove('show');
+                  tooltip.style.display = 'none';
+                }, 3000);
+              }
 
-
-
-
+              // Re-enable button
+              addToCartButton.disabled = false;
+              addToCartButton.classList.remove('loading');
+            });
+        });
+      }
+    });
+  </script>
 </section>

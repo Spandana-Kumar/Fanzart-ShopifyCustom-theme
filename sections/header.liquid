@@ -2,15 +2,16 @@
   <div class="container">
     <nav class="navbar_wrap">
       <div class="navbar_flex">
+        <!-- LOGO -->
         <a href="{{ routes.root_url }}" class="logo">
           {% if section.settings.logo != blank %}
             <img src="{{ section.settings.logo | image_url }}" alt="{{ shop.name }}">
           {% else %}
-            <img src="{{ 'img_logo.svg' | asset_url }}" alt="{{ shop.name }}">
+            <img src="{{ 'logo.svg' | asset_url }}" alt="{{ shop.name }}">
           {% endif %}
         </a>
 
-
+        <!-- NAVIGATION -->
         {% assign main_menu = linklists['main-menu'] %}
 
         <ul class="nav_list" id="humbuger_list">
@@ -21,30 +22,69 @@
                   <button class="dropdown_toggle">
                     <span>{{ link.title }}</span>
                   </button>
+
                   <div class="dropdown_menu megaMenu2">
                     <div class="linksWrap">
                       <div class="container">
-                        <ul class="fan_list">
-                          {% for sublink in link.links %}
-                            {% assign collection_handle = sublink.url | split: '/collections/' | last %}
-                            {% assign collection = collections[collection_handle] %}
-                            <li>
-                              <a href="{{ sublink.url }}">
-                                {% if collection.image %}
-                                  <img src="{{ collection.image | img_url: 'medium' }}" alt="{{ collection.title }}" />
-                                {% else %}
-                                  <img src="{{ 'placeholder.png' | asset_url }}" alt="{{ sublink.title }}" />
+                        <div class="fan_categroy_list_flex">
+                          {% for child in link.links %}
+                            {% assign has_sublinks = false %}
+                            {% if child.links != blank %}
+                              {% assign has_sublinks = true %}
+                            {% endif %}
+
+                            <div class="category_cards {% unless has_sublinks %}cardsImg{% endunless %}">
+                              <!-- TITLE + IMAGE -->
+                              <a href="{{ child.url }}" class="title_flex">
+                                <h4>{{ child.title }}</h4>
+
+                                {% if child.object.image %}
+                                  <img
+                                    src="{{ child.object.image | image_url: width: 250 }}"
+                                    alt="{{ child.title }}"
+                                  >
                                 {% endif %}
-                                <h6><span>{{ sublink.title }}</span></h6>
                               </a>
-                            </li>
+
+                              <!-- SUB LINKS -->
+                              {% if has_sublinks %}
+                                <ul class="unordered_links_list">
+                                  {% for grandchild in child.links %}
+                                    <li>
+                                      <a href="{{ grandchild.url }}">
+                                        {{ grandchild.title }}
+                                      </a>
+                                    </li>
+                                  {% endfor %}
+                                </ul>
+                              {% endif %}
+                            </div>
                           {% endfor %}
-                        </ul>
+                        </div>
+
+                        <!-- CTA BUTTON -->
+                        {% if shop.metafields.custom.product_catalogue != blank %}
+                          <div class="btn_wrapper">
+                            <a
+                              href="{{ shop.metafields.custom.product_catalogue | file_url }}"
+                              class="btns btnDark"
+                              download
+                              
+                            >
+                              <div class="bg"></div>
+                              <div class="btnText">
+                                <span>Download Product Catalogue</span>
+                                <span>Download Product Catalogue</span>
+                              </div>
+                            </a>
+                          </div>
+                        {% endif %}
                       </div>
                     </div>
                   </div>
                 </div>
               </li>
+
             {% else %}
               <li>
                 <a href="{{ link.url }}">
@@ -53,52 +93,79 @@
               </li>
             {% endif %}
           {% endfor %}
+          <!-- MOBILE CTA -->
+          <li>
+             {% if shop.metafields.custom.product_catalogue != blank %}
+            <div class="btn_mobile_fixed">
+             
+                 <a
+                              href="{{ shop.metafields.custom.product_catalogue | file_url }}"
+                              class="btns btnDark"
+                              download
+                            
+                            >
+                <div class="bg"></div>
+                <div class="btnText">
+                  <span>Download Product Catalogue</span>
+                  <span>Download Product Catalogue</span>
+                </div>
+              </a>
+            </div>
+            {% endif %}
+          </li>
         </ul>
       </div>
 
+      <!-- CART + SEARCH -->
       <ul class="nav_cart">
-     <li>
-  <!-- Open search icon -->
-  <img src="{{ 'img_icons_searchIcon-mob.svg' | asset_url }}" alt="" class="mobileSearchIcon">
+        <li>
+          <!-- Open search icon -->
+          <img src="{{ 'img_icons_searchIcon-mob.svg' | asset_url }}" alt="" class="mobileSearchIcon">
 
-  <!-- Search form -->
-  <form class="srchFrom" action="{{ routes.search_url }}" method="get" role="search">
-    <a href="javascript:;" class="mobSearchBack">
-      <img src="{{ 'img_icons_chevron-down-black.svg' | asset_url }}" alt="">
-    </a>
+          <!-- Search form -->
+          <form class="srchFrom" action="{{ routes.search_url }}" method="get" role="search">
+            <a href="javascript:;" class="mobSearchBack">
+              <img src="{{ 'img_icons_chevron-down-black.svg' | asset_url }}" alt="">
+            </a>
 
-    <input
-      type="search"
-      id="headerSearch"
-      name="q"
-      class="searchbox"
-      placeholder="Search Products"
-      value="{{ search.terms | escape }}"
-    >
+            <input
+              type="search"
+              id="headerSearch"
+              name="q"
+              class="searchbox"
+              placeholder="Search Products"
+              value="{{ search.terms | escape }}"
+            >
 
-    <!-- Force product-only search -->
-    <input type="hidden" name="type" value="product">
+            <!-- Force product-only search -->
+            <input type="hidden" name="type" value="product">
 
-    <label class="searchimg" for="headerSearch">
-      <img src="{{ 'img_icons_searchIcon.svg' | asset_url }}" alt="" class="searchIcon">
-    </label>
+            <label class="searchimg" for="headerSearch">
+              <img src="{{ 'img_icons_searchIcon.svg' | asset_url }}" alt="" class="searchIcon">
+            </label>
 
-    <span class="searchcloseIcon">
-      <img src="{{ 'img_icons_x.svg' | asset_url }}" alt="" class="searchcloseIcon">
-    </span>
-  </form>
-</li>
+            <span class="searchcloseIcon">
+              <img src="{{ 'img_icons_x.svg' | asset_url }}" alt="" class="searchcloseIcon">
+            </span>
+          </form>
+        </li>
 
-        <li >
+        <li>
           <a href="/pages/wishlist" id="wishlistNavItem">
-            <img src="{{ 'img_icon_heart.svg' | asset_url }}" alt="heart" />
+            <img src="{{ 'img_icon_heart.svg' | asset_url }}" alt="heart">
           </a>
         </li>
         <li>
           <a href="/cart">
-            <img src="{{ 'img_icon_cart.svg' | asset_url }}" alt="cart" />
-            {% if cart.item_count > 0 %}
-              <div class="count">{{ cart.item_count }}</div>
+            <img src="{{ 'img_icon_cart.svg' | asset_url }}" alt="cart">
+            {% assign product_count = cart.item_count %}
+            {% for item in cart.items %}
+              {% if item.product.title == "Installation Fee" %}
+                {% assign product_count = product_count | minus: 1 %}
+              {% endif %}
+            {% endfor %}
+            {% if product_count > 0 %}
+              <div class="count">{{ product_count }}</div>
             {% endif %}
           </a>
         </li>
@@ -120,14 +187,17 @@
         return folders.reduce(function (sum, f) {
           return sum + (Array.isArray(f.products) ? f.products.length : 0);
         }, 0);
-      } catch (e) { return 0; }
+      } catch (e) {
+        return 0;
+      }
     }
 
     function updateHeartClass() {
       var el = document.getElementById('wishlistNavItem');
       if (!el) return;
       var count = getWishlistCount();
-      if (count > 0) el.classList.add('heart'); else el.classList.remove('heart');
+      if (count > 0) el.classList.add('heart');
+      else el.classList.remove('heart');
     }
 
     // Watch for storage events from other tabs
@@ -143,7 +213,9 @@
           originalSet.apply(this, arguments);
           if (k === 'wishlist_folders') {
             // emit a custom event so other listeners in the same tab can react
-            try { window.dispatchEvent(new Event('wishlist:changed')); } catch (e) {}
+            try {
+              window.dispatchEvent(new Event('wishlist:changed'));
+            } catch (e) {}
             updateHeartClass();
           }
         };
@@ -154,7 +226,8 @@
     window.addEventListener('wishlist:changed', updateHeartClass);
 
     // Update on DOM ready
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateHeartClass); else updateHeartClass();
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateHeartClass);
+    else updateHeartClass();
   })();
 </script>
 

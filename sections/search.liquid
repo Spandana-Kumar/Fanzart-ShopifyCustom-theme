@@ -1,8 +1,18 @@
-{% if search.results_count == 0 %}
+{% assign search_terms_lower = search.terms | downcase %}
+{% assign blocked_keywords = 'installation|fee|install|charges|heavy|premium|standard' | split: '|' %}
+{% assign is_blocked = false %}
+{% for keyword in blocked_keywords %}
+  {% if search_terms_lower contains keyword %}
+    {% assign is_blocked = true %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% if is_blocked or search.results_count == 0 %}
   <section class="search__not__found">
     <div class="container">
       <div class="contents">
-        <img src="{{ 'img_no_search.svg' | asset_url }}" alt="No results" />
+        <img src="{{ 'img_no_search.svg' | asset_url }}" alt="No results">
         <h3>OOPS – NO RESULTS FOR</h3>
         <h4>“{{ search.terms }}”</h4>
         <ul>
@@ -23,379 +33,457 @@
     </div>
   </section>
   <section class="wishlist_product_list searchResultProducts">
-        <div class="wishlist_product_list_innn">
-            <div class="container">
-                <div class="wishlist_product_list_top_sticky">
-                    <div class="wishlist_product_list_top">
-                     <a href="javascript:;"  id="filterLinkToggle" class="filterLink">
-                            <img src="{{ 'img_icons_filter-icon.svg' | asset_url }}" alt="">
-                            <span>Filters</span>
-                        </a>
-                       
-                        <div class="wishlist_product_top_right">
-                                    <span class="res-num">{{ search.results_count }} Results</span>
+    <div class="wishlist_product_list_innn">
+      <div class="container">
+        <div class="wishlist_product_list_top_sticky">
+          <div class="wishlist_product_list_top">
+            <a href="javascript:;" id="filterLinkToggle" class="filterLink">
+              <img src="{{ 'img_icons_filter-icon.svg' | asset_url }}" alt="">
+              <span>Filters</span>
+            </a>
 
-                                    <div class="customDropdown">
-                                      <div class="selected">Sort by</div>
-                                      <ul class="options">
-                                        <li data-value="price-ascending">Price (Low - High)</li>
-                                        <li data-value="price-descending">Price (High - Low)</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                                               <!-- filter -->
-                                  <div class="filter_outer">
-                                <div class="filter-sidebar">
-                                    <div class="filter-header">
-                                        <span>Filter</span>
-                                        <button class="close-filter">×</button>
-                                    </div>
+            <div class="wishlist_product_top_right">
+              <span class="res-num">{{ search.results_count }} Results</span>
 
-                                <!-- Dynamic Facets: prefer collection.filters so search shows the same full option list as collection pages -->
-                                {% if collection and collection.filters.size > 0 %}
-                                  {% assign filters = collection.filters %}
-                                {% else %}
-                                  {% assign filters = search.filters %}
-                                {% endif %}
-
-                                {% if filters and filters.size > 0 %}
-                                  {% for filter in filters %}
-                                            <div class="filter-group accordion {% if forloop.first %}open{% endif %}">
-                                                <div class="accordion-header">
-                                                    {{ filter.label }}
-                                                    <span class="selected-count"></span>
-                                                </div>
-                                                <div class="accordion-body" {% unless forloop.first %}style="display:none"{% endunless %}>
-                                                    {% for value in filter.values %}
-                                                        <label>
-                                        <input type="checkbox" 
-                                          id="filter-{{ filter.param_name }}-{{ forloop.index }}" 
-                                          data-filter="{{ filter.param_name }}" 
-                                          value="{{ value.value }}" 
-                                          {% if value.active %}checked{% endif %}>
-                                                            {{ value.label }}
-                                                            {% if value.count %}<span>{{ value.count }}</span>{% endif %}
-                                                        </label>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                {% else %}
-                                        <p>No filters available</p>
-                                    {% endif %}
-
-                                <!-- Price Range -->
-                                <div class="filter-group accordion">
-                                  <div class="accordion-header">Price Range <span class="selected-count"></span></div>
-                                  <div class="accordion-body" style="display:none">
-                                    <div class="price-range">
-                                      <div id="price-slider"></div>
-                                      <div class="price-inputs">
-                                        <input type="text" id="price-min" readonly>
-                                        <input type="text" id="price-max" readonly>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                    <!-- Filter Actions -->
-                                    <div class="filter-action">
-                                        <a href="javascript:;" class="clearAllBtn">Clear All</a>
-                                        <button class="filter-apply-btn btns btnDark">
-                                            <div class="bg"></div>
-                                            <div class="btnText">
-                                                <span>Apply</span>
-                                                <span>Apply</span>
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                    </div>
-                </div>
-
-               <div class="wishlist_product_list_middle">
-                <a href="javascript:;" class="clearAllBtn">Clear all</a>
-                <div class="filterAdded"></div>
+              <div class="customDropdown">
+                <div class="selected">Sort by</div>
+                <ul class="options">
+                  <li data-value="price-ascending">Price (Low - High)</li>
+                  <li data-value="price-descending">Price (High - Low)</li>
+                </ul>
               </div>
+            </div>
+            <!-- filter -->
+            <div class="filter_outer">
+              <div class="filter-sidebar">
+                <div class="filter-header">
+                  <span class="filterText">Filter</span>
+                  <button class="close-filter">×</button>
+                </div>
 
-               <div class="wishlist_product_list_bottom">
+                <!--
+                  Dynamic Facets: prefer collection.filters so search shows the same full option list as collection pages
+                -->
+                {% if collection and collection.filters.size > 0 %}
+                  {% assign filters = collection.filters %}
+                {% else %}
+                  {% assign filters = search.filters %}
+                {% endif %}
 
-                  {% paginate search.results by 12 %}
-                    <div class="listing__card__wrapper">
-                      {% comment %} Loop over collection products and render dynamic product cards {% endcomment %}
-                      {% for product in search.results %}
-                        <div class="listing_card {% unless product.available %}outOfStock{% endunless %}">
-                          <a href="{{ product.url }}" class="mainImg">
-                            {%- assign first_media = product.media.first -%}
-                            {%- assign second_media = product.media[1] -%}
-                            
-                            <!-- lifestyle image -->
-                            <img src="{{ product.featured_image | img_url: '800x' }}" class="lifestyleImg" alt="{{ product.featured_image.alt | escape }}" />
-
-                            <div class="magicImg">
-                              {% if first_media %}
-                                <img src="{{ first_media.preview_image | img_url: '600x' }}" class="defaultImg" alt="{{ first_media.alt | escape }}" />
-                              {% elsif product.featured_image %}
-                                <img src="{{ product.featured_image | img_url: '600x' }}" class="defaultImg" alt="{{ product.featured_image.alt | escape }}" />
+                {% if filters and filters.size > 0 %}
+                  {% for filter in filters %}
+                    <div class="filter-group accordion ">
+                      <div class="accordion-header">
+                        {{ filter.label }}
+                        <span class="selected-count"></span>
+                      </div>
+                      <div
+                        class="accordion-body"
+                        {% unless forloop.first %}
+                          style="display:none"
+                        {% endunless %}
+                      >
+                        {% for value in filter.values %}
+                          <label>
+                            <input
+                              type="checkbox"
+                              id="filter-{{ filter.param_name }}-{{ forloop.index }}"
+                              data-filter="{{ filter.param_name }}"
+                              value="{{ value.value }}"
+                              {% if value.active %}
+                                checked
                               {% endif %}
+                            >
+                            {{ value.label }}
+                            {% if value.count -%}
+                              <span>{{ value.count }}</span>
+                            {%- endif %}
+                          </label>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <p>No filters available</p>
+                {% endif %}
 
-                              {% if second_media %}
-                                <img src="{{ second_media.preview_image | img_url: '600x' }}" class="colorImg" alt="{{ second_media.alt | escape }}" />
-                              {% elsif first_media %}
-                                <img src="{{ first_media.preview_image | img_url: '600x' }}" class="colorImg" alt="{{ first_media.alt | escape }}" />
-                              {% endif %}
-                            </div>
-                          </a>
+                <!-- Price Range -->
+                <div class="filter-group accordion">
+                  <div class="accordion-header">Price Range <span class="selected-count"></span></div>
+                  <div class="accordion-body" style="display:none">
+                    <div class="price-range">
+                      <div id="price-slider"></div>
+                      <div class="price-inputs">
+                        <input type="text" id="price-min" readonly>
+                        <input type="text" id="price-max" readonly>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-                          <div class="floatingItem_flex">
-                            {% if product.tags contains 'new' %}
-                              <div class="tagNew">New</div>
-                            {% endif %}
-                            {% unless product.available %}
-                              <div class="outOfStockTag">Out of stock</div>
-                            {% endunless %}
-                            <div class="wishList_wrap">
-       <button 
-  class="likes actionBtn add-to-wishlist"
-  data-id="{{ product.id }}"
-  data-title="{{ product.title | escape }}"
-  data-variant-id="{{ product.selected_or_first_available_variant.id }}"
-  data-image="{{ product.featured_image | img_url: '800x' }}"
-  data-price="{{ product.selected_or_first_available_variant.price | money_without_currency | split: '.' | first }}"
-  data-handle="{{ product.url }}"
-  data-option-color="{{ product.selected_or_first_available_variant.option1 }}"
-  data-option-sweep="{{ product.selected_or_first_available_variant.option2 }}"
-  data-option-watt="{{ product.selected_or_first_available_variant.option3 }}"
-  data-option-material="{{ product.selected_or_first_available_variant.option4 }}"
-  data-option-light="{{ product.selected_or_first_available_variant.option5 }}"
-  data-option-mount="{{ product.selected_or_first_available_variant.option6 }}"
-  data-option-addon="{{ product.selected_or_first_available_variant.option7 }}"
->
-</button>
+                <!-- Filter Actions -->
+                <div class="filter-action">
+                  <a href="javascript:;" class="clearAllBtn">Clear All</a>
+                  <button class="filter-apply-btn btns btnDark">
+                    <div class="bg"></div>
+                    <div class="btnText">
+                      <span>Apply</span>
+                      <span>Apply</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
+        <div class="wishlist_product_list_middle">
+          <a href="javascript:;" class="clearAllBtn">Clear all</a>
+          <div class="filterAdded"></div>
+        </div>
 
+        <div class="wishlist_product_list_bottom">
+          {% paginate search.results by 12 %}
+            <div class="listing__card__wrapper">
+              {% comment %} Loop over collection products and render dynamic product cards {% endcomment %}
+              {% for product in search.results %}
+                <div
+                  class="listing_card {% unless product.available %}outOfStock{% endunless %}"
+                  data-product-id="{{ product.id }}"
+                  data-product-handle="{{ product.handle }}"
+                  data-product-title="{{ product.title | escape }}"
+                >
+                  <a href="{{ product.url }}" class="mainImg">
+                    {%- assign first_media = product.media.first -%}
+                    {%- assign second_media = product.media[1] -%}
 
-                            <!-- Static dropdown template (will be updated dynamically) -->
-                            <div class="wishlist-dropdown">
-                              <div class="wishlist-inner">
-                                <div class="list"><!-- JS will inject projects here --></div>
-                                <div class="list-create">
-                                  <div class="create-btn">Create a New Project</div>
-                                </div>
-                              </div>
-                            </div>
+                    <!-- lifestyle image -->
+                    <img
+                      src="{{ product.featured_image | img_url: '800x' }}"
+                      class="lifestyleImg"
+                      alt="{{ product.featured_image.alt | escape }}"
+                    >
+
+                    <div class="magicImg">
+                      {% if first_media %}
+                        <img
+                          src="{{ first_media.preview_image | img_url: '600x' }}"
+                          class="defaultImg"
+                          alt="{{ first_media.alt | escape }}"
+                        >
+                      {% elsif product.featured_image %}
+                        <img
+                          src="{{ product.featured_image | img_url: '600x' }}"
+                          class="defaultImg"
+                          alt="{{ product.featured_image.alt | escape }}"
+                        >
+                      {% endif %}
+
+                      {% if second_media %}
+                        <img
+                          src="{{ second_media.preview_image | img_url: '600x' }}"
+                          class="colorImg"
+                          alt="{{ second_media.alt | escape }}"
+                        >
+                      {% elsif first_media %}
+                        <img
+                          src="{{ first_media.preview_image | img_url: '600x' }}"
+                          class="colorImg"
+                          alt="{{ first_media.alt | escape }}"
+                        >
+                      {% endif %}
+                    </div>
+                  </a>
+
+                  <div class="floatingItem_flex">
+                    {% unless product.available %}
+                      <div class="outOfStockTag">Out of stock</div>
+                    {% else %}
+                      {% if product.tags contains 'new' %}
+                        <div class="tagNew">New</div>
+                      {% endif %}
+                    {% endunless %}
+
+                    <div class="wishList_wrap">
+                      <button
+                        class="likes actionBtn add-to-wishlist"
+                        data-id="{{ product.id }}"
+                        data-title="{{ product.title | escape }}"
+                        data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                        data-image="{{ product.featured_image | img_url: '800x' }}"
+                        data-price="{{ product.selected_or_first_available_variant.price | money_without_currency | split: '.' | first }}"
+                        data-handle="{{ product.handle }}"
+                        data-option-color="{{ product.selected_or_first_available_variant.option1 }}"
+                        data-option-sweep="{{ product.selected_or_first_available_variant.option2 }}"
+                        data-option-watt="{{ product.selected_or_first_available_variant.option3 }}"
+                        data-option-material="{{ product.selected_or_first_available_variant.option4 }}"
+                        data-option-light="{{ product.selected_or_first_available_variant.option5 }}"
+                        data-option-mount="{{ product.selected_or_first_available_variant.option6 }}"
+                        data-option-addon="{{ product.selected_or_first_available_variant.option7 }}"
+                      ></button>
+
+                      <!-- Static dropdown template (will be updated dynamically) -->
+                      <div class="wishlist-dropdown">
+                        <div class="wishlist-inner">
+                          <div class="list"><!-- JS will inject projects here --></div>
+                          <div class="list-create">
+                            <div class="create-btn">Create a New Project</div>
                           </div>
-
-                          </div>
-
-                          <a href="" class="product_details">
-                            <div class="colorTitleFlex">
-                              {% assign _color_values = '' %}
-                              {% for variant in product.variants %}
-                                {% assign color_value = variant.option1 %}
-                                {% if color_value != blank %}
-                                  {% unless _color_values contains color_value %}
-                                    {% if _color_values == '' %}
-                                      {% assign _color_values = color_value %}
-                                    {% else %}
-                                      {% assign _color_values = _color_values | append: '||' | append: color_value %}
-                                    {% endif %}
-                                  {% endunless %}
-                                {% endif %}
-                              {% endfor %}
-                              {% assign color_list = _color_values | split: '||' %}
-
-                              {% assign _size_values = '' %}
-                              {% for variant in product.variants %}
-                                {% assign size_value = variant.option2 %}
-                                {% if size_value != blank %}
-                                  {% unless _size_values contains size_value %}
-                                    {% if _size_values == '' %}
-                                      {% assign _size_values = size_value %}
-                                    {% else %}
-                                      {% assign _size_values = _size_values | append: '||' | append: size_value %}
-                                    {% endif %}
-                                  {% endunless %}
-                                {% endif %}
-                              {% endfor %}
-                              {% assign size_list_header = _size_values | split: '||' %}
-
-                              <h6>{{ color_list.size }} colours</h6>
-                              <h6>{{ size_list_header.size }} sizes</h6>
-                            </div>
-
-                            <div class="hiddenDetails">
-                              <div class="colorFlex">
-                                {% for color in color_list %}
-                                  <div class="colorImg{% if forloop.first %} active{% endif %}" data-color="{{ color | escape }}">
-                                    {%- assign swatch_found = false -%}
-                                    {% for media in product.media %}
-                                      {% assign media_alt = media.alt | default: '' | downcase %}
-                                      {% assign color_key = color | default: '' | downcase %}
-                                      {% if media_alt != '' and media_alt == color_key %}
-                                        <img src="{{ media.preview_image | img_url: '80x80' }}" data-target-src="{{ media.preview_image | img_url: '600x' }}" alt="{{ media.alt | escape }}" />
-                                        {% assign swatch_found = true %}
-                                        {% break %}
-                                      {% endif %}
-                                    {% endfor %}
-                                    {% unless swatch_found %}
-                                      {% if first_media %}
-                                        <img src="{{ first_media.preview_image | img_url: '80x80' }}" data-target-src="{{ first_media.preview_image | img_url: '600x' }}" alt="{{ first_media.alt | escape }}" />
-                                      {% elsif product.featured_image %}
-                                        <img src="{{ product.featured_image | img_url: '80x80' }}" data-target-src="{{ product.featured_image | img_url: '600x' }}" alt="{{ product.featured_image.alt | escape }}" />
-                                      {% else %}
-                                        <div class="swatchFallback" data-target-src="">{{ color }}</div>
-                                      {% endif %}
-                                    {% endunless %}
-                                  </div>
-                                {% endfor %}
-                              </div>
-
-                              <div class="sizeFlex">
-                                <h6>Sweep size</h6>
-                                <ul class="size">
-                                  {%- assign size_values = '' -%}
-                                  {% for variant in product.variants %}
-                                    {% assign size_value = variant.option2 %}
-                                    {% if size_value != blank %}
-                                      {% unless size_values contains size_value %}
-                                        {% if size_values == '' %}
-                                          {% assign size_values = size_value %}
-                                        {% else %}
-                                          {% assign size_values = size_values | append: '||' | append: size_value %}
-                                        {% endif %}
-                                      {% endunless %}
-                                    {% endif %}
-                                  {% endfor %}
-                                  {% assign size_list = size_values | split: '||' %}
-                                  {% for s in size_list limit:2 %}
-                                    {% assign ds = s | split: '(' | last | remove: ')' | strip %}
-                                    <li{% if forloop.first %} class="active"{% endif %} data-raw-size="{{ s | escape }}">{{ ds }}</li>
-                                  {% endfor %}
-                                </ul>
-                              </div>
-                            </div>
-
-                            <div class="defaultDetails">
-                              <h4>{{ product.title }}</h4>
-                              <h3>
-                                <span>&#8377;</span>
-                                <span class="priceValue">
-                                  {{ product.variants.first.price | money_without_currency | split: '.' | first }}
-                                </span> Incl. Tax
-                              </h3>
-                            </div>
-                          </a>
-
-                          <script type="application/json" class="product-variants-json">
-                            {{ product.variants | json }}
-                          </script>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <a href="" class="product_details">
+                    <div class="colorTitleFlex">
+                      {% assign _color_values = '' %}
+                      {% for variant in product.variants %}
+                        {% assign color_value = variant.option1 %}
+                        {% if color_value != blank %}
+                          {% unless _color_values contains color_value %}
+                            {% if _color_values == '' %}
+                              {% assign _color_values = color_value %}
+                            {% else %}
+                              {% assign _color_values = _color_values | append: '||' | append: color_value %}
+                            {% endif %}
+                          {% endunless %}
+                        {% endif %}
                       {% endfor %}
-                    </div> 
+                      {% assign color_list = _color_values | split: '||' %}
 
-                    <!-- Pagination -->
-                    {% if paginate.pages > 1 %}
-                      <nav aria-label="Page navigation" class="mt-4">
-                        <ul class="pagination justify-content-center">
-                          <!-- Prev -->
-                          <li class="page-item {% if paginate.previous == nil %}disabled{% endif %}">
-                            {% if paginate.previous %}
-                              <a class="page-link" href="{{ paginate.previous.url }}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" fill="none" viewBox="0 0 21 20">
-                                  <path d="M18.5 10H2.5" stroke="#49516D" stroke-width="1.5"/>
-                                  <path d="M10.5 18L2.5 10L10.5 2" stroke="#49516D" stroke-width="1.5"/>
-                                </svg>
-                              </a>
+                      {% assign _size_values = '' %}
+                      {% for variant in product.variants %}
+                        {% assign size_value = variant.option2 %}
+                        {% if size_value != blank %}
+                          {% unless _size_values contains size_value %}
+                            {% if _size_values == '' %}
+                              {% assign _size_values = size_value %}
                             {% else %}
-                              <a class="page-link">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" fill="none" viewBox="0 0 21 20">
-                                  <path d="M18.5 10H2.5" stroke="#49516D" stroke-width="1.5"/>
-                                  <path d="M10.5 18L2.5 10L10.5 2" stroke="#49516D" stroke-width="1.5"/>
-                                </svg>
-                              </a>
+                              {% assign _size_values = _size_values | append: '||' | append: size_value %}
                             {% endif %}
-                          </li>
+                          {% endunless %}
+                        {% endif %}
+                      {% endfor %}
+                      {% assign size_list_header = _size_values | split: '||' %}
 
-                          <!-- Page numbers -->
-                          {% for part in paginate.parts %}
-                            {% if part.is_link %}
-                              <li class="page-item"><a class="page-link" href="{{ part.url }}">{{ part.title }}</a></li>
-                            {% elsif part.title == paginate.current_page %}
-                              <li class="page-item active"><a class="page-link" aria-current="page">{{ part.title }}</a></li>
-                            {% else %}
-                              <li class="page-item disabled"><span class="page-link">{{ part.title }}</span></li>
-                            {% endif %}
-                          {% endfor %}
+                      <h6>
+                        {{ color_list.size }}
+                        {% if color_list.size == 1 %}
+                          colour
+                        {% else %}
+                          colours
+                        {% endif %}
+                      </h6>
 
-                          <!-- Next -->
-                          <li class="page-item {% if paginate.next == nil %}disabled{% endif %}">
-                            {% if paginate.next %}
-                              <a class="page-link" href="{{ paginate.next.url }}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" fill="none" viewBox="0 0 21 20">
-                                  <path d="M2.5 10H18.5" stroke="#A1A1AA" stroke-width="1.5"/>
-                                  <path d="M10.5 18L18.5 10L10.5 2" stroke="#A1A1AA" stroke-width="1.5"/>
-                                </svg>
-                              </a>
-                            {% else %}
-                              <a class="page-link">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" fill="none" viewBox="0 0 21 20">
-                                  <path d="M2.5 10H18.5" stroke="#A1A1AA" stroke-width="1.5"/>
-                                  <path d="M10.5 18L18.5 10L10.5 2" stroke="#A1A1AA" stroke-width="1.5"/>
-                                </svg>
-                              </a>
-                            {% endif %}
-                          </li>
-                        </ul>
-                      </nav>
+                      <h6>
+                        {{ size_list_header.size }}
+                        {% if size_list_header.size == 1 %}
+                          size
+                        {% else %}
+                          sizes
+                        {% endif %}
+                      </h6>
+                    </div>
+
+                    <div class="hiddenDetails">
+                      <div class="colorFlex">
+                        {% for color in color_list %}
+                          <div
+                            class="colorImg{% if forloop.first %} active{% endif %}"
+                            data-color="{{ color | escape }}"
+                          >
+                            {%- assign swatch_found = false -%}
+                            {% for media in product.media %}
+                              {% assign media_alt = media.alt | default: '' | downcase %}
+                              {% assign color_key = color | default: '' | downcase %}
+                              {% if media_alt != '' and media_alt == color_key %}
+                                <img
+                                  src="{{ media.preview_image | img_url: '80x80' }}"
+                                  data-target-src="{{ media.preview_image | img_url: '600x' }}"
+                                  alt="{{ media.alt | escape }}"
+                                >
+                                {% assign swatch_found = true %}
+                                {% break %}
+                              {% endif %}
+                            {% endfor %}
+                            {% unless swatch_found %}
+                              {% if first_media %}
+                                <img
+                                  src="{{ first_media.preview_image | img_url: '80x80' }}"
+                                  data-target-src="{{ first_media.preview_image | img_url: '600x' }}"
+                                  alt="{{ first_media.alt | escape }}"
+                                >
+                              {% elsif product.featured_image %}
+                                <img
+                                  src="{{ product.featured_image | img_url: '80x80' }}"
+                                  data-target-src="{{ product.featured_image | img_url: '600x' }}"
+                                  alt="{{ product.featured_image.alt | escape }}"
+                                >
+                              {% else %}
+                                <div class="swatchFallback" data-target-src="">{{ color }}</div>
+                              {% endif %}
+                            {% endunless %}
+                          </div>
+                        {% endfor %}
+                      </div>
+                      {%- assign opt2_name = product.options[1] | default: '' -%}
+                      {%- assign opt2_key = opt2_name | downcase -%}
+                      {%- if opt2_key contains 'sweep' -%}
+                        <div class="sizeFlex">
+                          <h6>Sweep size</h6>
+                          <ul class="size">
+                            {%- assign size_values = '' -%}
+                            {% for variant in product.variants %}
+                              {% assign size_value = variant.option2 %}
+                              {% if size_value != blank %}
+                                {% unless size_values contains size_value %}
+                                  {% if size_values == '' %}
+                                    {% assign size_values = size_value %}
+                                  {% else %}
+                                    {% assign size_values = size_values | append: '||' | append: size_value %}
+                                  {% endif %}
+                                {% endunless %}
+                              {% endif %}
+                            {% endfor %}
+                            {% assign size_list = size_values | split: '||' %}
+                            {% for s in size_list limit: 2 %}
+                              {% assign ds = s | split: '(' | last | remove: ')' | remove: '"' | remove: "'" | strip %}
+                              <li
+                                {% if forloop.first %}
+                                  class="active"
+                                {% endif %}
+                                data-raw-size="{{ s | escape }}"
+                              >
+                                {{ ds }}
+                              </li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                      {%- endif -%}
+                    </div>
+
+                    <div class="defaultDetails">
+                      <h4>{{ product.title }}</h4>
+                      <h3>
+                        <span>&#8377;</span>
+                        <span class="priceValue">
+                          {{ product.variants.first.price | money_without_currency | split: '.' | first }}
+                        </span>
+                        Incl. Tax
+                      </h3>
+                    </div>
+                  </a>
+
+                  <script type="application/json" class="product-variants-json">
+                    {{ product.variants | json }}
+                  </script>
+                </div>
+              {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if paginate.pages > 1 %}
+              <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                  <!-- Prev -->
+                  <li class="page-item {% if paginate.previous == nil %}disabled{% endif %}">
+                    {% if paginate.previous %}
+                      <a class="page-link" href="{{ paginate.previous.url }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" fill="none" viewBox="0 0 21 20">
+                          <path d="M18.5 10H2.5" stroke="#49516D" stroke-width="1.5"/>
+                          <path d="M10.5 18L2.5 10L10.5 2" stroke="#49516D" stroke-width="1.5"/>
+                        </svg>
+                      </a>
+                    {% else %}
+                      <a class="page-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" fill="none" viewBox="0 0 21 20">
+                          <path d="M18.5 10H2.5" stroke="#49516D" stroke-width="1.5"/>
+                          <path d="M10.5 18L2.5 10L10.5 2" stroke="#49516D" stroke-width="1.5"/>
+                        </svg>
+                      </a>
                     {% endif %}
-                  {% endpaginate %}
+                  </li>
 
-                </div>
+                  <!-- Page numbers -->
+                  {% for part in paginate.parts %}
+                    {% if part.is_link %}
+                      <li class="page-item">
+                        <a class="page-link" href="{{ part.url }}">{{ part.title }}</a>
+                      </li>
+                    {% elsif part.title == paginate.current_page %}
+                      <li class="page-item active">
+                        <a class="page-link" aria-current="page">{{ part.title }}</a>
+                      </li>
+                    {% else %}
+                      <li class="page-item disabled">
+                        <span class="page-link">{{ part.title }}</span>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
 
-
-            </div>
+                  <!-- Next -->
+                  <li class="page-item {% if paginate.next == nil %}disabled{% endif %}">
+                    {% if paginate.next %}
+                      <a class="page-link" href="{{ paginate.next.url }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" fill="none" viewBox="0 0 21 20">
+                          <path d="M2.5 10H18.5" stroke="#A1A1AA" stroke-width="1.5"/>
+                          <path d="M10.5 18L18.5 10L10.5 2" stroke="#A1A1AA" stroke-width="1.5"/>
+                        </svg>
+                      </a>
+                    {% else %}
+                      <a class="page-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="20" fill="none" viewBox="0 0 21 20">
+                          <path d="M2.5 10H18.5" stroke="#A1A1AA" stroke-width="1.5"/>
+                          <path d="M10.5 18L18.5 10L10.5 2" stroke="#A1A1AA" stroke-width="1.5"/>
+                        </svg>
+                      </a>
+                    {% endif %}
+                  </li>
+                </ul>
+              </nav>
+            {% endif %}
+          {% endpaginate %}
         </div>
-        <!-- whishlist Toast -->
-        <div class="tooltip-msg">
-            <div class="container">
-                <div class="tooltip-msg-inn">
-                    <span class="tooltip-text">Product successfully added to 'Project - 2'</span>
-                    <span class="tooltip-close">
-                        <img src="{{ 'img_icons_x.svg' | asset_url }}" alt="">
-                    </span>
-                </div>
-            </div>
-        </div>
-    </section>
-     <!-- Popup for New Project -->
-    <div class="popup-overlay">
-        <div class="popup-box">
-            <h4>Create a Wishlist</h4>
-            <p>Enter the List name</p>
-            <div class="form-group">
-                <input type="text" id="new-wishlist-name" placeholder="Enter wishlist name" />
-                <div class="wishlist-error-msg ">Please enter a wishlist name</div>
-            </div>
-            <div class="btn-wrap">
-                <button id="closePopup-wishlist" class="btns btnWhite">
-                    <div class="bg"></div>
-                    <div class="btnText">
-                        <span>Cancel</span>
-                        <span>Cancel</span>
-                    </div>
-                </button>
-                <button id="add-wishlist" class="btns btnDark">
-                    <div class="bg"></div>
-                    <div class="btnText">
-                        <span>Create</span>
-                        <span>Create</span>
-                    </div>
-                </button>
-            </div>
-        </div>
+      </div>
     </div>
+    <!-- whishlist Toast -->
+    <div class="tooltip-msg">
+      <div class="container">
+        <div class="tooltip-msg-inn">
+          <span class="tooltip-text">Product successfully added to 'Project - 2'</span>
+          <a href="javascript:" class="undoBtn">UNDO</a>
+          <span class="tooltip-close">
+            <img src="{{ 'img_icons_x.svg' | asset_url }}" alt="">
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Popup for New Project -->
+  <div class="popup-overlay">
+    <div class="popup-box">
+      <h4>Create a Wishlist</h4>
+      <p>Enter the List name</p>
+      <div class="form-group">
+        <input type="text" id="new-wishlist-name" placeholder="Enter wishlist name">
+        <div class="wishlist-error-msg ">Please enter a wishlist name</div>
+      </div>
+      <div class="btn-wrap">
+        <button id="closePopup-wishlist" class="btns btnWhite">
+          <div class="bg"></div>
+          <div class="btnText">
+            <span>Cancel</span>
+            <span>Cancel</span>
+          </div>
+        </button>
+        <button id="add-wishlist" class="btns btnDark">
+          <div class="bg"></div>
+          <div class="btnText">
+            <span>Create</span>
+            <span>Create</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
 {% endif %}
-

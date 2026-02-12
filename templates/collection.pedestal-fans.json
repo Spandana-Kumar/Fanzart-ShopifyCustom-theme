@@ -2,7 +2,7 @@
   "name": "Pedestal Fans",
   "sections": {
     "banner": {
-      "type": "collection-banner"
+      "type": "collection-banner-standingfan"
     },
     "showcase": {
       "type": "collection-showcase"

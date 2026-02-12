@@ -1,5 +1,5 @@
 {% if cart.item_count == 0 %}
-   <section class="cart__empty__wrapper">
+  <section class="cart__empty__wrapper">
     <div class="container">
       <div class="empty_flex">
         {% if section.settings.empty_image != blank %}
@@ -7,13 +7,13 @@
             src="{{ section.settings.empty_image | image_url }}"
             class="img"
             alt="Empty cart"
-          />
+          >
         {% else %}
           <img
             src="{{ 'cart-empty.png' | asset_url }}"
             class="img"
             alt="Empty cart"
-          />
+          >
         {% endif %}
 
         <div class="empty_text">
@@ -37,735 +37,888 @@
     </div>
   </section>
 
-
-
 {% else %}
   <section class="cart__wrapper">
-          <div class="container">
-              <div class="row">
-                     <div class="col-12 col-md-7 col-lg-8 col-xl-7">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 col-md-7 col-lg-8 col-xl-7">
           <div class="cart_title">
             <h2>Your cart</h2>
-            <div class="count"><span>{{ cart.item_count }}</span> Products</div>
+            {% assign product_count = cart.item_count %}
+            {% for item in cart.items %}
+              {% if item.product.title == 'Installation Fee' %}
+                {% assign product_count = product_count | minus: 1 %}
+              {% endif %}
+            {% endfor %}
+            <div class="count">
+              <span>{{ product_count }}</span> Products
+            </div>
           </div>
 
           <!-- Product Card -->
           {% for item in cart.items %}
-
-            {%- assign housing = item.variant.metafields.custom.housing -%}
-            {%- assign blade = item.variant.metafields.custom.blade -%}
-            {%- assign color = item.variant.option1 -%}
-            {% assign sweep = item.properties['Sweep'] | strip %}
-            {% assign watt = item.properties['Watt'] | strip %}
-
-            {%- comment -%}
-              Build custom tracking key (Colour + Sweep + Watt only)
-            {%- endcomment -%}
-            {% assign tracking_key = color | append: '-' | append: sweep | append: '-' | append: watt %}
-
-            <div class="product_card" <div class="product_card" 
-              data-tracking-key="{{ tracking_key }}"
-              data-line="{{ forloop.index }}"
-              data-variant-id="{{ item.variant_id }}">
-              <div class="product_img">
-                <img src="{{ item.image | img_url: 'medium' }}" alt="{{ item.product.title }}" />
+            {% if item.product.title == 'Installation Fee' %}
+              <div class="cart__item installation-item">
+                <span class="cart__item-title">{{ item.product.title }}</span>
+                <span class="cart__item-price">{{ item.final_line_price | money }}</span>
               </div>
-              <div class="contents_flex">
-                <div class="deatails">
-                  <h3>{{ item.product.title }}</h3>
-                  <div class="inner_flex">
-                    <ul class="product_detail_list">
+            {% else %}
+              {%- assign housing = item.variant.metafields.custom.housing -%}
+              {%- assign blade = item.variant.metafields.custom.blade -%}
+              {%- assign color = item.variant.option1 -%}
+              {% assign sweep = item.properties.Sweep | strip %}
+              {% assign watt = item.properties.Watt | strip %}
 
-                      <!-- COLOUR -->
-                      {% if housing or blade %}
-                        <li>
-                          <h5>COLOUR</h5>
-                          <h6>
-                            {% if housing %}Housing: {{ housing }}<br>{% endif %}
-                            {% if blade %}Blades: {{ blade }}{% endif %}
-                          </h6>
-                        </li>
-                      {% elsif color %}
-                        <li>
-                          <h5>COLOUR</h5>
-                          <h6>{{ color }}</h6>
-                        </li>
-                      {% endif %}
+              {%- comment -%}
+                Build custom tracking key (Colour + Sweep + Watt only)
+              {%- endcomment -%}
+              {% assign tracking_key = color | append: '-' | append: sweep | append: '-' | append: watt %}
 
-                      <!-- SWEEP -->
-                      {% if sweep != blank %}
-                        <li>
-                          <h5>SWEEP</h5>
-                          <h6>{{ sweep }}</h6>
-                        </li>
-                      {% endif %}
-
-                      <!-- WATT -->
-                      {% if watt != blank %}
-                        <li>
-                          <h5>WATT</h5>
-                          <h6>{{ watt }}</h6>
-                        </li>
-                      {% endif %}
-                      
-
-                      <!-- Other properties -->
-                      {% for property in item.properties %}
-                        {% assign label = property.first %}
-                        {% assign value = property.last %}
-                        {% assign label_down = label | downcase %}
-
-                        {% unless label_down contains 'sweep' or
-                                  label_down == 'watt' or
-                                  label_down == 'custom image' or
-                                  label_down == 'custom price' or
-                                  label_down == 'custom label' or
-                                  label_down == 'colour' or
-                                  label_down == 'color' or
-                                  label_down == 'add on price' or
-                                  value == blank %}
-
-                          {% assign label_final = label | replace: 'color', 'colour' | replace: 'Color', 'Colour' | upcase %}
-
+              <div
+                class="product_card"
+                data-tracking-key="{{ tracking_key }}"
+                data-line="{{ forloop.index }}"
+                data-variant-id="{{ item.variant_id }}"
+              >
+                <div class="product_img">
+                  <img src="{{ item.image | img_url: 'medium' }}" alt="{{ item.product.title }}">
+                </div>
+                <div class="contents_flex">
+                  <div class="deatails">
+                    <h3>{{ item.product.title }}</h3>
+                    <div class="inner_flex">
+                      <ul class="product_detail_list">
+                        <!-- COLOUR -->
+                        {% if housing or blade %}
                           <li>
-                            <h5>{{ label_final }}</h5>
-                            <h6>{{ value }}</h6>
+                            <h5>COLOUR</h5>
+                            <h6>
+                              {% if housing -%}
+                                Housing: {{ housing -}}
+                                <br>
+                              {% endif %}
+                              {% if blade %}Blades: {{ blade }}{% endif %}
+                            </h6>
                           </li>
-                        {% endunless %}
-                      {% endfor %}
-                    </ul>
+                        {% elsif color %}
+                          <li>
+                            <h5>COLOUR</h5>
+                            <h6>{{ color }}</h6>
+                          </li>
+                        {% endif %}
 
-                    <div class="actionBtn_flex">
-                      <button class="actionBtn" onclick="toggleLike(this)">
-                        <span class="img"></span>
-                        <span>Wishlist</span>
-                      </button>
+                        <!-- SWEEP -->
+                        {% if sweep != blank %}
+                          <li>
+                            <h5>SWEEP</h5>
+                            <h6>{{ sweep }}</h6>
+                          </li>
+                        {% endif %}
 
-                      <button
-                        class="actionBtn remove-btn"
-                        data-bs-toggle="modal"
-                        data-bs-target="#removeProduct"
-                        data-product-id="{{ item.key }}"
-                        data-tracking-key="{{ tracking_key }}"
-                        data-product-title="{{ item.product.title }}"
-                        data-product-image="{{ item.image | img_url: 'medium' }}"
-                        data-product-price="{{ item.final_line_price | money_without_trailing_zeros }}"
-                      >
-                        <img src="{{ 'img_cart_trash.svg' | asset_url }}" alt="Remove" />
-                        <span>Remove</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div class="count_prices_flex">
-                  <div class="counter">
-                    <form method="post" action="/cart/change">
-                      <input type="hidden" name="id" value="{{ item.key }}">
+                        <!-- WATT -->
+                        {% if watt != blank %}
+                          <li>
+                            <h5>WATT</h5>
+                            <h6>{{ watt }}</h6>
+                          </li>
+                        {% endif %}
 
-                      <!-- Decrease -->
-                      <button class="decrease" 
-                        {% if item.quantity == 1 %}disabled{% endif %}
-                        onclick="this.parentNode.querySelector('[name=quantity]').value={{ item.quantity | minus: 1 }}">
-                        <img src="{{ 'img_cart_minus.svg' | asset_url }}" class="icon" alt="-" />
-                      </button>
+                        <!-- Other properties -->
+                        {% for property in item.properties %}
+                          {% assign label = property.first %}
+                          {% assign value = property.last %}
+                          {% assign label_down = label | downcase %}
 
-                      <span class="count">{{ item.quantity }}</span>
+                          {% unless label_down contains 'sweep'
+                            or label_down == 'watt'
+                            or label_down == 'custom image'
+                            or label_down == 'custom price'
+                            or label_down == 'custom label'
+                            or label_down == 'colour'
+                            or label_down == 'color'
+                            or label_down == 'add on price'
+                            or value == blank
+                          %}
+                            {% assign label_final = label
+                              | replace: 'color', 'colour'
+                              | replace: 'Color', 'Colour'
+                              | upcase
+                            %}
 
-                      <!-- Increase -->
-                    <button class="increase"
-                      data-tracking-key="{{ tracking_key }}"
-                      data-available="{{ item.variant.inventory_quantity }}"
-                      {% if item.variant.inventory_management and item.variant.inventory_policy == 'deny' and item.quantity >= item.variant.inventory_quantity %}
-                        disabled
-                      {% endif %}>
-                      <img src="{{ 'img_cart_plus.svg' | asset_url }}" class="icon" alt="+" />
-                    </button>
-                      <input type="hidden" name="quantity" value="{{ item.quantity }}" />
-                    </form>
-                  </div>
+                            <li>
+                              <h5>{{ label_final }}</h5>
+                              <h6>{{ value }}</h6>
+                            </li>
+                          {% endunless %}
+                        {% endfor %}
+                      </ul>
 
-                  <div class="prices">
-                    <div class="mrpItem">
-                      <div class="mrp">
-                        <h6>MRP:</h6>
-                        <div>
-                          {% assign addon_price = item.properties["Add On Price"] %}
-                          {% if addon_price %}
-                            {% assign addon_price_paise = addon_price | times: 100 %}
-                            {% assign addon_total = item.final_line_price | plus: addon_price_paise %}
-                            <span>&#8377;</span><span>{{ addon_total | money_without_currency | split: '.' | first }}</span>
-                          {% else %}
-                            <span>&#8377;</span><span>{{ item.final_line_price | money_without_currency | split: '.' | first }}</span>
-                          {% endif %}
+                      <div class="actionBtn_flex">
+                        <div class="wishList_wrap cart_wishlist_dropdown" id="wishListBtn">
+                          <button
+                            class="likes actionBtn add-to-wishlist"
+                            data-id="{{ item.product.id }}"
+                            data-variant-id="{{ item.variant_id }}"
+                            data-title="{{ item.product.title | escape }}"
+                            data-product-handle="{{ item.product.handle }}"
+                            data-image="{{ item.image | img_url: '600x' }}"
+                            data-price="{{ item.final_line_price | money }}"
+                            data-handle="{{ item.product.handle }}"
+                            aria-label="Add to wishlist"
+                          >
+                            <span class="img"></span>
+                            <span>Wishlist</span>
+                          </button>
+
+                          <div class="wishlist-dropdown">
+                            <div class="wishlist-inner">
+                              <div class="list"></div>
+                              <div class="list-create">
+                                <div class="create-btn">Create a New Project</div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
+
+                        <button
+                          class="actionBtn remove-btn"
+                          data-bs-toggle="modal"
+                          data-bs-target="#removeProduct"
+                          data-product-id="{{ item.key }}"
+                          data-tracking-key="{{ tracking_key }}"
+                          data-product-title="{{ item.product.title }}"
+                          data-product-image="{{ item.image | img_url: 'medium' }}"
+                          data-product-price="{{ item.final_line_price | money_without_trailing_zeros }}"
+                        >
+                          <img src="{{ 'img_cart_trash.svg' | asset_url }}" alt="Remove">
+                          <span>Remove</span>
+                        </button>
                       </div>
-                      <p>(Inclusive all of taxes)</p>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
+                  <div class="count_prices_flex">
+                    <div class="counter">
+                      <form method="post" action="/cart/change">
+                        <input type="hidden" name="id" value="{{ item.key }}">
 
-                  <div class="col-12 col-md-5 col-lg-4 col-xl-4 offset-xl-1">
-                      <div class="order__summary__wrapper">
-                       {% assign total_mrp = 0 %}
-                          {% for item in cart.items %}
-                            {% assign addon_price = item.properties["Add On Price"] %}
+                        <button
+                          class="decrease"
+                          {% if item.quantity == 1 %}
+                            disabled
+                          {% endif %}
+                        >
+                          <img src="{{ 'img_cart_minus.svg' | asset_url }}" class="icon" alt="-">
+                        </button>
+
+                        <span class="count">{{ item.quantity }}</span>
+
+                        <!-- Increase -->
+                        <button
+                          class="increase"
+                          data-tracking-key="{{ tracking_key }}"
+                          data-available="{{ item.variant.inventory_quantity }}"
+                          {% if item.variant.inventory_management
+                            and item.variant.inventory_policy == 'deny'
+                            and item.quantity >= item.variant.inventory_quantity
+                          %}
+                            disabled
+                          {% endif %}
+                        >
+                          <img src="{{ 'img_cart_plus.svg' | asset_url }}" class="icon" alt="+">
+                        </button>
+                        <input type="hidden" name="quantity" value="{{ item.quantity }}">
+                      </form>
+                    </div>
+
+                    <div class="prices">
+                      <div class="mrpItem">
+                        <div class="mrp">
+                          <h6>MRP:</h6>
+                          <div>
+                            {% assign addon_price = item.properties['Add On Price'] %}
                             {% if addon_price %}
                               {% assign addon_price_paise = addon_price | times: 100 %}
                               {% assign addon_total = item.final_line_price | plus: addon_price_paise %}
-                              {% assign total_mrp = total_mrp | plus: addon_total %}
+                              <span>&#8377;</span
+                              ><span>{{ addon_total | money_without_currency | split: '.' | first }}</span>
                             {% else %}
-                              {% assign total_mrp = total_mrp | plus: item.final_line_price %}
+                              <span>&#8377;</span
+                              ><span>{{ item.final_line_price | money_without_currency | split: '.' | first }}</span>
                             {% endif %}
-                          {% endfor %}
-
-                          <h3>Order Summary</h3>
-                          <div class="product_mrp_flex">
-                             <div class="inner_flex">
-                                <div class="item">MRP ({{ cart.item_count }} Products)</div>
-                                <div class="rate">
-                                  <span>&#8377;</span><span id="orderMrp">{{ total_mrp | money_without_currency | split: '.' | first }}</span>
-                                </div>
-                              </div>
-
-                              <div class="inner_flex">
-                                  <div class="item">Shipping</div>
-                                  <div class="rate">Free</div>
-                              </div>
                           </div>
-
-                          <div class="availability_wrap">
-                              <h4>Check availability for installation</h4>
-                              
-                              <div class="pinCode">
-                                <input type="text" id="pincodeInput" class="controls" placeholder="Pin code" maxlength="6" inputmode="numeric">
-                                <div class="successText" style="display:none;">Installation service is available.</div>
-                                <div class="errorText" style="display:none;">Installation service is unavailable.</div>
-                              </div>
-
-                              <div class="installation">
-                                <div class="checkbox_wrap">
-                                  <div class="checkbox">
-                                    <input type="checkbox" name="checkboxs" id="checkboxs" class="cstm-chk">
-                                    <label for="checkboxs">Add Installation Fee</label>
-                                  </div>
-                                  <div class="tooltip_wrap">
-                                    <img src="{{ 'img_cart_Info.svg' | asset_url }}" class="info" alt="" />
-                                   
-                                    <div class="tooltipText">
-                                            {{ shop.metafields.custom.installation_tooltip }}
-                                            <a href="javascript:void();" data-bs-toggle="modal"
-                                                data-bs-target="#modalTooltip">Read More.</a>
-                                        </div>
-                                  </div>
-                                </div>
-                                <div class="installationFee">
-                                  <span>&#8377;</span><span id="installationFeeValue">0</span>
-                                </div>
-                              </div>
-                            </div>
-
-
-
-                          <div class="total_price_flex">
-                              <div class="total">
-                                  <h4>Total</h4>
-                                  <div>
-                                      <span>&#8377;</span><span id="totalValue">{{ initial_total_cents | money_without_currency | split: '.' | first }}</span>
-                                  </div>
-                              </div>
-
-                           
-                          </div>
-
-
-                          <div class="floation_button">
-                              <!-- Only for Mobile (Desktop screen not required only its show in mobile) -->
-                              <div class="mrpMobile">
-                                  <h4>
-                                      <span class="mrp">MRP</span>
-                                      <span>&#8377;</span><span id="mrpMobileValue">{{ initial_total_cents | money_without_currency | split: '.' | first }}</span>
-                                  </h4>
-                              </div>
-                              <!-- Only for Mobile -->
-                              <a href="javascript:" class="btns btnDark btnProceed" data-bs-toggle="modal"
-                                  data-bs-target="#loginModal">
-                                  <div class="bg"></div>
-                                  <div class="btnText">
-                                      <span>Proceed</span>
-                                      <span>Proceed</span>
-                                  </div>
-                              </a>
-                          </div>
+                        </div>
+                        <p>(Inclusive all of taxes)</p>
                       </div>
+                    </div>
                   </div>
+                </div>
               </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <div class="col-12 col-md-5 col-lg-4 col-xl-4 offset-xl-1">
+          <div class="order__summary__wrapper">
+            {% assign total_mrp = 0 %}
+            {% assign summary_product_count = 0 %}
+            {% for item in cart.items %}
+              {% if item.product.title == 'Installation Fee' %}
+                {%- comment -%} Skip installation fee from total {%- endcomment -%}
+              {% else %}
+                {% assign summary_product_count = summary_product_count | plus: 1 %}
+                {% assign addon_price = item.properties['Add On Price'] %}
+                {% if addon_price %}
+                  {% assign addon_price_paise = addon_price | times: 100 %}
+                  {% assign addon_total = item.final_line_price | plus: addon_price_paise %}
+                  {% assign total_mrp = total_mrp | plus: addon_total %}
+                {% else %}
+                  {% assign total_mrp = total_mrp | plus: item.final_line_price %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+
+            <h3>Order Summary</h3>
+            <div class="product_mrp_flex">
+              <div class="inner_flex">
+                <div class="item">MRP ({{ summary_product_count }} Products)</div>
+                <div class="rate">
+                  <span>&#8377;</span
+                  ><span id="orderMrp">{{ total_mrp | money_without_currency | split: '.' | first }}</span>
+                </div>
+              </div>
+
+              <div class="inner_flex">
+                <div class="item">Shipping</div>
+                <div class="rate">Free</div>
+              </div>
+            </div>
+
+            <div class="availability_wrap">
+              <h4>Check availability for installation</h4>
+
+              <div class="pinCode">
+                <input
+                  type="text"
+                  id="pincodeInput"
+                  class="controls"
+                  placeholder="Pin code"
+                  maxlength="6"
+                  inputmode="numeric"
+                >
+                <div class="successText" style="display:none;">Installation service is available.</div>
+                <div class="errorText" style="display:none;">Installation service is unavailable.</div>
+              </div>
+
+              <div class="installation">
+                <div class="checkbox_wrap">
+                  <div class="checkbox">
+                    <input type="checkbox" name="checkboxs" id="checkboxs" class="cstm-chk">
+                    <label for="checkboxs">Add Installation Fee</label>
+                  </div>
+                  <div class="tooltip_wrap">
+                    <img src="{{ 'img_cart_Info.svg' | asset_url }}" class="info" alt="">
+
+                    <div class="tooltipText">
+                      {{ shop.metafields.custom.installation_tooltip }}
+                      <a
+                        href="javascript:void();"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalTooltip"
+                        >Read More.</a
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div class="installationFee"><span>&#8377;</span><span id="installationFeeValue">0</span></div>
+              </div>
+            </div>
+
+            <div class="total_price_flex">
+              <div class="total">
+                <h4>Total</h4>
+                <div>
+                  <span>&#8377;</span
+                  ><span id="totalValue">{{ initial_total_cents | money_without_currency | split: '.' | first }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="floation_button">
+              <!-- Only for Mobile (Desktop screen not required only its show in mobile) -->
+              <div class="mrpMobile">
+                <h4>
+                  <span class="mrp">Total</span>
+                  <span>&#8377;</span
+                  ><span id="mrpMobileValue">
+                    {{- initial_total_cents | money_without_currency | split: '.' | first -}}
+                  </span>
+                </h4>
+              </div>
+              <!-- Only for Mobile -->
+              <a
+                href="javascript:"
+                class="btns btnDark btnProceed"
+                id="proceedToPayBtn"
+              >
+                <div class="bg"></div>
+                <div class="btnText">
+                  <span>Proceed to Pay</span>
+                  <span>Proceed to Pay</span>
+                </div>
+              </a>
+            </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <!-- whishlist Toast -->
+    <div class="tooltip-msg">
+      <div class="container">
+        <div class="tooltip-msg-inn">
+          <span class="tooltip-text">Product successfully added to 'Project - 2'</span>
+          <a href="javascript:" class="undoBtn">UNDO</a>
+          <span class="tooltip-close">
+            <img src="{{ 'img_icons_x.svg' | asset_url }}" alt="">
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Popup for New Project -->
+    <div class="popup-overlay">
+      <div class="popup-box">
+        <h4>Create a Wishlist</h4>
+
+        <div class="form-group">
+          <input type="text" id="new-wishlist-name" placeholder="Enter wishlist name">
+          <div class="wishlist-error-msg ">Please enter a wishlist name</div>
+        </div>
+        <div class="btn-wrap">
+          <button id="closePopup-wishlist" class="btns btnWhite">
+            <div class="bg"></div>
+            <div class="btnText">
+              <span>Cancel</span>
+              <span>Cancel</span>
+            </div>
+          </button>
+          <button id="add-wishlist" class="btns btnDark">
+            <div class="bg"></div>
+            <div class="btnText">
+              <span>Create</span>
+              <span>Create</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
   <style>
-{% render 'sml-client-css' %}
-</style>
-{% render 'sml-main' %}
-<script>
-{% render 'sml-client-js' %}
-</script>
+    {% render 'sml-client-css' %}
+  </style>
+  {% render 'sml-main' %}
+  <script>
+    {% render 'sml-client-js' %}
+  </script>
 
-<form id="customer_login" style="display:none !important;"></form>
+  <form id="customer_login" style="display:none !important;"></form>
 
+  <!-- Login Modal -->
+  <div
+    class="modal logIn_modal fade"
+    id="loginModal"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="loginModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+          <img src="{{ 'img_cart_close.svg' | asset_url }}" alt="close">
+        </button>
+        <div class="modal-body">
+          <div class="logIn_bg">
+            <img src="{{ 'img_cart_logIn.png' | asset_url }}" alt="logIn">
+          </div>
 
+          <div class="logIn_form">
+            <div class="inner_wrap" id="logInBlock">
+              <div class="title">
+                <h3>Log In</h3>
+                <p>Get access to your orders</p>
+              </div>
 
-<!-- Login Modal -->
- <div class="modal logIn_modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <img src="{{ 'img_cart_close.svg' | asset_url }}" alt="close" />
-                    
-                </button>
-                <div class="modal-body">
-                    <div class="logIn_bg">
-                        <img src="{{ 'img_cart_logIn.png' | asset_url }}" alt="logIn" />
-                    </div>
-
-                    <div class="logIn_form">
-                        <div class="inner_wrap" id="logInBlock">
-                            <div class="title">
-                                <h3>Log In</h3>
-                                <p>Get access to your orders</p>
-                            </div>
-
-                            <form action="" class="form" >
-                                <div class="logIn_field">
-                                    <label for="phone">Enter 10 digit Mobile Number</label>
-                                    <input type="text" class="controls" name="phone" id="phone" />
-                                    <div class="waring" id="warningMsg">Please enter a valid 10-digit mobile number.
-                                    </div>
-                                </div>
-                                <button type="button" id="logInNum" class="btns btnDark">
-                                    <div class="bg"></div>
-                                    <div class="btnText">
-                                        <span>Get Verification Code</span>
-                                        <span>Get Verification Code</span>
-                                    </div>
-                                </button>
-
-                                <div class="deviderLine">
-                                    <div class="line"></div>
-                                    <div class="text">or</div>
-                                    <div class="line"></div>
-                                </div>
-
-                                <button type="button" class="btns btnWhite" id="guestCheckoutBtn">
-                                    <div class="bg"></div>
-                                    <div class="btnText">
-                                        <span>Checkout as a Guest</span>
-                                        <span>Checkout as a Guest</span>
-                                    </div>
-                                </button>
-                            </form>
-
-                            <div class="contents">
-                                <p>By logging in, you agree to our</p>
-                                <ul class="linksList">
-                                    <li><a href="{{ pages['terms-and-conditions'].url }}">Terms and Conditions</a></li>
-                                    <li><span>&</span></li>
-                                    <li><a href="{{ pages['privacy-policy'].url }}">Privacy Policy</a></li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="otp_wrapper" id="otpBlock" style="display:none;">
-                            <div class="title">
-                                <h3>Verify OTP</h3>
-                               <p>Provide OTP sent to <strong id="displayNumber"></strong> <a href="#" id="editNumber">Edit</a></p>
-                            </div>
-                            <form action="" id="otpForm">
-                                <div class="logIn_field">
-                                    <label for="otpInputs">Enter the verification code here</label>
-                                    <div class="otp_inputs" id="otpInputs">
-                                        <input type="text" class="otpControls" maxlength="1" />
-                                        <input type="text" class="otpControls" maxlength="1" />
-                                        <input type="text" class="otpControls" maxlength="1" />
-                                        <input type="text" class="otpControls" maxlength="1" />
-                                    </div>
-                                    
-                                      <div id="otpErrorMsg" style="color:red; display:none; font-size:12px; margin-top:5px;">
-                                        Invalid OTP. Please try again.
-                                      </div>
-                                </div>
-
-                                <p class="resendCounter">
-                                  Didn't get the code? Resend in <span id="resendTimer">00:30</span>
-                                </p>
-                                <p class="resend_text" style="display:none;">Didn't get the code? <br>
-                                    <a href="#" id="resendSMS">Resend code on SMS</a>
-                                </p>
-                            </form>
-                            <div class="contents">
-                                <p>By logging in, you agree to our</p>
-                                <ul class="linksList">
-                                    <li><a href="{{ pages['terms-and-conditions'].url }}">Terms and Conditions</a></li>
-                                    <li><span>&</span></li>
-                                    <li><a href="{{ pages['privacy-policy'].url }}">Privacy Policy</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="email_wrapper inner_wrap" id="emailBlock" style="display:none;">
-                          <div class="title">
-                              <h3>Enter Your Email</h3>
-                              <p>We need your email to complete your login</p>
-                          </div>
-                          <form id="emailForm">
-                              <div class="logIn_field">
-                                  <label for="userEmail">Email Address</label>
-                                  <input type="email" class="controls" name="userEmail" id="userEmail" placeholder="Enter your email" required>
-                              </div>
-                              <button type="submit" id="submitEmail" class="btns btnDark">
-                                  <div class="bg"></div>
-                                  <div class="btnText">
-                                      <span>Done</span>
-                                      <span>Done</span>
-                                  </div>
-                              </button>
-                          </form>
-                      </div>
-
-                        
-                    </div>
+              <form action="" class="form">
+                <div class="logIn_field">
+                  <label for="phone">Enter 10 digit Mobile Number</label>
+                  <input type="text" class="controls" name="phone" id="phone">
+                  <div class="waring" id="warningMsg">Please enter a valid 10-digit mobile number.</div>
                 </div>
+                <button type="button" id="logInNum" class="btns btnDark">
+                  <div class="bg"></div>
+                  <div class="btnText">
+                    <span>Get Verification Code</span>
+                    <span>Get Verification Code</span>
+                  </div>
+                </button>
+
+                <div class="deviderLine">
+                  <div class="line"></div>
+                  <div class="text">or</div>
+                  <div class="line"></div>
+                </div>
+
+                <button type="button" class="btns btnWhite" id="guestCheckoutBtn">
+                  <div class="bg"></div>
+                  <div class="btnText">
+                    <span>Checkout as a Guest</span>
+                    <span>Checkout as a Guest</span>
+                  </div>
+                </button>
+              </form>
+
+              <div class="contents">
+                <p>By logging in, you agree to our</p>
+                <ul class="linksList">
+                  <li><a href="{{ pages['terms-and-conditions'].url }}">Terms and Conditions</a></li>
+                  <li><span>&</span></li>
+                  <li><a href="{{ pages['privacy-policy'].url }}">Privacy Policy</a></li>
+                </ul>
+              </div>
             </div>
-        </div>
-    </div>
-  
-<div class="modal modal_remove fade" id="removeProduct" data-bs-backdrop="static" data-bs-keyboard="false"
-  tabindex="-1" aria-labelledby="removeProductLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      
-      <div class="modal-header">
-        <h1 class="modal-title" id="removeProductLabel">
-          Are you sure you want to remove this product from cart?
-        </h1>
-      </div>
 
-      <div class="modal-body">
-        <div class="product_remove">
-          <img src="" id="modal-product-image" class="img" alt="Product image" />
-          <div class="contents">
-            <h5 id="modal-product-title">Product Name</h5>
-            <p>Carved in wood. Composed in silence.</p>
-            <div class="mrp">
-              <h6>MRP: <span>&#8377;</span><span id="modal-product-price">0</span></h6>
-              <p>(Inclusive all of taxes)</p>
+            <div class="otp_wrapper" id="otpBlock" style="display:none;">
+              <div class="title">
+                <h3>Verify OTP</h3>
+                <p>Provide OTP sent to <strong id="displayNumber"></strong> <a href="#" id="editNumber">Edit</a></p>
+              </div>
+              <form action="" id="otpForm">
+                <div class="logIn_field">
+                  <label for="otpInputs">Enter the verification code here</label>
+                  <div class="otp_inputs" id="otpInputs">
+                    <input type="text" class="otpControls" maxlength="1">
+                    <input type="text" class="otpControls" maxlength="1">
+                    <input type="text" class="otpControls" maxlength="1">
+                    <input type="text" class="otpControls" maxlength="1">
+                  </div>
+
+                  <div id="otpErrorMsg" style="color:red; display:none; font-size:12px; margin-top:5px;">
+                    Invalid OTP. Please try again.
+                  </div>
+                </div>
+
+                <p class="resendCounter">Didn't get the code? Resend in <span id="resendTimer">00:30</span></p>
+                <p class="resend_text" style="display:none;">
+                  Didn't get the code? <br>
+                  <a href="#" id="resendSMS">Resend code on SMS</a>
+                </p>
+              </form>
+              <div class="contents">
+                <p>By logging in, you agree to our</p>
+                <ul class="linksList">
+                  <li><a href="{{ pages['terms-and-conditions'].url }}">Terms and Conditions</a></li>
+                  <li><span>&</span></li>
+                  <li><a href="{{ pages['privacy-policy'].url }}">Privacy Policy</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="email_wrapper inner_wrap" id="emailBlock" style="display:none;">
+              <div class="title">
+                <h3>Enter Your Email</h3>
+                <p>We need your email to complete your login</p>
+              </div>
+              <form id="emailForm">
+                <div class="logIn_field">
+                  <label for="userEmail">Email Address</label>
+                  <input
+                    type="email"
+                    class="controls"
+                    name="userEmail"
+                    id="userEmail"
+                    placeholder="Enter your email"
+                    required
+                  >
+                </div>
+                <button type="submit" id="submitEmail" class="btns btnDark">
+                  <div class="bg"></div>
+                  <div class="btnText">
+                    <span>Done</span>
+                    <span>Done</span>
+                  </div>
+                </button>
+              </form>
             </div>
           </div>
         </div>
-
-        <!-- Hidden input to store product ID -->
-        <input type="hidden" id="remove-product-id" />
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btns btnWhite" data-bs-dismiss="modal">
-          <div class="bg"></div>
-          <div class="btnText">
-            <span>Cancel</span>
-            <span>Cancel</span>
-          </div>
-        </button>
-
-        <button type="button" class="btns btnDark" data-bs-dismiss="modal" onclick="handleRemoveClick()" id="confirm-remove-btn">
-          <div class="bg"></div>
-          <div class="btnText">
-            <span>Remove</span>
-            <span>Remove</span>
-          </div>
-        </button>
       </div>
     </div>
   </div>
-</div>
 
-   <div id="toast" class="toastUndo">
-        <div class="flex_wrap">
-            <p>Product is removed from cart</p>
-            <button class="btnUndo" onclick="undoAction()">UNDO</button>
+  <div
+    class="modal modal_remove fade"
+    id="removeProduct"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="removeProductLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title" id="removeProductLabel">Are you sure you want to remove this product from cart?</h1>
         </div>
 
-        <button class="close" onclick="hideToast()">
-            <img src="{{ 'img_cart_undo.svg' | asset_url }}" alt="" />
-        </button>
-    </div>
-    
- <!-- ToolTip Modal -->
-    <div class="modal modalTooltip fade" id="modalTooltip" tabindex="-1" aria-labelledby="modalTooltipLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="modal-body">
-                    {{ shop.metafields.custom.installation_terms | raw }}
-                </div>
+        <div class="modal-body">
+          <div class="product_remove">
+            <img src="" id="modal-product-image" class="img" alt="Product image">
+            <div class="contents">
+              <h5 id="modal-product-title">Product Name</h5>
+              <p>Carved in wood. Composed in silence.</p>
+              <div class="mrp">
+                <h6>MRP: <span>&#8377;</span><span id="modal-product-price">0</span></h6>
+                <p>(Inclusive all of taxes)</p>
+              </div>
             </div>
+          </div>
+
+          <!-- Hidden input to store product ID -->
+          <input type="hidden" id="remove-product-id">
         </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btns btnWhite" data-bs-dismiss="modal">
+            <div class="bg"></div>
+            <div class="btnText">
+              <span>Cancel</span>
+              <span>Cancel</span>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            class="btns btnDark"
+            data-bs-dismiss="modal"
+            onclick="handleRemoveClick()"
+            id="confirm-remove-btn"
+          >
+            <div class="bg"></div>
+            <div class="btnText">
+              <span>Remove</span>
+              <span>Remove</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toastUndo">
+    <div class="flex_wrap">
+      <p>Product is removed from cart</p>
+      <button class="btnUndo" onclick="undoAction()">UNDO</button>
     </div>
 
+    <button class="close" onclick="hideToast()">
+      <img src="{{ 'img_cart_undo.svg' | asset_url }}" alt="">
+    </button>
+  </div>
+
+  <!-- ToolTip Modal -->
+  <div
+    class="modal modalTooltip fade"
+    id="modalTooltip"
+    tabindex="-1"
+    aria-labelledby="modalTooltipLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-body">
+          {{ shop.metafields.custom.installation_terms | raw }}
+        </div>
+      </div>
+    </div>
+  </div>
 {% endif %}
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  let resendTimerInterval;
-  let otpStartTime = null;
-  const otpValidDuration = 30; // seconds
+  document.addEventListener('DOMContentLoaded', function () {
+    let resendTimerInterval;
+    let otpStartTime = null;
+    const otpValidDuration = 30; // seconds
 
-  function clearOTPInputs() {
-    document.querySelectorAll("#otpInputs .otpControls").forEach(i => i.value = "");
-  }
+    function clearOTPInputs() {
+      document.querySelectorAll('#otpInputs .otpControls').forEach((i) => (i.value = ''));
+    }
 
-  function isOtpExpired() {
-    if (!otpStartTime) return true;
-    const elapsed = (Date.now() - otpStartTime) / 1000;
-    return elapsed > otpValidDuration;
-  }
+    function isOtpExpired() {
+      if (!otpStartTime) return true;
+      const elapsed = (Date.now() - otpStartTime) / 1000;
+      return elapsed > otpValidDuration;
+    }
 
-  function startResendCountdown(seconds = 30) {
-    otpStartTime = Date.now(); // Reset OTP timer start
-    clearInterval(resendTimerInterval);
+    function startResendCountdown(seconds = 30) {
+      otpStartTime = Date.now(); // Reset OTP timer start
+      clearInterval(resendTimerInterval);
 
-    const counter = document.querySelector(".resendCounter");
-    const timerSpan = document.getElementById("resendTimer");
-    const resendText = document.querySelector(".resend_text");
+      const counter = document.querySelector('.resendCounter');
+      const timerSpan = document.getElementById('resendTimer');
+      const resendText = document.querySelector('.resend_text');
 
-    if (!counter || !timerSpan || !resendText) return;
+      if (!counter || !timerSpan || !resendText) return;
 
-    counter.style.display = "block";
-    resendText.style.display = "none";
+      counter.style.display = 'block';
+      resendText.style.display = 'none';
 
-    let remaining = seconds;
+      let remaining = seconds;
 
-    function updateTimer() {
-      const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
-      const ss = String(remaining % 60).padStart(2, "0");
-      timerSpan.textContent = `${mm}:${ss}`;
+      function updateTimer() {
+        const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
+        const ss = String(remaining % 60).padStart(2, '0');
+        timerSpan.textContent = `${mm}:${ss}`;
 
-      if (remaining <= 0) {
-        clearInterval(resendTimerInterval);
-        counter.style.display = "none";
-        resendText.style.display = "block";
+        if (remaining <= 0) {
+          clearInterval(resendTimerInterval);
+          counter.style.display = 'none';
+          resendText.style.display = 'block';
+        }
+        remaining--;
       }
-      remaining--;
+
+      updateTimer();
+      resendTimerInterval = setInterval(updateTimer, 1000);
     }
 
-    updateTimer();
-    resendTimerInterval = setInterval(updateTimer, 1000);
-  }
+    // STEP 1: Send OTP
+    document.getElementById('logInNum').addEventListener('click', function () {
+      const phone = document.getElementById('phone').value.trim();
 
-  // STEP 1: Send OTP
-  document.getElementById("logInNum").addEventListener("click", function () {
-    const phone = document.getElementById("phone").value.trim();
+      if (!/^[6-9]\d{9}$/.test(phone)) {
+        document.getElementById('warningMsg').style.display = 'block';
+        return;
+      }
+      document.getElementById('warningMsg').style.display = 'none';
 
-    if (!/^[6-9]\d{9}$/.test(phone)) {
-      document.getElementById("warningMsg").style.display = "block";
-      return;
-    }
-    document.getElementById("warningMsg").style.display = "none";
+      document.getElementById('smlPhoneNumberInput').value = phone;
+      document.getElementById('getOTPButton').click();
 
-    document.getElementById("smlPhoneNumberInput").value = phone;
-    document.getElementById("getOTPButton").click();
+      document.getElementById('displayNumber').innerText = phone;
+      document.getElementById('logInBlock').style.display = 'none';
+      document.getElementById('otpBlock').style.display = 'block';
 
-    document.getElementById("displayNumber").innerText = phone;
-    document.getElementById("logInBlock").style.display = "none";
-    document.getElementById("otpBlock").style.display = "block";
+      clearOTPInputs();
+      startResendCountdown(30);
 
-    clearOTPInputs();
-    startResendCountdown(30);
-     
-    document.querySelector('#otpInputs .otpControls')?.focus();
+      document.querySelector('#otpInputs .otpControls')?.focus();
 
-    const otpError = document.getElementById("otpErrorMsg");
-    if (otpError) otpError.style.display = "none";
-  });
+      const otpError = document.getElementById('otpErrorMsg');
+      if (otpError) otpError.style.display = 'none';
+    });
 
-  // STEP 2: Capture OTP and validate
-  document.querySelectorAll("#otpInputs .otpControls").forEach((input, idx, arr) => {
-    input.addEventListener("input", function () {
-      if (this.value.length === 1 && idx < arr.length - 1) arr[idx + 1].focus();
+    // STEP 2: Capture OTP and validate
+    document.querySelectorAll('#otpInputs .otpControls').forEach((input, idx, arr) => {
+      input.addEventListener('input', function () {
+        if (this.value.length === 1 && idx < arr.length - 1) arr[idx + 1].focus();
 
-      const otp = Array.from(arr).map(i => i.value).join("");
+        const otp = Array.from(arr)
+          .map((i) => i.value)
+          .join('');
 
-      if (otp.length === 4) {
-        const otpError = document.getElementById("otpErrorMsg");
+        if (otp.length === 4) {
+          const otpError = document.getElementById('otpErrorMsg');
 
-        if (isOtpExpired()) {
-          otpError.style.display = "block";
-          otpError.textContent = "OTP expired. Please request a new one.";
+          if (isOtpExpired()) {
+            otpError.style.display = 'block';
+            otpError.textContent = 'OTP expired. Please request a new one.';
+            clearOTPInputs();
+            return;
+          }
+
+          otpError.style.display = 'none';
+          document.getElementById('otpInput').value = otp;
+          document.getElementById('submitOTPButton').click();
+        }
+      });
+    });
+
+    // STEP 3: Email for new users
+    document.getElementById('emailForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const email = document.getElementById('userEmail').value.trim();
+      if (!email) return;
+      localStorage.setItem('sml_user_email', email);
+      document.getElementById('userEmailInput').value = email;
+      document.getElementById('registerUserButton').click();
+    });
+
+    // STEP 4: Edit number
+    document.getElementById('editNumber').addEventListener('click', function (e) {
+      e.preventDefault();
+      document.getElementById('otpBlock').style.display = 'none';
+      document.getElementById('logInBlock').style.display = 'block';
+      clearOTPInputs();
+      clearInterval(resendTimerInterval);
+    });
+
+    // STEP 5: Resend OTP
+    document.getElementById('resendSMS').addEventListener('click', function (e) {
+      e.preventDefault();
+      clearOTPInputs();
+      document.getElementById('resendOTPButton').click();
+
+      otpStartTime = Date.now();
+      startResendCountdown(30);
+
+      const otpError = document.getElementById('otpErrorMsg');
+      if (otpError) otpError.style.display = 'none';
+    });
+
+    // STEP 6: Hook into SML events
+    window.runOnSMLEvent = function (event, data) {
+      console.log('SML Event:', event, data);
+
+      if (event === 'PHONE_OTP_SCREEN_TYPE_CHANGE') {
+        if (data.screen_type === 'ENTER_OTP') {
+          document.getElementById('logInBlock').style.display = 'none';
+          document.getElementById('otpBlock').style.display = 'block';
           clearOTPInputs();
-          return;
+          startResendCountdown(30);
+          const otpError = document.getElementById('otpErrorMsg');
+          if (otpError) otpError.style.display = 'none';
         }
-
-        otpError.style.display = "none";
-        document.getElementById("otpInput").value = otp;
-        document.getElementById("submitOTPButton").click();
+        if (data.screen_type === 'ENTER_EMAIL') {
+          document.getElementById('otpBlock').style.display = 'none';
+          document.getElementById('emailBlock').style.display = 'block';
+          clearInterval(resendTimerInterval);
+        }
       }
-    });
-  });
 
-  // STEP 3: Email for new users
-  document.getElementById("emailForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    const email = document.getElementById("userEmail").value.trim();
-    if (!email) return;
-    localStorage.setItem("sml_user_email", email);
-    document.getElementById("userEmailInput").value = email;
-    document.getElementById("registerUserButton").click();
-  });
-
-  // STEP 4: Edit number
-  document.getElementById("editNumber").addEventListener("click", function (e) {
-    e.preventDefault();
-    document.getElementById("otpBlock").style.display = "none";
-    document.getElementById("logInBlock").style.display = "block";
-    clearOTPInputs();
-    clearInterval(resendTimerInterval);
-  });
-
-  // STEP 5: Resend OTP
-  document.getElementById("resendSMS").addEventListener("click", function (e) {
-    e.preventDefault();
-    clearOTPInputs();
-    document.getElementById("resendOTPButton").click();
-
-    otpStartTime = Date.now();
-    startResendCountdown(30);
-
-    const otpError = document.getElementById("otpErrorMsg");
-    if (otpError) otpError.style.display = "none";
-  });
-
-  // STEP 6: Hook into SML events
-  window.runOnSMLEvent = function (event, data) {
-    console.log("SML Event:", event, data);
-
-    if (event === "PHONE_OTP_SCREEN_TYPE_CHANGE") {
-      if (data.screen_type === "ENTER_OTP") {
-        document.getElementById("logInBlock").style.display = "none";
-        document.getElementById("otpBlock").style.display = "block";
-        clearOTPInputs();
-        startResendCountdown(30);
-        const otpError = document.getElementById("otpErrorMsg");
-        if (otpError) otpError.style.display = "none";
+      if (event === 'LOGIN_SUCCESSFUL' || event === 'USER_REGISTERED_SUCCESSFULLY') {
+        if (data && data.email) {
+          localStorage.setItem('sml_user_email', data.email);
+        }
+        localStorage.setItem('sml_login_time', Date.now());
+        try {
+          window.dispatchEvent(new CustomEvent('sml_user_logged_in', { detail: data || {} }));
+        } catch (e) {}
+        if (window.jQuery && jQuery('#loginModal').modal) {
+          try {
+            jQuery('#loginModal').modal('hide');
+          } catch (e) {}
+        }
+        try {
+          if (!window.location.pathname.toLowerCase().includes('checkout')) {
+            window.location.href = '/checkout';
+          }
+        } catch (e) {}
       }
-      if (data.screen_type === "ENTER_EMAIL") {
-        document.getElementById("otpBlock").style.display = "none";
-        document.getElementById("emailBlock").style.display = "block";
-        clearInterval(resendTimerInterval);
-      }
+    };
+
+    // STEP 7: AJAX OTP failure
+    if (window.jQuery) {
+      jQuery(document).ajaxError(function (event, jqxhr, settings, thrownError) {
+        if (settings && settings.url && settings.url.includes('validateOTP')) {
+          console.error('OTP API error caught:', jqxhr);
+          const otpError = document.getElementById('otpErrorMsg');
+          if (otpError) {
+            otpError.style.display = 'block';
+            otpError.textContent = 'Invalid or expired OTP. Please try again.';
+          }
+          clearOTPInputs();
+        }
+      });
     }
 
-    if (event === "LOGIN_SUCCESSFUL" || event === "USER_REGISTERED_SUCCESSFULLY") {
-      if (data && data.email) {
-        localStorage.setItem("sml_user_email", data.email);
-      }
-      localStorage.setItem("sml_login_time", Date.now());
-      try {
-        window.dispatchEvent(new CustomEvent('sml_user_logged_in', { detail: data || {} }));
-      } catch (e) { }
-      if (window.jQuery && jQuery('#loginModal').modal) {
-        try { jQuery('#loginModal').modal('hide'); } catch (e) { }
-      }
-      try {
-        if (!window.location.pathname.toLowerCase().includes('checkout')) {
+    // STEP 8: Timeout fallback
+    document.getElementById('submitOTPButton').addEventListener('click', function () {
+      setTimeout(() => {
+        const otpBlock = document.getElementById('otpBlock');
+        if (otpBlock && otpBlock.style.display !== 'none') {
+          const otpError = document.getElementById('otpErrorMsg');
+          if (otpError) {
+            otpError.style.display = 'block';
+            otpError.textContent = 'Invalid or expired OTP. Please try again.';
+          }
+        }
+      }, 4000);
+    });
+
+    // STEP 9: Guest checkout
+    document.getElementById('guestCheckoutBtn').addEventListener('click', function (e) {
+      e.preventDefault();
       window.location.href = '/checkout';
-        }
-      } catch (e) { }
-    }
-  };
-
-  // STEP 7: AJAX OTP failure
-  if (window.jQuery) {
-    jQuery(document).ajaxError(function (event, jqxhr, settings, thrownError) {
-      if (settings && settings.url && settings.url.includes("validateOTP")) {
-        console.error("OTP API error caught:", jqxhr);
-        const otpError = document.getElementById("otpErrorMsg");
-        if (otpError) {
-          otpError.style.display = "block";
-          otpError.textContent = "Invalid or expired OTP. Please try again.";
-        }
-        clearOTPInputs();
-      }
     });
-  }
-
-  // STEP 8: Timeout fallback
-  document.getElementById("submitOTPButton").addEventListener("click", function () {
-    
-    setTimeout(() => {
-      const otpBlock = document.getElementById("otpBlock");
-      if (otpBlock && otpBlock.style.display !== "none") {
-        const otpError = document.getElementById("otpErrorMsg");
-        if (otpError) {
-          otpError.style.display = "block";
-          otpError.textContent = "Invalid or expired OTP. Please try again.";
-        }
-      }
-    }, 4000);
   });
-
-  // STEP 9: Guest checkout
-  document.getElementById("guestCheckoutBtn").addEventListener("click", function (e) {
-    e.preventDefault();
-    window.location.href = "/checkout";
-  });
-});
 </script>
 
+<!-- Handle Proceed to Pay button - check if user is already logged in -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const proceedBtn = document.getElementById('proceedToPayBtn');
+    if (!proceedBtn) return;
+
+    proceedBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      
+      // Check if user is already logged in via wishlist/login system
+      const loginTimestamp = localStorage.getItem('sml_login_time');
+      const now = Date.now();
+      const session24hrs = 24 * 60 * 60 * 1000;
+      
+      const isLoggedIn = !!(loginTimestamp && now - loginTimestamp < session24hrs);
+      
+      if (isLoggedIn) {
+        // User is already registered/logged in, proceed directly to checkout
+        window.location.href = '/checkout';
+      } else {
+        // User is not logged in, show login modal
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+          const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+          loginModal.show();
+        } else if (window.jQuery && jQuery('#loginModal').modal) {
+          jQuery('#loginModal').modal('show');
+        }
+      }
+    });
+  });
+</script>
 
 <!-- Autofill email at checkout -->
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  const storedEmail = localStorage.getItem("sml_user_email");
-  if (!storedEmail) return;
+  document.addEventListener('DOMContentLoaded', function () {
+    const storedEmail = localStorage.getItem('sml_user_email');
+    if (!storedEmail) return;
 
-  function fillEmail() {
-    const emailInput = document.querySelector(
-      'input#checkout_email, input#email, input[name="checkout[email]"]'
-    );
-    if (emailInput && !emailInput.value) {
-      emailInput.value = storedEmail;
-      emailInput.dispatchEvent(new Event("input", { bubbles: true }));
-      console.log("Email autofilled:", storedEmail);
-      return true;
+    function fillEmail() {
+      const emailInput = document.querySelector('input#checkout_email, input#email, input[name="checkout[email]"]');
+      if (emailInput && !emailInput.value) {
+        emailInput.value = storedEmail;
+        emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+        console.log('Email autofilled:', storedEmail);
+        return true;
+      }
+      return false;
     }
-    return false;
-  }
 
-  // Try immediately
-  if (fillEmail()) return;
+    // Try immediately
+    if (fillEmail()) return;
 
-  // Fallback: observe DOM changes until email field is available
-  const observer = new MutationObserver(() => {
-    if (fillEmail()) {
-      observer.disconnect();
-    }
+    // Fallback: observe DOM changes until email field is available
+    const observer = new MutationObserver(() => {
+      if (fillEmail()) {
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
   });
-
-  observer.observe(document.body, { childList: true, subtree: true });
-});
 </script>
-
-
-
-
-
 
 <script>
   let toastTimeout;
-  let recentlyRemovedProduct = null;
-  let removeTimeout;
 
   function handleRemoveClick() {
     const productId = document.getElementById("remove-product-id").value;
@@ -774,49 +927,94 @@ document.addEventListener("DOMContentLoaded", function() {
     const itemEl = document.querySelector(`[data-product-id="${productId}"]`);
     const productCard = itemEl.closest('.product_card');
 
-    // Store for undo
-    recentlyRemovedProduct = {
-      key: productId,
-      element: productCard.cloneNode(true),
-      quantity: productCard.querySelector("input[name=quantity]").value
-    };
-
     // Hide item from DOM (visually removed)
     productCard.style.display = 'none';
 
-    // Show toast
-    undoToast();
+    // Immediately remove from Shopify cart
+    removeFromCart(productId);
 
-    // After 5s, actually remove it from Shopify cart
-    removeTimeout = setTimeout(() => {
-      removeFromCart();
-    }, 5000);
+    // Show toast without undo
+    showRemoveToast();
   }
 
-  function removeFromCart() {
-    if (!recentlyRemovedProduct) return;
-
-    const form = document.createElement("form");
-    form.method = "post";
-    form.action = "/cart/change";
-
-    form.innerHTML = `
-      <input type="hidden" name="id" value="${recentlyRemovedProduct.key}">
-      <input type="hidden" name="quantity" value="0">
-    `;
-
-    document.body.appendChild(form);
-    form.submit(); // reloads cart
+  function removeFromCart(productId) {
+    // Use fetch API instead of form submission to avoid page reload and flickering
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: productId, quantity: 0 })
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log("Product removed from cart:", data);
+      
+      // Fetch updated cart to check if empty
+      fetch('/cart.js')
+        .then(r => r.json())
+        .then(cartData => {
+          // If cart is empty, reload page to show empty cart state
+          if (!cartData.items || cartData.items.length === 0) {
+            console.log("Cart is empty, reloading page");
+            window.location.reload();
+            return;
+          }
+          
+          var mrpCents = 0;
+          (cartData.items || []).forEach(function(it){
+            if (it.product_title !== 'Installation Fee') {
+              var itemTotal = parseInt(it.final_line_price || 0, 10) || 0;
+              var addon = 0;
+              if (it.properties && it.properties['Add On Price']) {
+                var parsed = parseFloat(it.properties['Add On Price']);
+                if (!isNaN(parsed)) addon = Math.round(parsed * 100);
+              }
+              mrpCents += itemTotal + addon;
+            }
+          });
+          
+          // Update order MRP smoothly
+          const orderMrpElement = document.getElementById('orderMrp');
+          if (orderMrpElement) {
+            orderMrpElement.textContent = Math.round(mrpCents / 100).toLocaleString("en-IN");
+          }
+          
+          // Update total value if it exists
+          const totalElement = document.getElementById('totalValue');
+          if (totalElement) {
+            const installFeeEl = document.getElementById('installationFeeValue');
+            const installFee = installFeeEl ? parseInt(installFeeEl.textContent) || 0 : 0;
+            const total = Math.round(mrpCents / 100) + installFee;
+            totalElement.textContent = total.toLocaleString("en-IN");
+          }
+          
+          // Update mobile total if it exists
+          const mrpMobileElement = document.getElementById('mrpMobileValue');
+          if (mrpMobileElement) {
+            const installFeeEl = document.getElementById('installationFeeValue');
+            const installFee = installFeeEl ? parseInt(installFeeEl.textContent) || 0 : 0;
+            const total = Math.round(mrpCents / 100) + installFee;
+            mrpMobileElement.textContent = total.toLocaleString("en-IN");
+          }
+        })
+        .catch(e => console.error('Error fetching cart.js after removal', e));
+    })
+    .catch(err => console.error("Cart removal error:", err));
   }
 
-  function undoToast() {
+  function showRemoveToast() {
     const toast = document.getElementById("toast");
+    const undoBtn = toast.querySelector('.btnUndo');
+    
+    // Hide undo button
+    undoBtn.style.display = 'none';
+    
     toast.style.display = "block";
 
     clearTimeout(toastTimeout);
     toastTimeout = setTimeout(() => {
       toast.style.display = "none";
-    }, 5000);
+      undoBtn.style.display = 'block'; // Restore for next time
+    }, 3000);
   }
 
   function hideToast() {
@@ -826,20 +1024,8 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   function undoAction() {
+    // This function is intentionally disabled for cart removals
     hideToast();
-    clearTimeout(removeTimeout);
-
-    const cartColumn = document.querySelector('.cart__wrapper .container .row .col-12');
-    const cartTitle = cartColumn.querySelector('.cart_title');
-
-    if (recentlyRemovedProduct && recentlyRemovedProduct.element) {
-      recentlyRemovedProduct.element.style.display = '';
-
-      // Insert after cart_title
-      cartTitle.insertAdjacentElement('afterend', recentlyRemovedProduct.element);
-    }
-
-    recentlyRemovedProduct = null;
   }
 
 
@@ -950,45 +1136,211 @@ document.addEventListener("DOMContentLoaded", function () {
   // Run initial
   updateStockButtons();
 });
- const installationFeesStr = '{{ shop.metafields.custom.installation_pincodes }}';
-  
-  // Parse it safely in JS
-  let windowInstallationFees = {};
+document.addEventListener("DOMContentLoaded", function () {
+
+  /* ===============================
+     CONFIG
+  =============================== */
+
+  const INSTALLATION_VARIANTS = {
+    600: 42852344463427,
+    4500: 42904708644931,
+    6000: 42904708677699
+  };
+
+  const INSTALLATION_PRODUCT_TITLE = 'Installation Fee';
+
+  /* ===============================
+     METAFIELD (SAFE PARSE)
+  =============================== */
+
+  // Get the metafield (could be string or object)
+  let installationFeesRaw =
+    {{ shop.metafields.custom.installation_pincodes}};
+
+  let installationFees = {};
   try {
-    windowInstallationFees = JSON.parse(installationFeesStr);
-  } catch(e) {
-    console.error("Invalid JSON in installation pincodes metafield:", e);
+    installationFees = typeof installationFeesRaw === 'string'
+      ? JSON.parse(installationFeesRaw)
+      : installationFeesRaw;
+  } catch (e) {
+    console.error("Failed to parse installation pincodes metafield", e);
+    installationFees = {};
   }
 
-  window.installationFees = windowInstallationFees;
-const pincodeInput = document.getElementById("pincodeInput");
-const successText = document.querySelector(".successText");
-const errorText = document.querySelector(".errorText");
-const installationFeeEl = document.getElementById("installationFeeValue");
-const installationDiv = document.querySelector('.installation');
-const installationCheckbox = document.getElementById('checkboxs'); // ✅ correct ID
+  console.log("Installation fees metafield:", installationFees);
+  console.log("Type:", typeof installationFees);
 
-let installationFee = 0;
+  /* ===============================
+     ELEMENTS
+  =============================== */
 
-// Hide initially
-installationDiv.style.display = "none";
-installationCheckbox.disabled = true;
+  const pincodeInput = document.getElementById("pincodeInput");
+  const successText = document.querySelector(".successText");
+  const errorText = document.querySelector(".errorText");
+  const installationDiv = document.querySelector(".installation");
+  const installationCheckbox = document.getElementById("checkboxs");
+  const installationFeeEl = document.getElementById("installationFeeValue");
 
-function validatePincode() {
-  const value = pincodeInput.value.replace(/\D/g, '').trim();
+  if (!pincodeInput) return;
 
-  if (/^\d{6}$/.test(value)) {
-    if (window.installationFees && window.installationFees[value]) {
-      // ✅ Installation available
+  let installationFee = 0;
+  let currentOrderMrpCents = {{ total_mrp | default: 0 }};
+
+  installationDiv.style.display = "none";
+  installationCheckbox.disabled = true;
+
+  /* ===============================
+     INITIALIZATION - Remove installation fee if unchecked on load
+  =============================== */
+  
+  async function initializeInstallationState() {
+    const cart = await getCart();
+    const installationInCart = cart.items.some(i => i.product_title === INSTALLATION_PRODUCT_TITLE);
+    
+    // If installation is in cart but checkbox is not checked, remove it silently
+    if (installationInCart && !installationCheckbox.checked) {
+      console.log("Installation found in cart but checkbox unchecked - removing it");
+      await removeInstallation();
+      
+      // Update totals without reloading the page
+      // Refetch cart and update the order MRP
+      const updatedCart = await getCart();
+      let mrpCents = 0;
+      (updatedCart.items || []).forEach(function(it){
+        if (it.product_title !== INSTALLATION_PRODUCT_TITLE) {
+          var itemTotal = parseInt(it.final_line_price || 0, 10) || 0;
+          var addon = 0;
+          if (it.properties && it.properties['Add On Price']) {
+            var parsed = parseFloat(it.properties['Add On Price']);
+            if (!isNaN(parsed)) addon = Math.round(parsed * 100);
+          }
+          mrpCents += itemTotal + addon;
+        }
+      });
+      currentOrderMrpCents = mrpCents;
+      renderTotals();
+    }
+  }
+  
+  // Run initialization on page load
+  initializeInstallationState().catch(e => console.error("Error initializing installation state:", e));
+
+  /* ===============================
+     CART HELPERS
+  =============================== */
+
+  async function getCart() {
+    return fetch('/cart.js').then(r => r.json());
+  }
+
+  async function removeInstallation() {
+    const cart = await getCart();
+    const item = cart.items.find(i => i.product_title === INSTALLATION_PRODUCT_TITLE);
+    if (!item) return;
+
+    await fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: item.key, quantity: 0 })
+    });
+  }
+async function addInstallation(price) {
+  try {
+    // get variantId from mapping
+    const variantId = INSTALLATION_VARIANTS[price];
+    if (!variantId) {
+      console.warn("No variant found for installation price:", price);
+      return;
+    }
+
+    // remove existing installation if any
+    await removeInstallation();
+
+    // validate pincode
+    const pincode = pincodeInput?.value?.trim();
+    if (!pincode || !installationFees[pincode]) {
+      console.warn("Invalid or unavailable pincode for installation:", pincode);
+      return;
+    }
+
+    // prepare payload
+    const payload = {
+      id: variantId,
+      quantity: 1,
+      properties: {
+        "Installation Pincode": pincode
+      }
+    };
+
+    console.log("Adding installation to cart:", payload);
+
+    // make request
+    const response = await fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    // check response
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error("Failed to add installation:", response.status, errorData);
+    } else {
+      console.log("Installation added successfully!");
+    }
+
+  } catch (error) {
+    console.error("Error in addInstallation():", error);
+  }
+}
+
+
+  /* ===============================
+     TOTALS
+  =============================== */
+
+  function renderTotals() {
+    const orderRs = Math.round(currentOrderMrpCents / 100);
+    const install = installationCheckbox.checked ? installationFee : 0;
+    const total = orderRs + install;
+
+    document.getElementById("orderMrp").textContent = orderRs.toLocaleString("en-IN");
+    document.getElementById("totalValue").textContent = total.toLocaleString("en-IN");
+    document.getElementById("mrpMobileValue").textContent = total.toLocaleString("en-IN");
+  }
+
+  renderTotals();
+
+  /* ===============================
+     PINCODE VALIDATION
+  =============================== */
+
+  pincodeInput.addEventListener("input", function () {
+    const value = this.value.replace(/\D/g, "").slice(0, 6);
+    this.value = value;
+
+    if (value.length !== 6) {
+      successText.style.display = "none";
+      errorText.style.display = "none";
+      installationDiv.style.display = "none";
+      installationCheckbox.checked = false;
+      installationCheckbox.disabled = true;
+      installationFee = 0;
+      installationFeeEl.textContent = "0";
+      removeInstallation();
+      renderTotals();
+      return;
+    }
+
+    if (installationFees && Object.prototype.hasOwnProperty.call(installationFees, value)) {
+      installationFee = parseInt(installationFees[value], 10);
       successText.style.display = "block";
       errorText.style.display = "none";
       installationDiv.style.display = "flex";
       installationCheckbox.disabled = false;
-
-      installationFee = parseInt(window.installationFees[value]);
       installationFeeEl.textContent = installationFee.toLocaleString("en-IN");
     } else {
-      // ❌ Not available
       successText.style.display = "none";
       errorText.style.display = "block";
       installationDiv.style.display = "none";
@@ -996,83 +1348,342 @@ function validatePincode() {
       installationCheckbox.disabled = true;
       installationFee = 0;
       installationFeeEl.textContent = "0";
+      removeInstallation();
     }
-  } else {
-    // ⚠️ Invalid pincode
-    successText.style.display = "none";
-    errorText.style.display = "none";
-    installationDiv.style.display = "none";
-    installationCheckbox.checked = false;
-    installationCheckbox.disabled = true;
-    installationFee = 0;
-    installationFeeEl.textContent = "0";
-  }
 
-  window.computeAndRenderTotals?.(currentOrderMrpCents);
-}
-
-pincodeInput.addEventListener("input", validatePincode);
-
-// Add dynamic totals calculation: include installation in displayed total
-(function(){
-  // initial order MRP in cents from Liquid
-  var currentOrderMrpCents = {{ total_mrp | default: 0 }};
-
-  function formatRupees(num) {
-    try { return Number(num).toLocaleString('en-IN'); } catch (e) { return num; }
-  }
-
-  // orderMrpCents expected in cents
-  window.computeAndRenderTotals = function(orderMrpCents) {
-    if (typeof orderMrpCents !== 'number') orderMrpCents = Number(orderMrpCents) || 0;
-    currentOrderMrpCents = orderMrpCents;
-
-    var orderMrpRupees = Math.round(orderMrpCents / 100);
-    var installCheckbox = document.getElementById('checkboxs');
-    var installation = (installCheckbox && installCheckbox.checked && typeof installationFee === 'number') ? installationFee : 0;
-
-    // Displayed order MRP = products only
-    var displayedOrderMrp = orderMrpRupees;
-
-    // Total = products + installation (shipping always free, no "you save")
-    var total = Math.round(orderMrpRupees + installation);
-    if (total < 0) total = 0;
-
-    var orderEl = document.getElementById('orderMrp');
-    if (orderEl) orderEl.textContent = formatRupees(displayedOrderMrp);
-
-    var totalEl = document.getElementById('totalValue');
-    if (totalEl) totalEl.textContent = formatRupees(total);
-
-    var mobileEl = document.getElementById('mrpMobileValue');
-    if (mobileEl) mobileEl.textContent = formatRupees(total);
-  };
-
-  // recompute shortly after pincode validation updates installationFee
-  var pincodeEl = document.getElementById('pincodeInput');
-  if (pincodeEl) {
-    pincodeEl.addEventListener('input', function(){
-      setTimeout(function(){ window.computeAndRenderTotals(currentOrderMrpCents); }, 50);
-    });
-  }
-
-  // recompute when installation checkbox toggles
-  var installationCheckbox = document.getElementById('checkboxs');
-  if (installationCheckbox) {
-    installationCheckbox.addEventListener('change', function(){
-      window.computeAndRenderTotals(currentOrderMrpCents);
-    });
-  }
-
-  // compute on initial load
-  document.addEventListener('DOMContentLoaded', function(){
-    window.computeAndRenderTotals(currentOrderMrpCents);
+    renderTotals();
   });
-})();
 
+  /* ===============================
+     CHECKBOX
+  =============================== */
 
+  installationCheckbox.addEventListener("change", async function () {
+    if (this.checked && installationFee > 0) {
+      await addInstallation(installationFee);
+    } else {
+      await removeInstallation();
+    }
+    renderTotals();
+  });
+
+});
 </script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // CART wishlist logic (matches product-main behavior)
+    let tooltipTimeout;
 
+    function isLoggedIn() {
+      try {
+        const ts = localStorage.getItem('sml_login_time');
+        if (!ts) return false;
+        return Date.now() - Number(ts) < 24 * 60 * 60 * 1000;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function getFolders() {
+      return JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+    }
+
+    function saveFolders(folders) {
+      localStorage.setItem('wishlist_folders', JSON.stringify(folders));
+      try {
+        window.dispatchEvent(new CustomEvent('wishlist:changed', { detail: { folders: folders } }));
+      } catch (e) {}
+    }
+
+    function addProductToFolder(name, product) {
+      let folders = getFolders();
+      let folder = folders.find((f) => f.name === name);
+      if (!folder) {
+        folder = { id: Date.now(), name: name, products: [] };
+        folders.push(folder);
+      }
+      folder.products.push(product);
+      saveFolders(folders);
+      localStorage.removeItem('wishlist_pending_product');
+      updateAllIcons(product.id || product);
+    }
+
+    function removeProductFromFolder(productId, folderName, variantId) {
+      let folders = getFolders();
+      let folder = folders.find((f) => f.name === folderName);
+      if (folder) {
+        if (variantId) {
+          folder.products = folder.products.filter((p) => !(String(p.id) === String(productId) && String(p.variantId) === String(variantId)));
+        } else {
+          folder.products = folder.products.filter((p) => String(p.id) !== String(productId));
+        }
+        saveFolders(folders);
+        updateAllIcons({ id: productId, variantId: variantId });
+      }
+    }
+
+    function getProductFolder(productId, variantId) {
+      let folders = getFolders();
+      for (let folder of folders) {
+        if (variantId) {
+          if (folder.products.some((p) => String(p.id) === String(productId) && String(p.variantId) === String(variantId))) return folder.name;
+        } else {
+          if (folder.products.some((p) => String(p.id) === String(productId))) return folder.name;
+        }
+      }
+      return null;
+    }
+
+    function showToast(msg, undoCallback = null) {
+      const tooltip = document.querySelector('.tooltip-msg');
+      if (!tooltip) return;
+      tooltip.querySelector('.tooltip-text').textContent = msg;
+      const undoBtn = tooltip.querySelector('.undoBtn');
+      if (undoCallback) {
+        undoBtn.style.display = 'inline-block';
+        undoBtn.onclick = function () {
+          undoCallback();
+          tooltip.classList.remove('show');
+          tooltip.style.display = 'none';
+        };
+      } else undoBtn.style.display = 'none';
+      tooltip.style.display = 'block';
+      tooltip.classList.add('show');
+      clearTimeout(tooltipTimeout);
+      tooltipTimeout = setTimeout(() => {
+        tooltip.classList.remove('show');
+        tooltip.style.display = 'none';
+      }, 2500);
+    }
+
+    function renderProjects(dropdownEl) {
+      const folders = getFolders();
+      const inner = dropdownEl.querySelector('.wishlist-inner') || dropdownEl;
+      let list = inner.querySelector('.list');
+      if (!folders || folders.length === 0) {
+        if (list) list.remove();
+        return;
+      }
+      if (!list) {
+        list = document.createElement('div');
+        list.className = 'list';
+        const createBlock = inner.querySelector('.list-create');
+        if (createBlock) inner.insertBefore(list, createBlock);
+        else inner.appendChild(list);
+      }
+      list.innerHTML = '';
+      folders.forEach((folder) => {
+        const option = document.createElement('div');
+        option.className = 'option';
+        option.textContent = folder.name;
+        option.style.cursor = 'pointer';
+        list.appendChild(option);
+      });
+    }
+
+    function updateIconStateForCard(card) {
+      const btn = card.querySelector('.likes.actionBtn');
+      if (!btn) return;
+      const pid = btn.getAttribute('data-id');
+      const vid = btn.getAttribute('data-variant-id') || null;
+      const folder = getProductFolder(pid, vid);
+      btn.classList.toggle('active', !!folder);
+    }
+
+    function updateAllIcons(productRef) {
+      // productRef can be {id, variantId} or a plain id
+      const pid = String(productRef && productRef.id ? productRef.id : productRef || '');
+      const folders = getFolders();
+      document.querySelectorAll(`.likes.actionBtn[data-id="${pid}"]`).forEach((btn) => {
+        const bvid = btn.getAttribute('data-variant-id') || null;
+        const folder = getProductFolder(pid, bvid);
+        btn.classList.toggle('active', !!folder);
+      });
+    }
+
+    // Initialize state for cart items
+    document.querySelectorAll('.product_card').forEach((card) => {
+      const likeBtn = card.querySelector('.likes.actionBtn');
+      if (!likeBtn) return;
+      updateIconStateForCard(card);
+
+      // Hide dropdowns if not logged in
+      const dropdown = card.querySelector('.wishlist-dropdown');
+      if (dropdown && !isLoggedIn()) dropdown.style.display = 'none';
+
+      likeBtn.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        const productId = likeBtn.getAttribute('data-id');
+        const variantId = likeBtn.getAttribute('data-variant-id') || null;
+        const existingFolder = getProductFolder(productId, variantId);
+        if (existingFolder) {
+          removeProductFromFolder(productId, existingFolder, variantId);
+          likeBtn.classList.remove('active');
+          showToast(`Product successfully removed from '${existingFolder}' in your Wishlist`, function undoAction() {
+            const pending = {
+              id: productId,
+              handle: likeBtn.getAttribute('data-handle') || null,
+              title: likeBtn.getAttribute('data-title') || '',
+              image: likeBtn.getAttribute('data-image') || '',
+              price: likeBtn.getAttribute('data-price') || '',
+              variantId: variantId,
+              options: {},
+            };
+            addProductToFolder(existingFolder, pending);
+            updateIconStateForCard(card);
+            updateAllIcons(pending);
+          });
+          return;
+        }
+
+        // prepare pending product from button/card
+        const pending = {
+          id: productId || null,
+          handle: likeBtn.getAttribute('data-handle') || null,
+          title:
+            likeBtn.getAttribute('data-title') ||
+            (card.querySelector('h3') ? card.querySelector('h3').textContent.trim() : ''),
+          image:
+            likeBtn.getAttribute('data-image') ||
+            (card.querySelector('.product_img img') ? card.querySelector('.product_img img').src : ''),
+          price: likeBtn.getAttribute('data-price') || '',
+          variantId: likeBtn.getAttribute('data-variant-id') || null,
+          options: {},
+        };
+        localStorage.setItem('wishlist_pending_product', JSON.stringify(pending));
+
+        if (!isLoggedIn()) {
+          window.location.href = '/pages/wishlist';
+          return;
+        }
+
+        if (dropdown) {
+          renderProjects(dropdown);
+          dropdown.classList.toggle('show');
+          document.querySelectorAll('.wishlist-dropdown').forEach((dd) => {
+            if (dd !== dropdown) dd.classList.remove('show');
+          });
+        }
+      });
+    });
+
+    // Select existing project / create project click handlers (global)
+    document.addEventListener('click', function (e) {
+      if (e.target.classList.contains('option')) {
+        e.preventDefault();
+        e.stopPropagation();
+        const projectName = e.target.textContent.trim();
+        const pending = JSON.parse(localStorage.getItem('wishlist_pending_product') || 'null');
+        if (!pending) return;
+        addProductToFolder(projectName, pending);
+        // update icons
+        updateAllIcons(pending);
+        showToast(`Product successfully added to '${projectName}'`, function undoAction() {
+          removeProductFromFolder(pending.id, projectName, pending.variantId);
+          updateAllIcons(pending);
+        });
+        const dd = e.target.closest('.wishlist-dropdown');
+        if (dd) dd.classList.remove('show');
+      }
+
+      if (e.target.classList.contains('create-btn')) {
+        e.stopPropagation();
+        document.querySelector('.popup-overlay')?.classList.add('showPopup');
+        document.body.classList.add('overflow-hidden');
+        const input = document.getElementById('new-wishlist-name');
+        if (input) {
+          input.value = '';
+          input.classList.remove('error');
+        }
+        document.querySelector('.wishlist-error-msg')?.classList.add('hidden');
+        document.getElementById('add-wishlist')?.setAttribute('disabled', 'true');
+      }
+    });
+
+    // Close dropdowns on outside click
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.wishlist-dropdown') && !e.target.classList.contains('actionBtn')) {
+        document.querySelectorAll('.wishlist-dropdown').forEach((dd) => dd.classList.remove('show'));
+      }
+    });
+
+    // React to storage/wishlist changes from other pages/components
+    window.addEventListener('storage', function (e) {
+      if (e.key === 'wishlist_folders') {
+        // update all cart icons
+        document.querySelectorAll('.product_card').forEach((card) => updateIconStateForCard(card));
+      }
+    });
+
+    window.addEventListener('wishlist:changed', function (ev) {
+      try {
+        document.querySelectorAll('.product_card').forEach((card) => updateIconStateForCard(card));
+      } catch (err) {}
+    });
+
+    // Wire up popup buttons (close / create) - reuse existing elements
+    document.getElementById('closePopup-wishlist')?.addEventListener('click', function () {
+      document.querySelector('.popup-overlay')?.classList.remove('showPopup');
+      document.body.classList.remove('overflow-hidden');
+    });
+
+    document.getElementById('add-wishlist')?.addEventListener('click', function () {
+      const input = document.getElementById('new-wishlist-name');
+      if (!input || !input.value.trim()) {
+        input?.classList.add('error');
+        document.querySelector('.wishlist-error-msg')?.classList.remove('hidden');
+        return;
+      }
+      const newName = input.value.trim();
+      let pendingProduct = JSON.parse(localStorage.getItem('wishlist_pending_product') || 'null');
+      let folders = getFolders();
+      let exists = folders.find((f) => f.name.toLowerCase() === newName.toLowerCase());
+      if (exists) {
+        input.classList.add('error');
+        const errorMsg = document.querySelector('.wishlist-error-msg');
+        if (errorMsg) {
+          errorMsg.textContent = 'Project name already exists!';
+          errorMsg.classList.remove('hidden');
+        }
+        return;
+      }
+      const newFolder = { id: Date.now(), name: newName, products: pendingProduct ? [pendingProduct] : [] };
+      folders.push(newFolder);
+      saveFolders(folders);
+      localStorage.removeItem('wishlist_pending_product');
+      if (pendingProduct) updateAllIcons(pendingProduct.id);
+      input.value = '';
+      document.querySelector('.popup-overlay')?.classList.remove('showPopup');
+      document.body.classList.remove('overflow-hidden');
+      showToast(`Product successfully added to '${newName}'`);
+    });
+
+    // Validate new wishlist name input
+    document.getElementById('new-wishlist-name')?.addEventListener('input', function () {
+      const createBtn = document.getElementById('add-wishlist');
+      const errorMsg = document.querySelector('.wishlist-error-msg');
+      let folders = getFolders();
+      let exists = folders.some((f) => f.name.toLowerCase() === this.value.trim().toLowerCase());
+      if (this.value.trim() === '') {
+        this.classList.add('error');
+        if (errorMsg) errorMsg.textContent = 'Please enter a project name.';
+        errorMsg?.classList.remove('hidden');
+        createBtn?.setAttribute('disabled', 'true');
+      } else if (exists) {
+        this.classList.add('error');
+        if (errorMsg) errorMsg.textContent = 'Project name already exists!';
+        errorMsg?.classList.remove('hidden');
+        createBtn?.setAttribute('disabled', 'true');
+      } else {
+        this.classList.remove('error');
+        errorMsg?.classList.add('hidden');
+        createBtn?.removeAttribute('disabled');
+      }
+    });
+  });
+</script>
 
 {% schema %}
 {

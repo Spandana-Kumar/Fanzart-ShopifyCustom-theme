@@ -1,4 +1,4 @@
-{% assign homepage_meta=shop.metaobjects.home_page.home%}
+{% assign homepage_meta = shop.metaobjects.home_page.home %}
 
 <!-- Hero Section -->
 <section class="banner__video__wrapper">
@@ -9,13 +9,13 @@
   </div>
 
   <div class="title_wrap">
-    <h1 class="title72 txtDark" id="animated-heading">
+    <h1 class="title72 txtWhite" id="animated-heading">
       {{ homepage_meta.hero_section_heading1.value }}
     </h1>
-    <h2 class="title72 txtDark" id="animated-heading-2">
+    <h2 class="title72 txtWhite" id="animated-heading-2">
       {{ homepage_meta.hero_section_heading2.value }}
     </h2>
-    <p class="font_20 txtDarkLight" id="animated-subtext">
+    <p class="font_20 txtWhite" id="animated-subtext">
       {{ homepage_meta.hero_section_subtitle.value }}
     </p>
   </div>
@@ -25,8 +25,8 @@
 <section class="our__story__wrapper">
   <div class="container">
     <div class="story_wrap">
-      <img src="{{ homepage_meta.our_story_bg_desktop | file_url }}" class="img-fluid d-none d-md-block" alt="Banner" />
-      <img src="{{ homepage_meta.our_story_bg_mobile | file_url }}" class="img-fluid d-block d-md-none" alt="Banner" />
+      <img src="{{ homepage_meta.our_story_bg_desktop | file_url }}" class="img-fluid d-none d-md-block" alt="Banner">
+      <img src="{{ homepage_meta.our_story_bg_mobile | file_url }}" class="img-fluid d-block d-md-none" alt="Banner">
 
       <div class="contents">
         <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
@@ -36,7 +36,12 @@
           {{ homepage_meta.our_story_paragraph.value }}
         </p>
 
-        <a href="{{ homepage_meta.our_story_btn_link.value }}" class="btns btnDark" data-aos="fade-up" data-aos-duration="2000">
+        <a
+          href="{{ homepage_meta.our_story_btn_link.value }}"
+          class="btns btnDark"
+          data-aos="fade-up"
+          data-aos-duration="2000"
+        >
           <div class="bg"></div>
           <div class="btnText">
             <span>{{ homepage_meta.our_story_btn_text.value }}</span>
@@ -48,11 +53,18 @@
   </div>
 </section>
 
-
 <section class="smart__silent__wrapper" id="smartSilent">
   <div class="wrapper">
-    <img src="{{ homepage_meta.smart_silent_section_background_image_desktop | file_url }}" class="bg d-none d-md-block" alt="Background" />
-    <img src="{{ homepage_meta.smart_silent_section_background_image_mobile | file_url }}" class="bg d-block d-md-none" alt="Background Mobile" />
+    <img
+      src="{{ homepage_meta.smart_silent_section_background_image_desktop | file_url }}"
+      class="bg d-none d-md-block"
+      alt="Background"
+    >
+    <img
+      src="{{ homepage_meta.smart_silent_section_background_image_mobile | file_url }}"
+      class="bg d-block d-md-none"
+      alt="Background Mobile"
+    >
 
     <div class="contents">
       <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
@@ -63,23 +75,20 @@
       </p>
     </div>
 
-        <ul class="card_list">
-          {% assign card_ids = "lFirst,lSecond,lThrid,rFourth,rFifth" | split: "," %}
-          {% for smart_silent_section_cards in homepage_meta.smart_silent_card_list.value %}
-            <li>
-              <div class="smart_card" id="{{ card_ids[forloop.index0] }}">
-                <img src="{{ smart_silent_section_cards.icon | file_url }}" alt="Icon" />
-                <div class="details">
-                  <h4>{{ smart_silent_section_cards.title.value }}</h4>
-                  <p>{{ smart_silent_section_cards.descripion.value }}</p>
-                </div>
-              </div>
-            </li>
-          {% endfor %}
-        </ul>
-
-
-
+    <ul class="card_list">
+      {% assign card_ids = 'lFirst,lSecond,lThrid,rFourth,rFifth' | split: ',' %}
+      {% for smart_silent_section_cards in homepage_meta.smart_silent_card_list.value %}
+        <li>
+          <div class="smart_card" id="{{ card_ids[forloop.index0] }}">
+            <img src="{{ smart_silent_section_cards.icon | file_url }}" alt="Icon">
+            <div class="details">
+              <h4>{{ smart_silent_section_cards.title.value }}</h4>
+              <p>{{ smart_silent_section_cards.descripion.value }}</p>
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
   </div>
 </section>
 
@@ -114,17 +123,47 @@
         <!-- Ceiling Fans (4 boxes) -->
         <div class="box_four">
           {% for product_ceiling_cards in homepage_meta.product_section_ceiling_card.value %}
-          {% assign collection = product_ceiling_cards.custom_collection.value %}
+            {%- assign parent_collection = product_ceiling_cards.custom_collection.value -%}
+            {%- assign parent_title = parent_collection.title | strip | downcase -%}
+
+            {%- capture sub_collection_items -%}
+              {% for sub_collection in collections %}
+                {% if sub_collection.metafields.custom.parent_collection.value != blank %}
+                  {% assign sub_parent = sub_collection.metafields.custom.parent_collection.value | strip | downcase %}
+                  {% if sub_parent == parent_title %}
+                    <li>
+                      {{ sub_collection.title }}
+                    </li>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            {%- endcapture -%}
+
             <div class="box">
-              <a href="{{ collection.url }}" class="fansCards">
+              <a href="{{ parent_collection.url }}" class="fansCards">
                 <div class="img">
                   {% if product_ceiling_cards.custom_image %}
-                    <img src="{{ product_ceiling_cards.custom_image | img_url: 'medium' }}" alt="{{ product_ceiling_cards.custom_title.value }}" />
+                    <img
+                      src="{{ product_ceiling_cards.custom_image | img_url: 'medium' }}"
+                      alt="{{ product_ceiling_cards.custom_title.value }}"
+                    >
                   {% else %}
-                    <img src="{{ 'placeholder.png' | asset_url }}" alt="{{ product_ceiling_cards.custom_title.value }}" />
+                    <img
+                      src="{{ 'placeholder.png' | asset_url }}"
+                      alt="{{ product_ceiling_cards.custom_title.value }}"
+                    >
                   {% endif %}
                 </div>
+
                 <h4>{{ product_ceiling_cards.custom_title.value }}</h4>
+
+                {% if sub_collection_items contains '<li>' %}
+                  <div class="card_overlay">
+                    <ul class="categroy_list">
+                      {{ sub_collection_items }}
+                    </ul>
+                  </div>
+                {% endif %}
               </a>
             </div>
           {% endfor %}
@@ -132,18 +171,50 @@
 
         <!-- Other Fans (3 boxes) -->
         <div class="box_three">
-         {% for product_other_cards in homepage_meta.product_section_other_cards.value %}
-          {% assign collection = product_other_cards.custom_collection.value %}
+          {% for product_other_cards in homepage_meta.product_section_other_cards.value %}
+            {%- assign parent_collection = product_other_cards.custom_collection.value -%}
+            {%- assign parent_title = parent_collection.title | strip | downcase -%}
+
+            {%- capture sub_collection_items -%}
+              {% for sub_collection in collections %}
+                {% if sub_collection.metafields.custom.parent_collection.value != blank %}
+                  {% assign sub_parent = sub_collection.metafields.custom.parent_collection.value | strip | downcase %}
+                  {% if sub_parent == parent_title %}
+                    <li>
+                      
+                        {{ sub_collection.title }}
+                    
+                    </li>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            {%- endcapture -%}
+
             <div class="box">
-              <a href="{{ collection.url }}" class="fansCards">
+              <a href="{{ parent_collection.url }}" class="fansCards">
                 <div class="img">
-                  {% if collection.image %}
-                    <img src="{{ product_other_cards.custom_image | img_url: 'medium' }}" alt="{{ product_other_cards.custom_title.value  }}" />
+                  {% if product_other_cards.custom_image %}
+                    <img
+                      src="{{ product_other_cards.custom_image | img_url: 'medium' }}"
+                      alt="{{ product_other_cards.custom_title.value }}"
+                    >
                   {% else %}
-                    <img src="{{ 'placeholder.png' | asset_url }}" alt="{{ product_other_cards.custom_title.value  }}" />
+                    <img
+                      src="{{ 'placeholder.png' | asset_url }}"
+                      alt="{{ product_other_cards.custom_title.value }}"
+                    >
                   {% endif %}
                 </div>
+
                 <h4>{{ product_other_cards.custom_title.value }}</h4>
+
+                {% if sub_collection_items contains '<li>' %}
+                  <div class="card_overlay">
+                    <ul class="categroy_list">
+                      {{ sub_collection_items }}
+                    </ul>
+                  </div>
+                {% endif %}
               </a>
             </div>
           {% endfor %}
@@ -165,24 +236,58 @@
           <path stroke-width="2" stroke="#ffffff" id="ceillingPath" fill="none"
             d="M396,200 C396,308.24781 308.24781,396 200,396 91.75219,396 4,308.24781 4,200 4,91.75219 91.75219,4 200,4 308.24781,4 396,91.75219 396,200 z"></path>
         </svg>
-
-        <div class="cards_four">
-          {% for product_ceiling_cards in homepage_meta.product_section_ceiling_card.value %}
-          {% assign collection = product_ceiling_cards.custom_collection.value %}
-            <div class="box">
-              <a href="{{ collection.url }}" class="fansCards">
-                <div class="img">
-                  {% if product_ceiling_cards.custom_image %}
-                    <img src="{{ product_ceiling_cards.custom_image | img_url: 'medium' }}" alt="{{ product_ceiling_cards.custom_title.value }}" />
-                  {% else %}
-                    <img src="{{ 'placeholder.png' | asset_url }}" alt="{{ product_ceiling_cards.custom_title.value }}" />
-                  {% endif %}
+        <div class="swiper mySwiper swiperCeilingMobile">
+          <div class="swiper-wrapper">
+            {% for product_ceiling_cards in homepage_meta.product_section_ceiling_card.value %}
+                {% assign collection = product_ceiling_cards.custom_collection.value %}
+            <div class="swiper-slide">
+              
+                <div class="box">
+                  <a href="{{ collection.url }}" class="fansCards">
+                    <div class="img">
+                      {% if product_ceiling_cards.custom_image %}
+                        <img
+                          src="{{ product_ceiling_cards.custom_image | img_url: 'medium' }}"
+                          alt="{{ product_ceiling_cards.custom_title.value }}"
+                        >
+                      {% else %}
+                        <img
+                          src="{{ 'placeholder.png' | asset_url }}"
+                          alt="{{ product_ceiling_cards.custom_title.value }}"
+                        >
+                      {% endif %}
+                    </div>
+                    <h4>{{ product_ceiling_cards.custom_title.value }}</h4>
+                  </a>
                 </div>
-                <h4>{{ product_ceiling_cards.custom_title.value }}</h4>
-              </a>
+             
             </div>
-          {% endfor %}
+             {% endfor %}
+          </div>
         </div>
+
+        {% comment %}
+          <div class="cards_four">
+            {% for product_ceiling_cards in homepage_meta.product_section_ceiling_card.value %}
+              {% assign collection = product_ceiling_cards.custom_collection.value %}
+              <div class="box">
+                <a href="{{ collection.url }}" class="fansCards">
+                  <div class="img">
+                    {% if product_ceiling_cards.custom_image %}
+                      <img
+                        src="{{ product_ceiling_cards.custom_image | img_url: 'medium' }}"
+                        alt="{{ product_ceiling_cards.custom_title.value }}"
+                      >
+                    {% else %}
+                      <img src="{{ 'placeholder.png' | asset_url }}" alt="{{ product_ceiling_cards.custom_title.value }}">
+                    {% endif %}
+                  </div>
+                  <h4>{{ product_ceiling_cards.custom_title.value }}</h4>
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+        {% endcomment %}
       </div>
     </div>
 
@@ -192,81 +297,126 @@
           <path stroke-width="2" stroke="#ffffff" id="othersPath" fill="none"
             d="M396,200 C396,308.24781 308.24781,396 200,396 91.75219,396 4,308.24781 4,200 4,91.75219 91.75219,4 200,4 308.24781,4 396,91.75219 396,200 z"></path>
         </svg>
-
-        <div class="cards_three">
-             {% for product_other_cards in homepage_meta.product_section_other_cards.value %}
-          {% assign collection = product_other_cards.custom_collection.value %}
-            <div class="boxOne">
-              <a href="{{ collection.url }}" class="fansCards">
-                 <div class="img">
-                  {% if collection.image %}
-                    <img src="{{ product_other_cards.custom_image | img_url: 'medium' }}" alt="{{ product_other_cards.custom_title.value  }}" />
-                  {% else %}
-                    <img src="{{ 'placeholder.png' | asset_url }}" alt="{{ product_other_cards.custom_title.value  }}" />
-                  {% endif %}
+        <div class="swiper mySwiper swiperCeilingMobile">
+          <div class="swiper-wrapper">
+            {% for product_other_cards in homepage_meta.product_section_other_cards.value %}
+                {% assign collection = product_other_cards.custom_collection.value %}
+            <div class="swiper-slide">
+              
+                <div class="boxOne">
+                  <a href="{{ collection.url }}" class="fansCards">
+                    <div class="img">
+                      {% if collection.image %}
+                        <img
+                          src="{{ product_other_cards.custom_image | img_url: 'medium' }}"
+                          alt="{{ product_other_cards.custom_title.value  }}"
+                        >
+                      {% else %}
+                        <img
+                          src="{{ 'placeholder.png' | asset_url }}"
+                          alt="{{ product_other_cards.custom_title.value  }}"
+                        >
+                      {% endif %}
+                    </div>
+                    <h4>{{ product_other_cards.custom_title.value }}</h4>
+                  </a>
                 </div>
-                <h4>{{ product_other_cards.custom_title.value }}</h4>
-              </a>
+              
             </div>
-          {% endfor %}
+            {% endfor %}
+          </div>
+        </div>
+
+        {% comment %}
+          <div class="cards_three">
+            {% for product_other_cards in homepage_meta.product_section_other_cards.value %}
+              {% assign collection = product_other_cards.custom_collection.value %}
+              <div class="boxOne">
+                <a href="{{ collection.url }}" class="fansCards">
+                  <div class="img">
+                    {% if collection.image %}
+                      <img
+                        src="{{ product_other_cards.custom_image | img_url: 'medium' }}"
+                        alt="{{ product_other_cards.custom_title.value  }}"
+                      >
+                    {% else %}
+                      <img src="{{ 'placeholder.png' | asset_url }}" alt="{{ product_other_cards.custom_title.value  }}">
+                    {% endif %}
+                  </div>
+                  <h4>{{ product_other_cards.custom_title.value }}</h4>
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+        {% endcomment %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="showroom___wrapper" id="showroom">
+  <div id="bgScale"></div>
+  <div class="container">
+    <div class="main_wrap">
+      <div class="row">
+        <div class="col-12 col-md-12 col-lg-5">
+          <div class="sticky_title">
+            <h2 class="title42 txtWhite" data-aos="fade-up" data-aos-duration="1000">
+              {{ homepage_meta.showroom_section_heading.value }}
+            </h2>
+            <p class="font_18 txtWhite-2" data-aos="fade-up" data-aos-duration="1500">
+              {{ homepage_meta.showroom_section_description.value }}
+            </p>
+            <a
+              href="{{ homepage_meta.showroom_section_button_link.value }}"
+              class="btns btnWhite"
+              data-aos="fade-up"
+              data-aos-duration="2000"
+            >
+              <div class="bg"></div>
+              <div class="btnText">
+                <span>{{ homepage_meta.showroom_section_button_label.value }}</span>
+                <span>{{ homepage_meta.showroom_section_button_label.value }}</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-12 col-lg-4 offset-lg-3">
+          <div class="item_cards" id="cards">
+            {% for showroom_cards in homepage_meta.showroom_section_feature_cards.value %}
+              <div class="card_box">
+                <img src="{{ showroom_cards.image | file_url }}" alt="{{ showroom_cards.description.value }}">
+                <p>{{ showroom_cards.description.value }}</p>
+              </div>
+            {% endfor %}
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-
-
-<section class="showroom___wrapper" id="showroom">
-    <div id="bgScale"></div>
-    <div class="container">
-      <div class="main_wrap">
-        <div class="row">
-          <div class="col-12 col-md-12 col-lg-5">
-            <div class="sticky_title">
-              <h2 class="title42 txtWhite" data-aos="fade-up" data-aos-duration="1000">{{ homepage_meta.showroom_section_heading.value }}</h2>
-              <p class="font_18 txtWhite-2" data-aos="fade-up" data-aos-duration="1500">{{ homepage_meta.showroom_section_description.value }} </p>
-              <a href="{{ homepage_meta.showroom_section_button_link.value }}" class="btns btnWhite" data-aos="fade-up" data-aos-duration="2000">
-                <div class="bg"></div>
-                <div class="btnText">
-                  <span>{{ homepage_meta.showroom_section_button_label.value }}</span>
-                  <span>{{ homepage_meta.showroom_section_button_label.value }}</span>
-                </div>
-              </a>
-            </div>
-          </div>
-
-         <div class="col-12 col-md-12 col-lg-4 offset-lg-3">
-          <div class="item_cards" id="cards">
-            {% for showroom_cards in homepage_meta.showroom_section_feature_cards.value %}
-              <div class="card_box">
-                <img src="{{ showroom_cards.image | file_url }}" alt="{{ showroom_cards.description.value }}" />
-                <p>{{ showroom_cards.description.value }}</p>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
 <section class="testimonials__wrapper">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-6">
-          <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-lg-6">
+        <h2 class="title42 txtDark" data-aos="fade-up" data-aos-duration="1000">
           {{ homepage_meta.testimonial_section_heading.value }}
         </h2>
         <p class="font_18 txtDarkLight" data-aos="fade-up" data-aos-duration="1500">
           {{ homepage_meta.testimonial_section_subtext.value }}
         </p>
-          <img src="{{ 'img_quote.svg' | asset_url }}" data-aos="fade-up" data-aos-duration="2000" class="quote"
-            alt="" />
-          <div class="swiper mySwiper swiperTestimonials">
-            <div class="swiper-wrapper">
-               {% for testimonials_section_swiper in homepage_meta.testimonials_swiper.value %}
+        <img
+          src="{{ 'img_quote.svg' | asset_url }}"
+          data-aos="fade-up"
+          data-aos-duration="2000"
+          class="quote"
+          alt=""
+        >
+        <div class="swiper mySwiper swiperTestimonials">
+          <div class="swiper-wrapper">
+            {% for testimonials_section_swiper in homepage_meta.testimonials_swiper.value %}
               <div class="swiper-slide">
                 <div class="contents">
                   <p>{{ testimonials_section_swiper.content.value }}</p>
@@ -274,20 +424,21 @@
                 </div>
               </div>
             {% endfor %}
-            </div>
+          </div>
+          <div class="swiper_navigation_wrap">
             <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
             <div class="swiper-pagination"></div>
+            <div class="swiper-button-prev"></div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 </section>
 
-
 <section class="choose__it__wrapper">
-  <img src="{{ homepage_meta.choose_it_section_background_image | file_url }}" class="bg" alt="Background" />
-  <img src="{{ homepage_meta.choose_it_section_background_image | file_url }}" class="bg-mobile" alt="Background" />
+  <img src="{{ homepage_meta.choose_it_section_background_image | file_url }}" class="bg" alt="Background">
+  <img src="{{ homepage_meta.choose_it_section_background_image | file_url }}" class="bg-mobile" alt="Background">
 
   <div class="contents">
     <h2 class="title42 txtWhite" data-aos="fade-up" data-aos-duration="1000">
@@ -299,7 +450,12 @@
     </p>
 
     {% if homepage_meta.choose_it_section_button_link and homepage_meta.choose_it_section_button_text %}
-      <a href="{{ homepage_meta.choose_it_section_button_link.value }}" class="btns btnWhite" data-aos="fade-up" data-aos-duration="2000">
+      <a
+        href="{{ homepage_meta.choose_it_section_button_link.value }}"
+        class="btns btnWhite"
+        data-aos="fade-up"
+        data-aos-duration="2000"
+      >
         <div class="bg"></div>
         <div class="btnText">
           <span>{{ homepage_meta.choose_it_section_button_text.value }}</span>

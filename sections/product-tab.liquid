@@ -1,8 +1,8 @@
-<section class="tabs__wrapper"> 
+<section class="tabs__wrapper">
   <div class="tabs_flex_wrap">
     <div class="item_left">
       <!-- Single common image for all tabs -->
-      <img id="tabImage" src="{{ product.metafields.custom.tab_overview_image | image_url }}" alt="Tab Image" />
+      <img id="tabImage" src="{{ product.metafields.custom.tab_overview_image | image_url }}" alt="Tab Image">
     </div>
 
     <div class="contents_wrap">
@@ -12,12 +12,20 @@
           <div class="tabBtn" data-tab="features">Features</div>
           <div class="tabBtn" data-tab="specs">Technical Specification</div>
           <div class="tabBtn" data-tab="accessories">Accessories</div>
+          {% if product.metafields.custom.product_manufactured_by.value != blank %}
+            <div class="tabBtn" data-tab="manufacturedby">Manufactured By</div>
+          {% endif %}
         </div>
 
         <!-- Overview -->
         <div id="overview" class="tabContent active">
-          <!-- First item: Product Description -->
-          <h4>Description</h4>
+          <!-- Product Overview Description -->
+          {% if product.metafields.custom.product_overview_description_title != blank %}
+            <h4>{{ product.metafields.custom.product_overview_description_title }}</h4>
+          {% else %}
+            <h4>Description</h4>
+          {% endif %}
+
           <div class="rte">
             {{ product.description }}
           </div>
@@ -37,7 +45,7 @@
             {% if product.metafields.custom.product_features.value != blank %}
               {% for feature in product.metafields.custom.product_features.value %}
                 <div class="features_card">
-                  <img src="{{ feature.icon | image_url }}" alt="" />
+                  <img src="{{ feature.icon | image_url }}" alt="">
                   <h5>{{ feature.text }}</h5>
                 </div>
               {% endfor %}
@@ -47,7 +55,8 @@
 
         <!-- Specs -->
         <div id="specs" class="tabContent">
-          <table class="features_table">
+          <div class="table_wrap">
+            <table class="features_table">
             <tr>
               <th>Specification</th>
               <th>Details</th>
@@ -69,10 +78,11 @@
                     {% endif %}
                   </td>
                 </tr>
-
               {% endfor %}
             {% endif %}
           </table>
+          </div>
+          
         </div>
 
         <!-- Accessories -->
@@ -81,36 +91,62 @@
             {% if product.metafields.custom.product_accessories.value != blank %}
               {% for acc in product.metafields.custom.product_accessories.value %}
                 <div class="accessories_card">
-                  <img src="{{ acc.icon | image_url }}" alt="" />
+                  <img src="{{ acc.icon | image_url }}" alt="">
                   <h5>{{ acc.text }}</h5>
                 </div>
               {% endfor %}
             {% endif %}
           </div>
         </div>
+
+        {% comment %} Manufactured By {% endcomment %}
+        <div id="manufacturedby" class="tabContent">
+          <div class="table_wrap">
+             <table class="features_table">
+            <tr>
+              <th>Specification</th>
+              <th>Details</th>
+            </tr>
+
+            {% if product.metafields.custom.product_manufactured_by.value != blank %}
+              {% for manufacturedby in product.metafields.custom.product_manufactured_by.value %}
+                <tr>
+                  <td>{{ manufacturedby.manufacture_name }}</td>
+                  <td>
+                    {{ manufacturedby.manufacture_detail }}
+                  </td>
+                </tr>
+              {% endfor %}
+            {% endif %}
+          </table>
+            
+
+          </div>
+         
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const tabs = document.querySelectorAll(".tabBtn");
-      const contents = document.querySelectorAll(".tabContent");
-      const image = document.getElementById("tabImage");
+    document.addEventListener('DOMContentLoaded', function () {
+      const tabs = document.querySelectorAll('.tabBtn');
+      const contents = document.querySelectorAll('.tabContent');
+      const image = document.getElementById('tabImage');
 
       // Single common image for all tabs
-      const commonImage = "{{ product.metafields.custom.tab_overview_image | image_url }}";
+      const commonImage = '{{ product.metafields.custom.tab_overview_image | image_url }}';
 
       tabs.forEach((tab) => {
-        tab.addEventListener("click", () => {
+        tab.addEventListener('click', () => {
           // Remove active class from all
-          tabs.forEach((t) => t.classList.remove("active"));
-          contents.forEach((c) => c.classList.remove("active"));
+          tabs.forEach((t) => t.classList.remove('active'));
+          contents.forEach((c) => c.classList.remove('active'));
 
           // Add active class to clicked tab and related content
-          tab.classList.add("active");
-          const tabName = tab.getAttribute("data-tab");
-          document.getElementById(tabName).classList.add("active");
+          tab.classList.add('active');
+          const tabName = tab.getAttribute('data-tab');
+          document.getElementById(tabName).classList.add('active');
 
           // Always use the same image
           if (window.innerWidth > 1025) {

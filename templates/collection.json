@@ -1,0 +1,9 @@
+{
+  "name": "All Collections",
+  "sections": {
+    "main": {
+      "type": "product-listing-main"
+    }
+  },
+  "order": ["main"]
+}

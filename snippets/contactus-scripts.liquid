@@ -6,166 +6,160 @@
         integrity="sha512-SlsU65KdLej2skQ24jI+POL40KCeJ7aR9dy6lhT6ZUggKQeoqq6Lj+7n6i8zqO2gcelYQBPgOdrtIwDXF6cLIw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
- 
-<script>
-  $("#phone, #pincode").on("input", function () {
-    const cleaned = $(this).val().replace(/\D/g, "");
-    $(this).val(cleaned);
-  });
+<script id='wf_anal' src='https://crm.zohopublic.in/crm/WebFormAnalyticsServeServlet?
+rid=bed6b59f2685e1e221171604ec4ffeacb1da97fd689e7efacc3c31431d503c2ec
+5dba63a2dd3e3940d02fed968251636gid8be86e61d3061b167946e296f022f459fe
+1d9b6548a52ade9aac8e9ae5dda6ccgid8ec438b3bd7c051c97e728d77c334807c2
+b32975b71ce7abd77727db11a4ce3cgidfe19b2cb7303332a7f8426ae74fe5d237e8
+8bd8f2bd752acf88f3744a33371f8&tw=977e4e53257b1f8eefa56ada3e3553b9b2f
+7dfd8c9a9c1f61422d21a4e05f271'> </script>
 
-  var input = document.querySelector("#phone");
-  if (input) {
-    window.intlTelInput(input, {
-      allowDropdown: true,
-      countrySearch: false,
-      separateDialCode: true,
-      initialCountry: "in",
-    });
-  }
-
-  $(function () {
-    function showError($el, msg) {
-      $el.addClass("error");
-      $el.closest(".form_group").find(".errorMsg").text(msg).show();
-    }
-
-    function clearError($el) {
-      $el.removeClass("error");
-      $el.closest(".form_group").find(".errorMsg").hide();
-    }
-
-    function validateField($el) {
-      const name = $el.attr("name");
-      const rawVal = $el.val();
-      const val = typeof rawVal === "string" ? rawVal.trim() : rawVal;
-
-      if (optionalFields.includes(name)) {
-        clearError($el);
-        return true;
-      }
-
-      if (!val || val === "0") {
-        showError($el, "This field is required");
-        return false;
-      }
-
-      if (name === "contact[email]" && !/^\S+@\S+\.\S+$/.test(val)) {
-        showError($el, "Enter a valid email");
-        return false;
-      }
-
-      if (name === "contact[phone]" && !/^\d{10}$/.test(val)) {
-        showError($el, "Enter a valid 10-digit phone number");
-        return false;
-      }
-
-      clearError($el);
-      return true;
-    }
-
-    // Optional fields
-    const optionalFields = ["contact[preferredMode]", "contact[reason]"];
-
-    // Real-time validation
-    $(".formControl").on("input blur change", function () {
-      validateField($(this));
-    });
-
-    // Checkbox validation
-    $("#chkbox").on("change", function () {
-      if ($(this).is(":checked")) {
-        clearError($(this));
-      } else {
-        showError($(this), "Please accept the agreement");
-      }
-    });
-
-    // Submit handler
-    $("#contactForm").on("submit", function (e) {
-      let isValid = true;
-
-      $(".formControl").each(function () {
-        if (!validateField($(this))) isValid = false;
-      });
-
-      const $radios = $("input[name='contact[role]']");
-      if (!$radios.is(":checked")) {
-        showError($radios.first(), "Please select an option");
-        isValid = false;
-      } else {
-        clearError($radios.first());
-      }
-
-      const $chk = $("#chkbox");
-      if (!$chk.is(":checked")) {
-        showError($chk, "Please accept the agreement");
-        isValid = false;
-      } else {
-        clearError($chk);
-      }
-
-      if (!isValid) {
-        e.preventDefault(); // prevent submission if invalid
-      }
-      // ✅ If valid, form will submit naturally and Shopify handles reCAPTCHA
-    });
-
-    $(".close-btn").on("click", function () {
-      $("#successMsg").fadeOut();
-    });
-  });
-</script>
+    <script> function
+            addAriaSelected1111638000001421074() {
+            var optionElem = event.target; var
+                previousSelectedOption = optionElem.querySelector('[aria-selected=true]');
+            if (previousSelectedOption) {
+                previousSelectedOption.removeAttribute('aria-selected');
+            } optionElem.querySelectorAll('option')
+            [optionElem.selectedIndex].ariaSelected = 'true';
+        } function
+            validateEmail1111638000001421074() {
+            var form =
+                document.forms['WebToLeads1111638000001421074']; var emailFld =
+                    form.querySelectorAll('[ftype=email]'); var i; for (i = 0; i < emailFld.length; i++) {
+                        var emailVal = emailFld[i].value; if ((emailVal.replace(
+                            /^\s+|\s+$/g, '')).length != 0) {
+                            var atpos = emailVal.indexOf('@'); var dotpos =
+                                emailVal.lastIndexOf('.'); if (atpos < 1 || dotpos < atpos + 2 || dotpos + 2 >=
+                                    emailVal.length) {
+                                alert('Please enter a valid email address. ');
+                                emailFld[i].focus(); return false;
+                            }
+                        }
+                    } return true;
+        } function
+            checkMandatory1111638000001421074() {
+            var mndFileds = new Array('Last Name', 'Email', 'Phone', 'LEADCF14'); var fldLangVal = new Array('Name', 'Email', 'Phone\x20Number', 'Message'); for (i = 0; i < mndFileds.length; i++) {
+                var fieldObj = document.forms['WebToLeads1111638000001421074']
+                [mndFileds[i]]; if (fieldObj) {
+                    if (((fieldObj.value).replace(
+                        /^\s+|\s+$/g, '')).length == 0) {
+                        if (fieldObj.type == 'file') {
+                            alert('Please select a file to upload.'); fieldObj.focus(); return false;
+                        } alert(fldLangVal[i] + ' cannot be empty.'); fieldObj.focus(); return false;
+                    } else if (fieldObj.nodeName == 'SELECT') {
+                        if (fieldObj.options[fieldObj.selectedIndex].value == '-None-') { alert(fldLangVal[i] + ' cannot be none.'); fieldObj.focus(); return false; }
+                    } else
+                        if (fieldObj.type == 'checkbox') {
+                            if (fieldObj.checked == false) {
+                                alert('Please accept ' + fldLangVal[i]); fieldObj.focus(); return false;
+                            }
+                        } try {
+                            if (fieldObj.name
+                                == 'Last Name') { name = fieldObj.value; }
+                        } catch (e) { }
+                }
+            } if (!
+                validateEmail1111638000001421074()) { return false; } var urlparams = new
+                    URLSearchParams(window.location.search); if (urlparams.has('service') &&
+                        (urlparams.get('service') === 'smarturl')) {
+                var webform =
+                    document.getElementById('webform1111638000001421074'); var service =
+                        urlparams.get('service'); var smarturlfield = document.createElement('input');
+                smarturlfield.setAttribute('type', 'hidden'); smarturlfield.setAttribute('value',
+                    service); smarturlfield.setAttribute('name', 'service');
+                webform.appendChild(smarturlfield);
+            }
+            document.querySelector('.crmWebToEntityForm .formsubmit').setAttribute('disabled', true); return true;
+        } $(document).ready(function () {
+            $
+                ('#webform1111638000001421074').submit(function (e) {
+                    var ismandatory =
+                        checkMandatory1111638000001421074(); e.preventDefault(); if (ismandatory) {
+                            if (typeof _wfa_track != 'undefined' && _wfa_track.wfa_submit) { _wfa_track.wfa_submit(e); } var formData = new FormData(this);
+                            $.ajax({
+                                url: 'https://crm.zoho.in/crm/WebToLeadForm', type: 'POST',
+                                data: formData, cache: false, contentType: false, processData: false, success:
+                                    function (data) {
+                                        var splashinfodom =
+                                            document.getElementById('wf_splash_info'); splashinfodom.innerText =
+                                                data.actionvalue; var splashdom = document.getElementById('wf_splash');
+                                        document.getElementById('webform1111638000001421074').reset.click();
+                                        splashdom.style.display = ''; setTimeout(function () {
+                                            splashdom.style.display =
+                                                'none';
+                                        }, 5000);
+                                        document.querySelector('.crmWebToEntityForm .formsubmit').removeAttribut
+                                        e('disabled');
+                                    }, error: function (data) { alert('an error occurred'); }
+                            });
+                        }
+                });
+        });
+        function tooltipShow1111638000001421074(el) {
+            var tooltip =
+                el.nextElementSibling; var tooltipDisplay = tooltip.style.display;
+            if (tooltipDisplay == 'none') {
+                var allTooltip =
+                    document.getElementsByClassName('zcwf_tooltip_over'); for (i = 0; i <
+                        allTooltip.length; i++) { allTooltip[i].style.display = 'none'; }
+                tooltip.style.display = 'block';
+            } else { tooltip.style.display = 'none'; }
+        } 
+    </script>
 
 
 
-    <script>
+
+      <script>
         $(document).ready(function () {
             $(".tab_content").hide();
             $(".tab_content:first").show();
 
-            /* if in tab mode */
             $("ul.tabs li").click(function () {
-
-                $(".tab_content").hide();
                 var activeTab = $(this).attr("rel");
-                $("#" + activeTab).fadeIn();
+                var tabContent = $("#" + activeTab);
 
-                $("ul.tabs li").removeClass("active");
-                $(this).addClass("active");
+                if ($(this).hasClass("active")) {
+                    // If the same tab is clicked again → close it
+                    $(this).removeClass("active");
+                    tabContent.slideUp();
+                } else {
+                    // Otherwise → open it and close others
+                    $("ul.tabs li").removeClass("active");
+                    $(this).addClass("active");
 
+                    $(".tab_content").slideUp();
+                    tabContent.slideDown();
+                }
+
+                // Sync drawer headings
                 $(".tab_drawer_heading").removeClass("d_active");
-                $(".tab_drawer_heading[rel^='" + activeTab + "']").addClass("d_active");
-
+                $(".tab_drawer_heading[rel^='" + activeTab + "']").toggleClass("d_active", $(this).hasClass("active"));
             });
-            /* if in drawer mode */
+
+            // Drawer toggle (for mobile view)
             $(".tab_drawer_heading").click(function () {
-
-                $(".tab_content").hide();
                 var d_activeTab = $(this).attr("rel");
-                $("#" + d_activeTab).fadeIn();
+                var tabContent = $("#" + d_activeTab);
 
-                $(".tab_drawer_heading").removeClass("d_active");
-                $(this).addClass("d_active");
+                if ($(this).hasClass("d_active")) {
+                    $(this).removeClass("d_active");
+                    tabContent.slideUp();
+                    $("ul.tabs li[rel^='" + d_activeTab + "']").removeClass("active");
+                } else {
+                    $(".tab_drawer_heading").removeClass("d_active");
+                    $(this).addClass("d_active");
 
-                $("ul.tabs li").removeClass("active");
-                $("ul.tabs li[rel^='" + d_activeTab + "']").addClass("active");
+                    $(".tab_content").slideUp();
+                    tabContent.slideDown();
+
+                    $("ul.tabs li").removeClass("active");
+                    $("ul.tabs li[rel^='" + d_activeTab + "']").addClass("active");
+                }
             });
 
-
-            /* Extra class "tab_last" 
-              to add border to right side
-              of last tab */
             $('ul.tabs li').last().addClass("tab_last");
-
         });
     </script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-  if (window.location.hash === "#successMsg") {
-    const thankYou = document.getElementById("successMsg");
-    if (thankYou) {
-      thankYou.scrollIntoView({ behavior: "smooth" });
-    }
-  }
-});
-  </script>
+

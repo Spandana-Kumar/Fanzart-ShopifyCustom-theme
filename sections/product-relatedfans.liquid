@@ -5,20 +5,1268 @@
       <div class="swiper-wrapper">
         {% assign current_collection = product.collections.first %}
         {% if current_collection %}
-          {% for related_product in current_collection.products limit:8 %}
+          {% for related_product in current_collection.products limit: 8 %}
             {% if related_product.id != product.id %}
               <div class="swiper-slide">
-                <a href="{{ related_product.url }}" class="related_card">
-                  <img src="{{ related_product.variants.first.featured_image | image_url: width: 400 }}" alt="{{ related_product.title }}" />
-                  <p>{{ related_product.title }}</p>
-                  <h6><span>&#8377;</span> {{ related_product.variants.first.price | money_without_trailing_zeros }}</h6>
-                </a>
+                <div
+                  class="listing_card {% unless related_product.available %}outOfStock{% endunless %}"
+                  data-product-id="{{ related_product.id }}"
+                >
+                  <!-- PRODUCT IMAGES -->
+                  <a href="{{ related_product.url | within: collection }}" class="mainImg">
+                    {%- assign first_media = related_product.media.first -%}
+                    {%- assign second_media = related_product.media[1] -%}
+
+                    <!-- Lifestyle Image -->
+                    <img
+                      src="{{ related_product.featured_image | img_url: '800x' }}"
+                      class="lifestyleImg"
+                      alt="{{ related_product.featured_image.alt | escape }}"
+                    >
+
+                    <div class="magicImg">
+                      {% if first_media %}
+                        <img
+                          src="{{ first_media.preview_image | img_url: '600x' }}"
+                          class="defaultImg"
+                          alt="{{ first_media.alt | escape }}"
+                        >
+                      {% endif %}
+
+                      {% if second_media %}
+                        <img
+                          src="{{ second_media.preview_image | img_url: '600x' }}"
+                          class="colorImg"
+                          alt="{{ second_media.alt | escape }}"
+                        >
+                      {% endif %}
+                    </div>
+                  </a>
+
+                  <!-- TAGS (New/Out of Stock) -->
+                  <div class="floatingItem_flex">
+                    {% unless related_product.available %}
+                      <div class="outOfStockTag">Out of stock</div>
+                    {% else %}
+                      {% if related_product.tags contains 'new' %}
+                        <div class="tagNew">New</div>
+                      {% endif %}
+                    {% endunless %}
+
+                    <!-- Wishlist Button -->
+                    <div class="wishList_wrap">
+                      <button
+                        class="likes actionBtn add-to-wishlist"
+                        data-id="{{ related_product.id }}"
+                        data-variant-id="{{ related_product.selected_or_first_available_variant.id }}"
+                        data-title="{{ related_product.title | escape }}"
+                        data-product-handle="{{ related_product.handle }}"
+
+                        data-image="{{ related_product.featured_image | img_url: '600x' }}"
+                        data-price="{{ related_product.selected_or_first_available_variant.price | money }}"
+                        data-handle="{{ related_product.handle }}"
+                      ></button>
+
+                      <div class="wishlist-dropdown">
+                        <div class="wishlist-inner">
+                          <div class="list"></div>
+                          <div class="list-create">
+                            <div class="create-btn">Create a New Project</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- DETAILS -->
+                  <a href="{{ related_product.url }}" class="product_details">
+                    <!-- COLOR + SIZE COUNT -->
+                    <div class="colorTitleFlex">
+                      {% assign _color_values = '' %}
+                      {% for variant in related_product.variants %}
+                        {% assign color_value = variant.option1 %}
+                        {% if color_value != blank %}
+                          {% unless _color_values contains color_value %}
+                            {% if _color_values == '' %}
+                              {% assign _color_values = color_value %}
+                            {% else %}
+                              {% assign _color_values = _color_values | append: '||' | append: color_value %}
+                            {% endif %}
+                          {% endunless %}
+                        {% endif %}
+                      {% endfor %}
+                      {% assign color_list = _color_values | split: '||' %}
+
+                      {% assign _size_values = '' %}
+                      {% for variant in related_product.variants %}
+                        {% assign size_value = variant.option2 %}
+                        {% if size_value != blank %}
+                          {% unless _size_values contains size_value %}
+                            {% if _size_values == '' %}
+                              {% assign _size_values = size_value %}
+                            {% else %}
+                              {% assign _size_values = _size_values | append: '||' | append: size_value %}
+                            {% endif %}
+                          {% endunless %}
+                        {% endif %}
+                      {% endfor %}
+                      {% assign size_list_header = _size_values | split: '||' %}
+
+                      <h6>
+                        {{ color_list.size }}
+                        {% if color_list.size == 1 %}
+                          colour
+                        {% else %}
+                          colours
+                        {% endif %}
+                      </h6>
+
+                      <h6>
+                        {{ size_list_header.size }}
+                        {% if size_list_header.size == 1 %}
+                          size
+                        {% else %}
+                          sizes
+                        {% endif %}
+                      </h6>
+                    </div>
+
+                    <!-- HIDDEN DETAILS (SWATCHES + SWEEP SIZE) -->
+                    <div class="hiddenDetails">
+                      <!-- COLOR SWATCHES -->
+                      <div class="colorFlex">
+                        {% for color in color_list %}
+                          <div
+                            class="colorImg{% if forloop.first %} active{% endif %}"
+                            data-color="{{ color | escape }}"
+                          >
+                            {%- assign swatch_found = false -%}
+                            {% for media in related_product.media %}
+                              {% assign media_alt = media.alt | default: '' | downcase %}
+                              {% assign color_key = color | default: '' | downcase %}
+                              {% if media_alt != '' and media_alt == color_key %}
+                                <img
+                                  src="{{ media.preview_image | img_url: '80x80' }}"
+                                  data-target-src="{{ media.preview_image | img_url: '600x' }}"
+                                  alt="{{ media.alt | escape }}"
+                                >
+                                {% assign swatch_found = true %}
+                                {% break %}
+                              {% endif %}
+                            {% endfor %}
+
+                            {% unless swatch_found %}
+                              {% if related_product.featured_media %}
+                                <img
+                                  src="{{ related_product.featured_media.preview_image | img_url: '80x80' }}"
+                                  data-target-src="{{ related_product.featured_media.preview_image | img_url: '600x' }}"
+                                  alt="{{ related_product.featured_media.alt | escape }}"
+                                >
+                              {% else %}
+                                <div class="swatchFallback">{{ color }}</div>
+                              {% endif %}
+                            {% endunless %}
+                          </div>
+                        {% endfor %}
+                      </div>
+
+                      <!-- SWEEP SIZE -->
+                      {%- assign opt2_name = related_product.options[1] | default: '' -%}
+                      {%- assign opt2_key = opt2_name | downcase -%}
+
+                      {% if opt2_key contains 'sweep' %}
+                        <div class="sizeFlex">
+                          <h6>Sweep size</h6>
+
+                          <ul class="size">
+                            {% assign size_values = '' %}
+                            {% for variant in related_product.variants %}
+                              {% assign size_value = variant.option2 %}
+                              {% if size_value != blank %}
+                                {% unless size_values contains size_value %}
+                                  {% if size_values == '' %}
+                                    {% assign size_values = size_value %}
+                                  {% else %}
+                                    {% assign size_values = size_values | append: '||' | append: size_value %}
+                                  {% endif %}
+                                {% endunless %}
+                              {% endif %}
+                            {% endfor %}
+                            {% assign size_list = size_values | split: '||' %}
+
+                            {% for s in size_list %}
+                              {% assign ds = s | split: '(' | last | remove: ')' | remove: '"' | remove: "'" | strip %}
+                              <li
+                                {% if forloop.first %}
+                                  class="active"
+                                {% endif %}
+                                data-raw-size="{{ s | escape }}"
+                              >
+                                {{ ds }}
+                              </li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                      {% endif %}
+                    </div>
+
+                    <!-- DEFAULT DETAILS -->
+                    <div class="defaultDetails">
+                      <h4>{{ related_product.title }}</h4>
+
+                      <h3>
+                        <span>&#8377;</span>
+                        <span class="priceValue">
+                          {{
+                            related_product.selected_or_first_available_variant.price
+                            | money_without_currency
+                            | split: '.'
+                            | first
+                          }}
+                        </span>
+                        Incl. Tax
+                      </h3>
+                    </div>
+                  </a>
+
+                  <script type="application/json" class="product-variants-json">
+                    {{ related_product.variants | json }}
+                  </script>
+                </div>
               </div>
             {% endif %}
           {% endfor %}
         {% endif %}
       </div>
-      <div class="swiper-pagination"></div>
+
+      <div class="swiper_navigation_wrap">
+        <div class="swiper-button-next"></div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-prev"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- whishlist Toast -->
+  <div class="tooltip-msg">
+    <div class="container">
+      <div class="tooltip-msg-inn">
+        <span class="tooltip-text">Product successfully added to 'Project - 2'</span>
+        <a href="javascript:" class="undoBtn">UNDO</a>
+        <span class="tooltip-close">
+          <img src="{{ 'img_icons_x.svg' | asset_url }}" alt="">
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup for New Project -->
+  <div class="popup-overlay">
+    <div class="popup-box">
+      <h4>Create a Wishlist</h4>
+
+      <div class="form-group">
+        <input type="text" id="new-wishlist-name" placeholder="Enter wishlist name">
+        <div class="wishlist-error-msg ">Please enter a wishlist name</div>
+      </div>
+      <div class="btn-wrap">
+        <button id="closePopup-wishlist" class="btns btnWhite">
+          <div class="bg"></div>
+          <div class="btnText">
+            <span>Cancel</span>
+            <span>Cancel</span>
+          </div>
+        </button>
+        <button id="add-wishlist" class="btns btnDark">
+          <div class="bg"></div>
+          <div class="btnText">
+            <span>Create</span>
+            <span>Create</span>
+          </div>
+        </button>
+      </div>
     </div>
   </div>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const dropdown = document.querySelector('.customDropdown');
+    const selected = dropdown.querySelector('.selected');
+    const options = dropdown.querySelectorAll('.options li');
+    const productWrapper = document.querySelector('.listing__card__wrapper');
+
+    // Function to sort current page products
+    function sortProducts(type) {
+      const cards = Array.from(productWrapper.querySelectorAll('.listing_card'));
+
+      cards.sort((a, b) => {
+        const priceA = parseFloat(a.querySelector('.priceValue').textContent.replace(/,/g, ''));
+        const priceB = parseFloat(b.querySelector('.priceValue').textContent.replace(/,/g, ''));
+
+        if (type === 'price-ascending') {
+          return priceA - priceB; // Low → High
+        } else if (type === 'price-descending') {
+          return priceB - priceA; // High → Low
+        }
+        return 0;
+      });
+
+      // Put sorted cards back
+      cards.forEach((card) => productWrapper.appendChild(card));
+    }
+
+    // Initialization: respect server-side active option if present.
+    // If an option already has the 'active' class (rendered server-side via collection.sort_by),
+    // use that option and apply sorting. Otherwise show a non-selectable placeholder 'Sort by'
+    // and do not auto-sort the current page.
+    const activeOption = Array.from(options).find((opt) => opt.classList.contains('active'));
+    if (activeOption) {
+      selected.textContent = activeOption.textContent.trim();
+      sortProducts(activeOption.dataset.value);
+    } else {
+      selected.textContent = 'Sort by';
+    }
+
+    // Toggle dropdown
+    selected.addEventListener('click', () => {
+      dropdown.classList.toggle('open');
+      selected.classList.toggle('open');
+    });
+
+    // Select option
+    options.forEach((option) => {
+      option.addEventListener('click', () => {
+        options.forEach((opt) => opt.classList.remove('active'));
+        option.classList.add('active');
+        selected.textContent = option.textContent;
+        dropdown.classList.remove('open');
+        selected.classList.remove('open');
+
+        // Sort based on selected option
+        sortProducts(option.dataset.value);
+      });
+    });
+
+    // Close dropdown if clicking outside
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('open');
+        selected.classList.remove('open');
+      }
+    });
+  });
+</script>
+<script>
+  // Make listing page wishlist icons variant-aware: update like button variantId
+  document.addEventListener('DOMContentLoaded', function () {
+    function getFolders() {
+      return JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+    }
+
+    function isSaved(productId, variantId) {
+      const folders = getFolders();
+      for (const f of folders) {
+        for (const p of f.products || []) {
+          if (String(p.id) === String(productId)) {
+            if (variantId) {
+              if (String(p.variantId) === String(variantId)) return true;
+            } else return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function updateCardIcon(btn) {
+      if (!btn) return;
+      const pid = btn.getAttribute('data-id') || btn.dataset.id || '';
+      const vid = btn.getAttribute('data-variant-id') || btn.dataset.variantId || null;
+      const active = isSaved(pid, vid);
+      btn.classList.toggle('active', !!active);
+    }
+
+    function updateAllCards() {
+      document.querySelectorAll('.likes.actionBtn').forEach((b) => updateCardIcon(b));
+    }
+
+    // Helper function to update variant and icon state for a card
+    function updateVariantAndIcon(card) {
+      const variantsJsonEl = card.querySelector('.product-variants-json');
+      let variants = [];
+      try {
+        variants = variantsJsonEl ? JSON.parse(variantsJsonEl.textContent || '[]') : [];
+      } catch (e) {
+        variants = [];
+      }
+
+      const likeBtn = card.querySelector('.likes.actionBtn');
+      if (!likeBtn) return;
+
+      try {
+        const activeColorEl = card.querySelector('.colorFlex .colorImg.active');
+        const color = activeColorEl
+          ? (activeColorEl.dataset.color || activeColorEl.textContent || '').toString().trim()
+          : '';
+        const activeSizeEl = card.querySelector('.size li.active');
+        const size = activeSizeEl
+          ? (activeSizeEl.dataset.rawSize || activeSizeEl.textContent || '').toString().trim()
+          : '';
+
+        let match = variants.find((v) => {
+          const vColor = (v.option1 || '').toString().trim().toLowerCase();
+          const vSize = (v.option2 || '').toString().trim().toLowerCase();
+          if (color && vColor !== color.toLowerCase()) return false;
+          if (size && vSize !== size.toLowerCase()) return false;
+          return true;
+        });
+        if (!match && color) {
+          match = variants.find((v) => (v.option1 || '').toString().trim().toLowerCase() === color.toLowerCase());
+        }
+        if (!match && variants.length) match = variants[0];
+
+        if (match) {
+          likeBtn.setAttribute('data-variant-id', match.id);
+        }
+        updateCardIcon(likeBtn);
+      } catch (err) {
+        /* ignore */
+      }
+    }
+
+    // Wire per-card variant selection -> update like button variantId
+    document.querySelectorAll('.listing_card').forEach((card) => {
+      const likeBtn = card.querySelector('.likes.actionBtn');
+
+      // Initial set
+      updateVariantAndIcon(card);
+
+      // When user changes color or size, update the like button's variant id
+      card.querySelectorAll('.colorFlex .colorImg').forEach((el) => {
+        el.addEventListener('click', function () {
+          // allow other handlers to toggle active class first
+          setTimeout(() => updateVariantAndIcon(card), 0);
+        });
+      });
+      card.querySelectorAll('.size li').forEach((el) => {
+        el.addEventListener('click', function () {
+          setTimeout(() => updateVariantAndIcon(card), 0);
+        });
+      });
+    });
+
+    // Update icons initially and when storage/custom events change
+    updateAllCards();
+    window.addEventListener('storage', function (e) {
+      if (e.key === 'wishlist_folders') updateAllCards();
+    });
+    window.addEventListener('wishlist:changed', function () {
+      updateAllCards();
+    });
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.innerWidth >= 767) {
+      const cards = document.querySelectorAll('.listing_card');
+      const outOfStock = document.querySelectorAll('.outOfStock');
+      cards.forEach((card) => {
+        const lifestyleImg = card.querySelector('.lifestyleImg');
+        const magicImgs = card.querySelectorAll('.magicImg img');
+        const colorOptions = card.querySelectorAll('.colorFlex .colorImg');
+        const defaultImg = card.querySelector('.magicImg .defaultImg');
+        const productDetails = card.querySelector('.product_details');
+        const hiddenDetails = card.querySelector('.hiddenDetails');
+        const colorTitleFlex = card.querySelector('.colorTitleFlex');
+        let selectedSrc =
+          defaultImg.dataset && defaultImg.dataset.src ? defaultImg.dataset.src : defaultImg.getAttribute('src'); // Default selected
+        const originalSrc = selectedSrc; // keep original for restore on mouseleave
+        // Helper: Hide all magic images
+        function hideAllMagicImages() {
+          magicImgs.forEach((img) => {
+            img.classList.remove('show');
+            img.classList.add('hide');
+          });
+        }
+        // Show selected image in magicImg
+        // showSelectedImage(optionalSrc) - if optionalSrc provided, show that src without modifying selectedSrc
+        function showSelectedImage(optionalSrc) {
+          const srcToShow = optionalSrc || selectedSrc;
+          hideAllMagicImages();
+          lifestyleImg.classList.remove('show');
+          lifestyleImg.classList.add('hide');
+          const targetImg = Array.from(magicImgs).find(
+            (img) => (img.dataset && img.dataset.src ? img.dataset.src : img.getAttribute('src')) === srcToShow
+          );
+          if (targetImg) {
+            targetImg.classList.remove('hide');
+            targetImg.classList.add('show');
+          } else if (srcToShow) {
+            // fallback: set the defaultImg src to the srcToShow and show it
+            try {
+              defaultImg.setAttribute('src', srcToShow);
+              if (defaultImg.dataset) defaultImg.dataset.src = srcToShow;
+              defaultImg.classList.remove('hide');
+              defaultImg.classList.add('show');
+            } catch (e) {
+              // ignore
+            }
+          }
+        }
+        // Initial state
+        showSelectedImage();
+        // Hover on card: show hover image (second magic image) if present, otherwise show lifestyle image
+        card.addEventListener('mouseenter', function () {
+          productDetails.classList.add('floating');
+          hiddenDetails.classList.add('expend');
+          colorTitleFlex.classList.add('hidden');
+          // try to find hover image inside magicImgs (prefer element with class 'colorImg')
+          const hoverImg = card.querySelector('.magicImg .colorImg');
+          if (hoverImg) {
+            hideAllMagicImages();
+            // hide lifestyle
+            lifestyleImg.classList.remove('show');
+            lifestyleImg.classList.add('hide');
+            // show hover
+            hoverImg.classList.remove('hide');
+            hoverImg.classList.add('show');
+          } else {
+            // fallback: show lifestyle image
+            lifestyleImg.classList.remove('hide');
+            lifestyleImg.classList.add('show');
+            hideAllMagicImages();
+          }
+        });
+        // On leave: restore the original default image (hover is temporary)
+        card.addEventListener('mouseleave', function () {
+          // Restore image
+          showSelectedImage(originalSrc);
+          // Set first color as active (default) when coming back from hover
+          const firstColor = colorOptions && colorOptions.length ? colorOptions[0] : null;
+          if (firstColor) {
+            // reset active classes
+            colorOptions.forEach((opt) => opt.classList.remove('active'));
+            firstColor.classList.add('active');
+            // update selectedSrc to first color's target (but we won't show it, image remains original)
+            const swatchImg = firstColor.querySelector('img');
+            let firstTarget = '';
+            if (swatchImg && swatchImg.dataset && swatchImg.dataset.targetSrc)
+              firstTarget = swatchImg.dataset.targetSrc;
+            else if (firstColor.dataset && firstColor.dataset.targetSrc) firstTarget = firstColor.dataset.targetSrc;
+            else if (swatchImg) firstTarget = swatchImg.getAttribute('src');
+            if (firstTarget) selectedSrc = firstTarget;
+            // update sizes for the first color
+            try {
+              const variantsJsonEl = card.querySelector('.product-variants-json');
+              if (variantsJsonEl) {
+                const variants = JSON.parse(variantsJsonEl.textContent || '[]');
+                const selectedColor = firstColor.dataset.color || (firstColor.textContent || '').trim();
+                const sizes = [];
+                variants.forEach((v) => {
+                  const vColor = (v.option1 || '').toString();
+                  const vSize = (v.option2 || '').toString();
+                  if (vColor.toLowerCase() === selectedColor.toLowerCase()) {
+                    if (vSize && sizes.indexOf(vSize) === -1) sizes.push(vSize);
+                  }
+                });
+                const sizeUl = card.querySelector('.size');
+                if (sizeUl) {
+                  sizeUl.innerHTML = '';
+                  if (sizes.length === 0) {
+                    const li = document.createElement('li');
+                    li.classList.add('active');
+                    li.textContent = '-';
+                    sizeUl.appendChild(li);
+                  } else {
+                    sizes.forEach((s, idx) => {
+                      const li = document.createElement('li');
+                      if (idx === 0) li.classList.add('active');
+                      // keep raw size for logic and show trimmed version to user
+                      li.dataset.rawSize = s;
+                      li.textContent = (function (raw) {
+                        try {
+                          // Extract text inside parentheses
+                          const m = raw.match(/\(([^)]+)\)/);
+                          if (m && m[1]) {
+                            // Remove both single and double quotes and trim
+                            return m[1].replace(/['"]/g, '').trim();
+                          }
+                          const parts = raw.split('-');
+                          return parts.length > 1
+                            ? parts[parts.length - 1].replace(/['"]/g, '').trim()
+                            : raw.replace(/['"]/g, '').trim();
+                        } catch (e) {
+                          return raw.replace(/['"]/g, '').trim();
+                        }
+                      })(s);
+                      sizeUl.appendChild(li);
+                    });
+                  }
+                  // After updating sizes, also update the displayed price to match the restored first color (and first size if present)
+                  try {
+                    const activeLi = sizeUl.querySelector('li.active');
+                    const selectedSizeRaw =
+                      activeLi && activeLi.dataset && activeLi.dataset.rawSize
+                        ? activeLi.dataset.rawSize
+                        : activeLi
+                        ? activeLi.textContent
+                        : null;
+                    updateCardPrice(card, variants, { color: selectedColor, size: selectedSizeRaw });
+
+                    // Update like button variant id to match restored first color (+size)
+                    try {
+                      const likeBtnForCard = card.querySelector('.likes.actionBtn');
+                      if (likeBtnForCard) {
+                        const lc = (selectedColor || '').toString().trim().toLowerCase();
+                        const ls = selectedSizeRaw ? selectedSizeRaw.toString().trim().toLowerCase() : '';
+                        let matched = null;
+                        for (let v of variants) {
+                          const vColor = (v.option1 || '').toString().trim().toLowerCase();
+                          const vSize = (v.option2 || '').toString().trim().toLowerCase();
+                          if (lc && ls) {
+                            if (vColor === lc && vSize === ls) { matched = v; break; }
+                          } else if (lc) {
+                            if (vColor === lc) { matched = v; break; }
+                          }
+                        }
+                        if (!matched && variants.length) matched = variants[0];
+                        if (matched && (matched.id || matched.id === 0)) likeBtnForCard.setAttribute('data-variant-id', matched.id);
+                      }
+                    } catch (e) {
+                      // ignore
+                    }
+                  } catch (err) {
+                    // ignore price update errors
+                  }
+                }
+              }
+            } catch (e) {
+              // ignore
+            }
+          }
+          productDetails.classList.remove('floating');
+          colorTitleFlex.classList.remove('hidden');
+          hiddenDetails.classList.remove('expend');
+
+          // Update icon state based on whether the first variant is in the wishlist
+          try {
+            const likeBtn = card.querySelector('.likes.actionBtn');
+            if (likeBtn) {
+              const currentVariantId = likeBtn.getAttribute('data-variant-id') || null;
+              const productId = card.dataset.productId;
+              const folderName = getProductFolder(productId, currentVariantId);
+              likeBtn.classList.toggle('active', !!folderName);
+            }
+          } catch (e) {
+            // ignore icon update errors
+          }
+        });
+        // Click on color options
+
+        colorOptions.forEach((option) => {
+          option.addEventListener('click', function (evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            colorOptions.forEach((opt) => opt.classList.remove('active'));
+            this.classList.add('active');
+
+            const swatchImg = this.querySelector('img');
+            let targetSrc =
+              swatchImg && swatchImg.dataset && swatchImg.dataset.targetSrc
+                ? swatchImg.dataset.targetSrc
+                : swatchImg.getAttribute('src');
+            if (targetSrc) {
+              selectedSrc = targetSrc;
+            }
+            showSelectedImage();
+
+            // Update size list based on selected color
+            try {
+              const variantsJsonEl = card.querySelector('.product-variants-json');
+                if (variantsJsonEl) {
+                const variants = JSON.parse(variantsJsonEl.textContent || '[]');
+                const selectedColor = option.dataset.color || (option.textContent || '').trim();
+                const sizes = [];
+                variants.forEach((v) => {
+                  const vColor = (v.option1 || '').toString();
+                  const vSize = (v.option2 || '').toString();
+                  if (vColor.toLowerCase() === selectedColor.toLowerCase() && vSize && sizes.indexOf(vSize) === -1) {
+                    sizes.push(vSize);
+                  }
+                });
+
+                const sizeUl = card.querySelector('.size');
+                if (sizeUl) {
+                  sizeUl.innerHTML = '';
+                  if (sizes.length === 0) {
+                    const li = document.createElement('li');
+                    li.classList.add('active');
+                    li.textContent = '-';
+                    sizeUl.appendChild(li);
+                  } else {
+                    sizes.forEach((s, idx) => {
+                      const li = document.createElement('li');
+                      if (idx === 0) li.classList.add('active');
+                      li.dataset.rawSize = s;
+
+                      // Apply the same formatting logic as Liquid
+                      let displayText = s;
+                      const match = s.match(/\(([^)]+)\)/);
+                      if (match && match[1]) {
+                        displayText = match[1].replace(/['"]/g, '').trim();
+                      } else {
+                        displayText = s.replace(/['"]/g, '').trim();
+                      }
+
+                      li.textContent = displayText;
+                      sizeUl.appendChild(li);
+                    });
+                  }
+                }
+                // Update price when color is selected
+                updateCardPrice(card, variants, { color: selectedColor });
+
+                // Update like button variant id to best matching variant for selected color (+ current size if present)
+                try {
+                  const likeBtnForCard = card.querySelector('.likes.actionBtn');
+                  if (likeBtnForCard) {
+                    let selSize = null;
+                    const sizeUl = card.querySelector('.size');
+                    if (sizeUl) {
+                      const activeLi = sizeUl.querySelector('li.active') || sizeUl.querySelector('li');
+                      if (activeLi) selSize = activeLi.dataset && activeLi.dataset.rawSize ? activeLi.dataset.rawSize : activeLi.textContent;
+                    }
+
+                    const lc = (selectedColor || '').toString().trim().toLowerCase();
+                    const ls = selSize ? selSize.toString().trim().toLowerCase() : '';
+                    let matched = null;
+                    for (let v of variants) {
+                      const vColor = (v.option1 || '').toString().trim().toLowerCase();
+                      const vSize = (v.option2 || '').toString().trim().toLowerCase();
+                      if (lc && ls) {
+                        if (vColor === lc && vSize === ls) { matched = v; break; }
+                      } else if (lc) {
+                        if (vColor === lc) { matched = v; break; }
+                      }
+                    }
+                    if (!matched && variants.length) matched = variants[0];
+                    if (matched && (matched.id || matched.id === 0)) likeBtnForCard.setAttribute('data-variant-id', matched.id);
+                  }
+                } catch (e) {
+                  // ignore
+                }
+              }
+            } catch (e) {
+              // ignore JSON parse errors
+            }
+          });
+        });
+
+        // Listen for size (sweep) clicks to update price
+        const sizeContainer = card.querySelector('.size');
+        if (sizeContainer) {
+          sizeContainer.addEventListener('click', function (ev) {
+            const targetLi = ev.target.closest('li');
+            if (!targetLi) return;
+            // set active
+            Array.from(sizeContainer.querySelectorAll('li')).forEach((li) => li.classList.remove('active'));
+            targetLi.classList.add('active');
+            try {
+              const variantsJsonEl = card.querySelector('.product-variants-json');
+                if (variantsJsonEl) {
+                const variants = JSON.parse(variantsJsonEl.textContent || '[]');
+                const activeColorEl = card.querySelector('.colorFlex .colorImg.active');
+                const selectedColor = activeColorEl
+                  ? activeColorEl.dataset.color || activeColorEl.textContent.trim()
+                  : null;
+                // prefer rawSize data when present (used for matching variants), fallback to visible text
+                const selectedSize =
+                  targetLi.dataset && targetLi.dataset.rawSize
+                    ? targetLi.dataset.rawSize.trim()
+                    : targetLi.textContent.trim();
+                updateCardPrice(card, variants, { color: selectedColor, size: selectedSize });
+
+                // Update like button variant id to matching variant for selected color+size
+                try {
+                  const likeBtnForCard = card.querySelector('.likes.actionBtn');
+                  if (likeBtnForCard) {
+                    const lc = (selectedColor || '').toString().trim().toLowerCase();
+                    const ls = (selectedSize || '').toString().trim().toLowerCase();
+                    let matched = null;
+                    for (let v of variants) {
+                      const vColor = (v.option1 || '').toString().trim().toLowerCase();
+                      const vSize = (v.option2 || '').toString().trim().toLowerCase();
+                      if (lc && ls) {
+                        if (vColor === lc && vSize === ls) { matched = v; break; }
+                      } else if (lc) {
+                        if (vColor === lc) { matched = v; break; }
+                      }
+                    }
+                    if (!matched && variants.length) matched = variants[0];
+                    if (matched && (matched.id || matched.id === 0)) likeBtnForCard.setAttribute('data-variant-id', matched.id);
+                  }
+                } catch (e) {
+                  /* ignore */
+                }
+              }
+            } catch (e) {
+              /* ignore */
+            }
+          });
+        }
+        {% comment %} outOfStock.forEach((outOfStockCard) => {
+          outOfStockCard.addEventListener('mouseenter', function () {
+            showSelectedImage();
+            productDetails.classList.remove('floating');
+            colorTitleFlex.classList.remove('hidden');
+            hiddenDetails.classList.remove('expend');
+          });
+        }); {% endcomment %}
+      });
+    }
+  });
+</script>
+
+<script>
+  // Helper: update displayed price on a product card based on selected color/size
+  function updateCardPrice(card, variants, opts) {
+    try {
+      opts = opts || {};
+      const color = (opts.color || '').toString().trim().toLowerCase();
+      const size = (opts.size || '').toString().trim().toLowerCase();
+      // Filter matching variants by provided attributes. If an attribute is empty, it's ignored.
+      let matches = variants.filter((v) => {
+        const vColor = (v.option1 || '').toString().trim().toLowerCase();
+        const vSize = (v.option2 || '').toString().trim().toLowerCase();
+        if (color && vColor !== color) return false;
+        if (size && vSize !== size) return false;
+        return true;
+      });
+      // If no matches found and color provided, fall back to color-only matches, then to any available variant
+      if (matches.length === 0 && color) {
+        matches = variants.filter((v) => (v.option1 || '').toString().trim().toLowerCase() === color);
+      }
+      if (matches.length === 0) matches = variants.slice();
+
+      // Pick lowest price among matches
+      let lowest = null;
+      matches.forEach((v) => {
+        // Variant price may be provided in different shapes (string/number, cents or units).
+        let priceRaw = v.price || v.compare_at_price || v.presentment_price || 0;
+        let price = Number(priceRaw);
+        if (isNaN(price)) {
+          // try parsing string with decimal
+          price = parseFloat((priceRaw || '').toString().replace(/[^0-9.\-]/g, '')) || 0;
+        }
+        // Heuristic: if price looks like cents (divisible by 100 and > 1000), convert to units
+        if (price >= 1000 && Math.round(price) % 100 === 0) {
+          price = price / 100;
+        }
+        if (lowest === null || price < lowest) lowest = price;
+      });
+      if (lowest === null) return; // nothing to show
+
+      // price value element
+      const priceEl = card.querySelector('.priceValue');
+      if (!priceEl) return;
+
+      // Format INR without currency symbol and without decimals (match existing markup)
+      const formatted = Math.round(lowest).toLocaleString('en-IN');
+      priceEl.textContent = formatted;
+    } catch (e) {
+      // ignore failures
+    }
+  }
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    let tooltipTimeout;
+
+    //Check login status
+    function isLoggedIn() {
+      try {
+        const ts = localStorage.getItem('sml_login_time');
+        if (!ts) return false;
+        return Date.now() - Number(ts) < 24 * 60 * 60 * 1000; // 24h validity
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // Toggle wishlist dropdowns
+    function toggleWishlistDropdowns() {
+      document.querySelectorAll('.wishlist-dropdown').forEach(function (dropdown) {
+        dropdown.style.display = isLoggedIn() ? '' : 'none';
+      });
+    }
+    toggleWishlistDropdowns();
+
+    // Save product to localStorage
+    function addProductToFolder(name, product) {
+      let folders = JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+      let folder = folders.find((f) => f.name === name);
+      if (!folder) {
+        folder = { id: Date.now(), name: name, products: [] };
+        folders.push(folder);
+      }
+      folder.products.push(product);
+      localStorage.setItem('wishlist_folders', JSON.stringify(folders));
+      localStorage.removeItem('wishlist_pending_product');
+    }
+
+    // Remove product from folder (optionally remove only specific variant)
+    function removeProductFromFolder(productId, folderName, variantId) {
+      let folders = JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+      let folder = folders.find((f) => f.name === folderName);
+      if (folder) {
+        folder.products = folder.products.filter((p) => {
+          if (!p) return true;
+          const pid = p.id != null ? String(p.id) : '';
+          const vid = p.variantId != null ? String(p.variantId) : '';
+          if (variantId) {
+            // remove only the matching variant for the product
+            return !(pid === String(productId) && vid === String(variantId));
+          }
+          // remove all entries with this product id
+          return pid !== String(productId);
+        });
+        localStorage.setItem('wishlist_folders', JSON.stringify(folders));
+      }
+    }
+
+    // Get folder containing product (optionally match variantId)
+    function getProductFolder(productId, variantId) {
+      let folders = JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+      for (let folder of folders) {
+        if (
+          folder.products.some((p) => {
+            if (!p) return false;
+            // Normalize ids to string for safe comparison
+            const pid = p.id != null ? String(p.id) : '';
+            const vid = p.variantId != null ? String(p.variantId) : '';
+            if (variantId) {
+              return pid === String(productId) && vid === String(variantId);
+            }
+            // fallback: match by product id only
+            return pid === String(productId);
+          })
+        ) {
+          return folder.name;
+        }
+      }
+      return null;
+    }
+
+    // Toast message
+    function showToast(msg, undoCallback = null) {
+      const tooltip = document.querySelector('.tooltip-msg');
+      if (!tooltip) return;
+
+      tooltip.querySelector('.tooltip-text').textContent = msg;
+
+      const undoBtn = tooltip.querySelector('.undoBtn');
+      if (undoCallback) {
+        undoBtn.style.display = 'inline-block';
+        undoBtn.onclick = function () {
+          undoCallback();
+          tooltip.classList.remove('show');
+          tooltip.style.display = 'none';
+        };
+      } else {
+        undoBtn.style.display = 'none';
+      }
+
+      tooltip.style.display = 'block';
+      tooltip.classList.add('show');
+
+      clearTimeout(tooltipTimeout);
+      tooltipTimeout = setTimeout(() => {
+        tooltip.classList.remove('show');
+        tooltip.style.display = 'none';
+      }, 2500);
+    }
+
+    // Render folders inside dropdown
+    function renderProjects(dropdown) {
+      let folders = JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+
+      // ensure we can find the static inner container (where .list and .list-create live)
+      const inner = dropdown.querySelector('.wishlist-inner') || dropdown;
+      let list = inner.querySelector('.list');
+
+      // If no folders: remove the .list element so only the static create area remains
+      if (!folders || folders.length === 0) {
+        if (list) list.remove();
+        return;
+      }
+
+      // If folders exist but .list was removed previously, recreate it before the create block
+      if (!list) {
+        list = document.createElement('div');
+        list.className = 'list';
+        const createBlock = inner.querySelector('.list-create');
+        if (createBlock) inner.insertBefore(list, createBlock);
+        else inner.appendChild(list);
+      }
+
+      // populate list
+      list.innerHTML = '';
+      folders.forEach((folder) => {
+        const option = document.createElement('div');
+        option.className = 'option';
+        option.textContent = folder.name;
+        option.style.cursor = 'pointer';
+        list.appendChild(option);
+      });
+    }
+
+    // Update icon state for a single card based on wishlist status
+    function updateIconState(card) {
+      const productId = card.dataset.productId;
+      const likeBtn = card.querySelector('.likes.actionBtn');
+      if (!likeBtn) return;
+      const variantId = likeBtn.getAttribute('data-variant-id') || null;
+      const folderName = getProductFolder(productId, variantId);
+
+      likeBtn.classList.toggle('active', !!folderName);
+    }
+
+    // Update icon state across all cards that match productId (and variantId when provided)
+    function updateAllIconStates(productId, variantId) {
+      if (!productId) return;
+      const cards = document.querySelectorAll(`.listing_card[data-product-id="${productId}"]`);
+      cards.forEach((c) => {
+        const like = c.querySelector('.likes.actionBtn');
+        if (!like) return;
+        const vid = like.getAttribute('data-variant-id') || null;
+        const folderName = getProductFolder(productId, vid);
+        like.classList.toggle('active', !!folderName);
+      });
+    }
+
+    // Handle wishlist button click
+    document.querySelectorAll('.listing_card').forEach((card) => {
+      const likeBtn = card.querySelector('.likes.actionBtn');
+      if (!likeBtn) return;
+
+      // Update initial icon state
+      updateIconState(card);
+
+      likeBtn.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        const productId = card.dataset.productId;
+        const variantId = likeBtn.getAttribute('data-variant-id') || null;
+        const folderName = getProductFolder(productId, variantId);
+
+        // If product variant is already in wishlist (icon is dark), remove it
+        if (folderName) {
+          removeProductFromFolder(productId, folderName, variantId);
+          likeBtn.classList.remove('active');
+
+          showToast(`Product successfully removed from '${folderName}' in your Wishlist`, function undoAction() {
+            // Re-add product on UNDO (include variantId)
+            let pending = {
+              id: productId,
+              handle: card.dataset.productHandle,
+              title: card.dataset.productTitle,
+              image: card.querySelector('.mainImg img')?.src || '',
+              price: card.querySelector('.priceValue')?.textContent.trim() || '',
+              variantId: variantId,
+              options: {},
+            };
+            addProductToFolder(folderName, pending);
+            updateAllIconStates(pending.id, pending.variantId);
+          });
+
+          return;
+        }
+
+        // Otherwise, add to wishlist
+        const pending = {
+          id: card.dataset.productId || null,
+          handle: likeBtn.getAttribute('data-handle') || card.dataset.productHandle || null,
+
+          title:
+            card.dataset.productTitle ||
+            (card.querySelector('.defaultDetails h4')
+              ? card.querySelector('.defaultDetails h4').textContent.trim()
+              : 'Product'),
+          image: card.querySelector('.mainImg img') ? card.querySelector('.mainImg img').src : '',
+          price: card.querySelector('.priceValue') ? card.querySelector('.priceValue').textContent.trim() : '',
+          outOfStock: card.classList.contains('outOfStock'),
+          variantId: likeBtn.getAttribute('data-variant-id') || null,
+          options: {
+            color: likeBtn.getAttribute('data-option-color') || '',
+            sweep: likeBtn.getAttribute('data-option-sweep') || '',
+            watt: likeBtn.getAttribute('data-option-watt') || '',
+            material: likeBtn.getAttribute('data-option-material') || '',
+            light: likeBtn.getAttribute('data-option-light') || '',
+            mount: likeBtn.getAttribute('data-option-mount') || '',
+            addon: likeBtn.getAttribute('data-option-addon') || '',
+          },
+        };
+
+        // Prefer the currently visible variant image (magicImg .show) for the wishlist item
+        // ✅ Always use FIRST image of the SELECTED VARIANT (never hover image)
+        try {
+          const variantsJsonEl = card.querySelector('.product-variants-json');
+          const variants = variantsJsonEl ? JSON.parse(variantsJsonEl.textContent || '[]') : [];
+
+          const selectedVariantId = likeBtn.getAttribute('data-variant-id');
+          const matchedVariant = variants.find((v) => String(v.id) === String(selectedVariantId));
+
+          if (matchedVariant && matchedVariant.featured_image && matchedVariant.featured_image.src) {
+            pending.image = matchedVariant.featured_image.src;
+          } else {
+            // Fallback → product featured image
+            const featuredImg = card.querySelector('.lifestyleImg');
+            if (featuredImg) pending.image = featuredImg.src;
+          }
+        } catch (e) {
+          // fallback safety
+          const featuredImg = card.querySelector('.lifestyleImg');
+          if (featuredImg) pending.image = featuredImg.src;
+        }
+
+        localStorage.setItem('wishlist_pending_product', JSON.stringify(pending));
+
+        if (!isLoggedIn()) {
+          window.location.href = '/pages/wishlist';
+          return;
+        }
+
+        // Show dropdown
+        const dropdown = card.querySelector('.wishlist-dropdown');
+        if (dropdown) {
+          renderProjects(dropdown);
+          dropdown.classList.toggle('show');
+          document.querySelectorAll('.wishlist-dropdown').forEach((dd) => {
+            if (dd !== dropdown) dd.classList.remove('show');
+          });
+        }
+      });
+    });
+
+    // Select existing project
+    document.addEventListener('click', function (e) {
+      if (e.target.classList.contains('option')) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const projectName = e.target.textContent.trim();
+        const pending = JSON.parse(localStorage.getItem('wishlist_pending_product') || 'null');
+        if (!pending) return;
+
+        addProductToFolder(projectName, pending);
+
+        // Update icon state across matching cards
+        updateAllIconStates(pending.id, pending.variantId);
+
+        showToast(`Product successfully added to '${projectName}'`, function undoAction() {
+          removeProductFromFolder(pending.id, projectName, pending.variantId);
+          updateAllIconStates(pending.id, pending.variantId);
+        });
+        const dropdown = e.target.closest('.wishlist-dropdown');
+        if (dropdown) dropdown.classList.remove('show');
+      }
+
+      // Open create project popup
+      if (e.target.classList.contains('create-btn')) {
+        e.stopPropagation();
+        document.querySelector('.popup-overlay')?.classList.add('showPopup');
+        document.body.classList.add('overflow-hidden');
+        const input = document.getElementById('new-wishlist-name');
+        if (input) {
+          input.value = '';
+          input.classList.remove('error');
+        }
+        document.querySelector('.wishlist-error-msg')?.classList.add('hidden');
+
+        // disable create button initially
+        document.getElementById('add-wishlist')?.setAttribute('disabled', 'true');
+      }
+    });
+
+    // Outside click closes dropdowns
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.wishlist-dropdown') && !e.target.classList.contains('actionBtn')) {
+        document.querySelectorAll('.wishlist-dropdown').forEach((dd) => dd.classList.remove('show'));
+      }
+    });
+
+    // Close popup
+    document.getElementById('closePopup-wishlist')?.addEventListener('click', function () {
+      document.querySelector('.popup-overlay')?.classList.remove('showPopup');
+      document.body.classList.remove('overflow-hidden');
+    });
+
+    // Create new project
+    document.getElementById('add-wishlist')?.addEventListener('click', function () {
+      const input = document.getElementById('new-wishlist-name');
+      if (!input || !input.value.trim()) {
+        input?.classList.add('error');
+        document.querySelector('.wishlist-error-msg')?.classList.remove('hidden');
+        return;
+      }
+
+      const newName = input.value.trim();
+      let pendingProduct = JSON.parse(localStorage.getItem('wishlist_pending_product') || 'null');
+
+      let folders = JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+      let exists = folders.find((f) => f.name.toLowerCase() === newName.toLowerCase());
+
+      if (exists) {
+        input.classList.add('error');
+        const errorMsg = document.querySelector('.wishlist-error-msg');
+        if (errorMsg) {
+          errorMsg.textContent = 'Project name already exists!';
+          errorMsg.classList.remove('hidden');
+        }
+        return;
+      }
+
+      const newFolder = { id: Date.now(), name: newName, products: pendingProduct ? [pendingProduct] : [] };
+      folders.push(newFolder);
+      localStorage.setItem('wishlist_folders', JSON.stringify(folders));
+      localStorage.removeItem('wishlist_pending_product');
+
+      // Update icon state for matching cards
+      if (pendingProduct) {
+        updateAllIconStates(pendingProduct.id, pendingProduct.variantId);
+      }
+
+      // Close popup
+      input.value = '';
+      document.querySelector('.popup-overlay')?.classList.remove('showPopup');
+      document.body.classList.remove('overflow-hidden');
+
+      showToast(`Product successfully added to '${newName}'`);
+    });
+
+    // Validate input while typing
+    document.getElementById('new-wishlist-name')?.addEventListener('input', function () {
+      const createBtn = document.getElementById('add-wishlist');
+      const errorMsg = document.querySelector('.wishlist-error-msg');
+      let folders = JSON.parse(localStorage.getItem('wishlist_folders') || '[]');
+      let exists = folders.some((f) => f.name.toLowerCase() === this.value.trim().toLowerCase());
+
+      if (this.value.trim() === '') {
+        this.classList.add('error');
+        errorMsg.textContent = 'Please enter a project name.';
+        errorMsg.classList.remove('hidden');
+        createBtn?.setAttribute('disabled', 'true');
+      } else if (exists) {
+        this.classList.add('error');
+        errorMsg.textContent = 'Project name already exists!';
+        errorMsg.classList.remove('hidden');
+        createBtn?.setAttribute('disabled', 'true');
+      } else {
+        this.classList.remove('error');
+        errorMsg.classList.add('hidden');
+        createBtn?.removeAttribute('disabled');
+      }
+    });
+  });
+</script>

@@ -10,7 +10,13 @@
 
  {% render 'favicon' %}
 
-
+{% if request.path == '/collections' %}
+  <script>
+    window.location.replace('/collections/all');
+  </script>
+{% endif %}
+{% comment %} zoho pagesense {% endcomment %}
+  <script src="https://cdn-in.pagesense.io/js/fanzartllp897/e727fd5c53184431a5e4d84b51433cfd.js"></script>
   <link rel="stylesheet" href="{{ 'css-bootstrap.min.css' | asset_url }}" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     
@@ -33,7 +39,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     {% endif %} 
 
-    {% if template == 'collection.product-listing' or template == 'search' %}
+    {% if template == 'collection.product-listing' or template == 'search' or template == 'collection' %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css" />
     {% endif %}
     
@@ -43,7 +49,24 @@
 
 
   {{ content_for_header }}
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CGNS1LDWET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-CGNS1LDWET');
   
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NTMHM8C');</script>
+<!-- End Google Tag Manager -->
 </head>
 
 <body class="{% if customer %}customer-logged-in{% else %}customer-guest{% endif %}">
@@ -57,7 +80,10 @@
   {% sections 'footer-group' %}
 
  
-
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NTMHM8C"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"
     integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
@@ -100,6 +126,8 @@
      {% render 'collections-scripts' %}
   {% elsif template == 'collection.product-listing' %}
     {% render 'product-listing-scripts' %}
+  {% elsif template == 'collection' %}
+    {% render 'product-listing-scripts' %}
   {% elsif template == 'search' %}
     {% render 'search-scripts' %}
   {% elsif template == 'product' %}
@@ -110,5 +138,24 @@
 
 
   {{ content_for_footer }}
+
+{% comment %} LUCEP Script {% endcomment %}
+<script type="text/javascript"> 
+window.$gorilla || ( (window._gorilla={
+        no_ui: false,
+        mobile: false,
+        cdn: "https://8d69a4badb4c0e3cd487-efd95a2de0a33cb5b6fcd4ec94d1740c.ssl.cf2.rackcdn.com/",
+        domain: "fanzart",
+        id: 1,
+        lang: "eng"
+}) && ( function ( l, u, c, e, p ){ 
+        var g = document.createElement(e); 
+        g.src = l; 
+        g.onload=u; 
+        document.getElementsByTagName(c)[p].appendChild(g);
+})("https://8d69a4badb4c0e3cd487-efd95a2de0a33cb5b6fcd4ec94d1740c.ssl.cf2.rackcdn.com/js/L.SalesGorilla.stable.latest.min.js", null, "head", "script", 0) ) 
+</script>
+<noscript><a href="https://lucep.com/client-enquiry/fanzart">Click to get a call from our team!</a> <a href="https://lucep.com">Click to call</a> by Lucep</noscript>
 </body>
+
 </html>

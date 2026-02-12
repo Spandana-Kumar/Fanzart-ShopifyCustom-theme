@@ -21,6 +21,8 @@ templates/cart.json
 templates/404.json
 sections/header-group.json
 sections/footer-group.json
+config/settings_data.json
+
 #
 # Ignore templates with a wildcard pattern:
 #   templates/*.json

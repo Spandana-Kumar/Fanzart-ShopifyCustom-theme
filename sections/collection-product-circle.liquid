@@ -19,32 +19,92 @@
           d="M396,200 C396,308.24781 308.24781,396 200,396 91.75219,396 4,308.24781 4,200 4,91.75219 91.75219,4 200,4 308.24781,4 396,91.75219 396,200 z" />
       </svg>
 
-      <div class="box_four">
+      <div class="box_four d-none d-md-block">
         {% for block in section.blocks %}
-          {% assign collection = block.settings.collection %}
+          {% assign parent_collection = block.settings.collection %}
           {% assign image = block.settings.image %}
           {% assign card_title = block.settings.title %}
-          {% if collection %}
+
+          {% if parent_collection %}
+            {%- assign parent_title = parent_collection.title | strip | downcase -%}
+
+            {%- capture sub_collection_items -%}
+              {% for sub_collection in collections %}
+                {% if sub_collection.metafields.custom.parent_collection.value != blank %}
+                  {% assign sub_parent = sub_collection.metafields.custom.parent_collection.value | strip | downcase %}
+                  {% if sub_parent == parent_title %}
+                    <li>
+                      
+                        {{ sub_collection.title }}
+                      
+                    </li>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            {%- endcapture -%}
+
             <div class="box">
-              <a href="{{ collection.url }}" class="fansCards">
+              <a href="{{ parent_collection.url }}" class="fansCards">
                 <div class="img">
                   {% if image %}
-                    <img src="{{ image | image_url: width: 300 }}" alt="{{ card_title | escape }}">
+                    <img
+                      src="{{ image | image_url: width: 300 }}"
+                      alt="{{ card_title | escape }}"
+                    >
                   {% endif %}
                 </div>
-                <h4>{{ collection.title }}</h4>
+
+                <h4>{{ parent_collection.title }}</h4>
+
+                {% if sub_collection_items contains '<li>' %}
+                  <div class="card_overlay">
+                    <ul class="categroy_list">
+                      {{ sub_collection_items }}
+                    </ul>
+                  </div>
+                {% endif %}
               </a>
             </div>
           {% endif %}
         {% endfor %}
       </div>
+      <div class="d-block d-md-none">
+        <div class="swiper mySwiper swiperCeilingMobile">
+          <div class="swiper-wrapper">
+            {% for block in section.blocks %}
+              {% assign parent_collection = block.settings.collection %}
+              {% assign image = block.settings.image %}
+              {% assign card_title = block.settings.title %}
+
+              {% if parent_collection %}
+                {%- assign parent_title = parent_collection.title | strip | downcase -%}
+
+                <div class="swiper-slide">
+                  <div class="box">
+                    <a href="{{ parent_collection.url }}" class="fansCards">
+                      <div class="img">
+                        {% if image %}
+                          <img
+                            src="{{ image | image_url: width: 300 }}"
+                            alt="{{ card_title | escape }}"
+                          >
+                        {% endif %}
+                      </div>
+
+                      <h4>{{ parent_collection.title }}</h4>
+
+                    
+                    </a>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
-
-
-
-
 
 {% schema %}
 {
@@ -77,7 +137,7 @@
           "type": "image_picker",
           "id": "image",
           "label": "Custom Image"
-        },
+        }
       ]
     }
   ],

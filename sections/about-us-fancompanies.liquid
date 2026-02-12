@@ -1,6 +1,6 @@
 <section class="fan__company__wrapper">
   <!-- Large Screen Above 768 -->
-  <div class="img_wrap d-none d-md-block">
+  <div class="img_wrap d-none d-xl-block">
     {% for block in section.blocks %}
       <div class="img">
         {% if block.settings.desktop_image %}
@@ -25,7 +25,7 @@
         </p>
 
         <!-- Desktop Listing -->
-        <ul class="listing d-none d-md-block">
+        <ul class="listing d-none d-xl-block">
           {% for block in section.blocks %}
             {% assign index_multiplier = forloop.index0 | times: 200 %}
             {% assign aos_delay = 1700 | plus: index_multiplier %}
@@ -37,7 +37,7 @@
 
 
         <!-- Mobile Listing -->
-        <div class="mobile_wrap d-md-none d-block">
+        <div class="mobile_wrap d-xl-none d-block">
           <ul class="img_list_mobile">
             {% for block in section.blocks %}
               <li>

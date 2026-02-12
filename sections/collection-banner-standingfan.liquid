@@ -1,0 +1,56 @@
+<section class="specialty__banner__wrapper other_banner">
+ 
+
+  <div class="container">
+    <div class="wrapper">
+         {% if section.settings.banner_image %}
+    <img 
+      src="{{ section.settings.banner_image | image_url: width: 2000 }}" 
+      class="img" 
+      alt="{{ collection.title | escape }}" 
+      loading="lazy"
+    />
+  {% endif %}
+
+        <div class="contents">
+          <div class="tag">
+            {{ collection.metafields.custom.tag | default: collection.title }}
+          </div>
+
+          <h1 class="title32 txtDark">
+            {{ collection.metafields.custom.heading | default: collection.title }}
+          </h1>
+
+          <p class="font_18 txtDarkLight">
+            {{ collection.description }}
+          </p>
+
+          {% if collection.metafields.custom.subtext != blank %}
+            <p class="font_18 txtDarkLight">
+              {{ collection.metafields.custom.subtext }}
+            </p>
+          {% endif %}
+        </div>
+    </div>
+  </div>
+</section>
+
+
+{% schema %}
+{
+  "name": "Collection Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner Image",
+      "info": "Recommended size: 1920x800px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Banner Standing Fan"
+    }
+  ]
+}
+{% endschema %}
